@@ -212,6 +212,23 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 700px) { .tabbar { left: 50%; right: auto; width: 520px; transform: translateX(-50%); border: 2px solid var(--ink); border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .tab { animation: none; } }
 
+/* calendar day detail */
+.day-detail { padding: 16px; border-radius: var(--wob1); display: flex; flex-direction: column; gap: 10px; scroll-margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+.dd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.dd-head h3 { margin: 0; font-weight: 400; font-size: 20px; }
+.dd-head .total { font-family: var(--f-num); font-size: 28px; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); padding: 0 4px; }
+.dd-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 14px; color: var(--pencil); }
+.dd-items { list-style: none; margin: 0; padding: 0; }
+.dd-items li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 2px; border-bottom: 2px dashed var(--grid); }
+.dd-items li span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.dd-items li span:last-child { font-family: var(--f-num); font-size: 19px; white-space: nowrap; }
+.dd-note { margin: 0; font-size: 14px; color: var(--pencil); overflow-wrap: anywhere; }
+.dd-empty { margin: 0; color: var(--pencil); font-size: 15px; }
+.dd-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.dd-nav { display: flex; gap: 6px; }
+.dd-nav button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.dd-nav button:disabled { opacity: .3; cursor: default; }
+
 /* wishlist */
 .wish-sum { padding: 16px; border-radius: var(--wob2); display: flex; flex-direction: column; gap: 6px; }
 .wish-sum .big-total { font-family: var(--f-num); font-size: 40px; line-height: 1; }
@@ -434,6 +451,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <span><span style="color:var(--burn)">×</span> burnout　<span style="color:var(--body)">×</span> 身体不行</span>
       </div>
     </div>
+    <div class="day-detail sketch" id="calDetail" aria-live="polite"></div>
   </section>
   </main>
 
@@ -570,6 +588,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   let current = nightOf();
   let calMonth = current.slice(0, 7);
+  let calSel = current;   // 日历里点开查看的那一天
 
   function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2400); }
 
@@ -756,7 +775,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     for (let d = 1; d <= days; d++) {
       const date = `${calMonth}-${pad(d)}`, n = nights[date], v = n ? sum(n) : 0;
       const b = document.createElement("button"); b.type = "button"; b.dataset.date = date;
-      b.className = "day" + (n ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === current ? " sel" : "");
+      b.className = "day" + (n ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
       if (date > today) b.disabled = true;
       if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${Math.round(20 + 80 * v / (maxN || 1))}%, var(--card))`;
       const dn = document.createElement("span"); dn.className = "d"; dn.textContent = d; b.append(dn);
@@ -772,6 +791,51 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (n) label += `，花了 ${money(v)}` + (n.burnout ? `，burnout ${n.burnout} 次` : "") + (n.body ? `，身体不行 ${n.body} 次` : "");
       b.setAttribute("aria-label", label); b.title = label;
       g.append(b);
+    }
+    renderDayDetail();
+  }
+
+  // 日历下方的当晚详情：买了什么、花了多少、状态
+  function renderDayDetail() {
+    const box = $("calDetail"); box.textContent = "";
+    const date = calSel, n = nights[date], d = parse(date), today = nightOf();
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+    const head = el("div", "dd-head");
+    head.append(el("h3", null, `${d.getMonth() + 1}月${d.getDate()}日 星期${WEEK[d.getDay()]}`));
+    if (n) head.append(el("span", "total", money(sum(n))));
+    box.append(head);
+    if (n) {
+      const meta = el("div", "dd-meta");
+      if (n.end) meta.append(el("span", null, `${n.end} 下班`));
+      if (n.burnout) meta.append(el("span", "pill b", "burnout ×" + n.burnout));
+      if (n.body) meta.append(el("span", "pill p", "身体 ×" + n.body));
+      if (n.sample) meta.append(el("span", "sample-tag", "示例"));
+      if (meta.childNodes.length) box.append(meta);
+      if (n.items.length) {
+        const ul = el("ul", "dd-items");
+        n.items.forEach(it => { const li = el("li"); li.append(el("span", null, it.name), el("span", null, money(Number(it.amount) || 0))); ul.append(li); });
+        box.append(ul);
+      } else box.append(el("p", "dd-empty", "这晚没买东西。"));
+      if (n.note && n.note !== "示例数据") box.append(el("p", "dd-note", "备注：" + n.note));
+    } else box.append(el("p", "dd-empty", date === today ? "今晚还没有记录。" : "这天没有加班记录。"));
+    const act = el("div", "dd-actions");
+    const nav = el("div", "dd-nav");
+    const prev = el("button", null, "‹"); prev.type = "button"; prev.setAttribute("aria-label", "前一天");
+    const next = el("button", null, "›"); next.type = "button"; next.setAttribute("aria-label", "后一天"); next.disabled = date >= today;
+    prev.onclick = () => pickDay(shift(date, -1)); next.onclick = () => pickDay(shift(date, 1));
+    nav.append(prev, next);
+    const edit = el("button", "btn-ghost", n ? "编辑这一晚" : "补记这一晚"); edit.type = "button";
+    edit.onclick = () => { go(date); showTab("tonight"); };
+    act.append(nav, edit); box.append(act);
+  }
+  function pickDay(date, reveal) {
+    if (date > nightOf()) return;
+    calSel = date;
+    if (date.slice(0, 7) !== calMonth) calMonth = date.slice(0, 7);
+    renderCal();
+    if (reveal) {
+      const r = $("calDetail").getBoundingClientRect();
+      if (r.bottom > innerHeight - 90) $("calDetail").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "end" });
     }
   }
 
@@ -830,12 +894,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("note").addEventListener("input", () => { clearTimeout(noteT); const v = $("note").value; const d = current; noteT = setTimeout(() => { if (d === current) update(n => n.note = v); }, 700); });
   $("note").addEventListener("blur", () => { clearTimeout(noteT); if ($("note").value !== (get(current).note || "")) update(n => n.note = $("note").value); });
 
-  const go = (date) => { if (!date) return; current = date > nightOf() ? nightOf() : date; calMonth = current.slice(0, 7); renderAll(); };
+  const go = (date) => { if (!date) return; current = date > nightOf() ? nightOf() : date; calMonth = current.slice(0, 7); calSel = current; renderAll(); };
   const monthShift = (k) => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m - 1 + k, 1); calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; renderCal(); };
   $("calPrev").onclick = () => monthShift(-1);
   $("calNext").onclick = () => monthShift(1);
   $("calToday").onclick = () => { calMonth = nightOf().slice(0, 7); renderCal(); };
-  $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) { go(b.dataset.date); showTab("tonight"); } });
+  $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) pickDay(b.dataset.date, true); });
   $("prevDay").onclick = () => go(shift(current, -1));
   $("nextDay").onclick = () => go(shift(current, 1));
   $("datePick").addEventListener("change", (e) => go(e.target.value));
