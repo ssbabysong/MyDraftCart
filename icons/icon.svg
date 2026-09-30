@@ -1,19 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="112" fill="#FAFAF4"/>
-  <g stroke="#DCE6EF" stroke-width="4">
-    <path d="M0 96H512M0 160H512M0 224H512M0 288H512M0 352H512M0 416H512M96 0V512M160 0V512M224 0V512M288 0V512M352 0V512M416 0V512"/>
+  <path d="M0 96H512M0 160H512M0 224H512M0 288H512M0 352H512M0 416H512M96 0V512M160 0V512M224 0V512M288 0V512M352 0V512M416 0V512" stroke="#DCE6EF" stroke-width="4"/>
+  <!-- 月亮和星星 -->
+  <path d="M372 78 A62 62 0 1 1 304 152 A48 48 0 1 0 372 78Z" fill="#F5C21B" stroke="#26354D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M166 104 L172 122 L190 125 L175 136 L180 154 L166 143 L151 153 L156 136 L142 124 L160 122Z" fill="#FFEB7A" stroke="#26354D" stroke-width="7" stroke-linejoin="round"/>
+  <!-- 热气 -->
+  <g fill="none" stroke="#26354D" stroke-width="11" stroke-linecap="round">
+    <path d="M212 238 Q192 214 212 192 Q232 170 212 146"/>
+    <path d="M266 238 Q246 214 266 192 Q286 170 266 146"/>
   </g>
-  <!-- 手画的本子 -->
-  <path d="M120 104 Q256 92 392 106 Q400 256 390 410 Q256 422 122 408 Q110 256 120 104Z" fill="#FFFFFF" stroke="#26354D" stroke-width="14" stroke-linejoin="round"/>
-  <path d="M150 88 L230 96 L226 128 L146 120Z" fill="#FFEB7A" opacity=".9"/>
-  <!-- 月亮 -->
-  <path d="M322 150 A46 46 0 1 1 272 206 A36 36 0 1 0 322 150Z" fill="#F5C21B" stroke="#26354D" stroke-width="8" stroke-linejoin="round"/>
-  <!-- 正 字 -->
-  <g fill="none" stroke="#D9483B" stroke-width="16" stroke-linecap="round">
-    <path d="M160 250 Q228 244 296 249"/>
-    <path d="M228 250 Q231 310 228 370"/>
-    <path d="M230 308 Q258 305 284 308"/>
-    <path d="M176 300 Q179 336 177 370"/>
-    <path d="M150 372 Q228 366 306 371"/>
-  </g>
+  <!-- 杯子 -->
+  <path d="M378 300 Q444 298 440 348 Q436 396 368 392" fill="none" stroke="#26354D" stroke-width="14" stroke-linecap="round"/>
+  <path d="M130 262 Q256 254 384 264 Q380 350 350 398 Q300 430 248 428 Q190 430 160 398 Q132 352 130 262Z" fill="#FFFFFF" stroke="#26354D" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M146 280 Q256 274 368 282 Q366 300 362 314 Q256 306 150 312 Q147 296 146 280Z" fill="#D9483B" opacity=".85"/>
+  <!-- 碟子 -->
+  <path d="M96 440 Q256 424 416 438" fill="none" stroke="#26354D" stroke-width="14" stroke-linecap="round"/>
 </svg>
