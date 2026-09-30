@@ -240,6 +240,14 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .wbar i { display: block; height: 100%; background: repeating-linear-gradient(-45deg, var(--body) 0 3px, transparent 3px 6px); }
 .wish-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .got-head { font-size: 14px; color: var(--pencil); }
+.wname, .wprice { cursor: pointer; }
+.wname:hover, .wprice:hover { text-decoration: underline wavy var(--pencil); text-underline-offset: 4px; }
+.wedit { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: end; }
+.wedit input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px; }
+.wedit input[type=number] { font-family: var(--f-num); font-size: 18px; }
+.wedit .btns { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
+.wedit .save { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--body-hi); padding: 3px 16px; box-shadow: 2px 2px 0 var(--ink); }
+.wedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 
 /* backup */
 .backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--wob3); }
@@ -860,12 +868,36 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const spend = recent.reduce((a, n) => a + sum(n), 0);
     return recent.length ? spend / recent.length : 0;
   }
+  let editingWish = null;
+  function wishEditRow(w) {
+    const li = document.createElement("li"); li.dataset.id = w.id;
+    const f = document.createElement("form"); f.className = "wedit"; f.autocomplete = "off";
+    const n = document.createElement("input"); n.type = "text"; n.id = "wedit-name"; n.maxLength = 40; n.value = w.name; n.setAttribute("aria-label", "名称");
+    const p = document.createElement("input"); p.type = "number"; p.id = "wedit-price"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = w.price; p.setAttribute("aria-label", "价格 $");
+    const btns = document.createElement("div"); btns.className = "btns";
+    const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = "取消";
+    const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = "保存";
+    btns.append(c, ok); f.append(n, p, btns); li.append(f);
+    c.onclick = () => { editingWish = null; renderWishes(); };
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      const name = n.value.trim(), price = parseFloat(p.value);
+      if (!name) { n.focus(); return; }
+      if (!(price >= 0)) { p.focus(); toast("请填一个价格，比如 49.99"); return; }
+      w.name = name; w.price = Math.round(price * 100) / 100; delete w.sample;
+      editingWish = null; saveWishes(); renderWishes(); toast("已保存");
+    };
+    f.onkeydown = (e) => { if (e.key === "Escape") c.onclick(); };
+    setTimeout(() => { n.focus(); n.select(); });
+    return li;
+  }
   function wishRow(w, avg, monthSpend) {
+    if (editingWish === w.id) return wishEditRow(w);
     const li = document.createElement("li"); li.dataset.id = w.id; if (w.got) li.className = "got";
     const box = document.createElement("button"); box.type = "button"; box.className = "wbox"; box.dataset.act = "got";
     box.innerHTML = CHECK; box.setAttribute("aria-label", w.got ? "改回还没买" : "标记为买到了");
     const body = document.createElement("div"); body.className = "wbody";
-    const nm = document.createElement("span"); nm.className = "wname"; nm.textContent = w.name;
+    const nm = document.createElement("span"); nm.className = "wname"; nm.textContent = w.name; nm.dataset.act = "edit"; nm.title = "点一下修改";
     if (w.sample) { const t = document.createElement("span"); t.className = "sample-tag"; t.textContent = "示例"; nm.append(t); }
     const meta = document.createElement("span"); meta.className = "wmeta";
     body.append(nm);
@@ -884,7 +916,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       }
     }
     const side = document.createElement("div"); side.className = "wish-actions";
-    const pr = document.createElement("span"); pr.className = "wprice"; pr.textContent = money(w.price || 0);
+    const pr = document.createElement("span"); pr.className = "wprice"; pr.textContent = money(w.price || 0); pr.dataset.act = "edit"; pr.title = "点一下修改";
     const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.dataset.act = "del"; x.textContent = "×"; x.setAttribute("aria-label", "删除 " + w.name);
     side.append(pr, x);
     li.append(box, body, side);
@@ -941,6 +973,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const onWishClick = (e) => {
     const el = e.target.closest("[data-act]"); if (!el) return;
     const id = el.closest("li").dataset.id, w = wishes.find(x => x.id === id); if (!w) return;
+    if (el.dataset.act === "edit") { editingWish = id; renderWishes(); return; }
     if (el.dataset.act === "got") {
       w.got = !w.got; w.gotAt = w.got ? ymd(new Date()) : ""; saveWishes(); renderWishes();
       if (w.got) toast(`恭喜，买到了「${w.name}」`);
