@@ -318,6 +318,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 .link:hover { color: var(--burn); }
 .sync::before { content: "○"; margin-right: 4px; }
 .sync.on::before { content: "✓"; color: var(--ink); }
+.update-bar {
+  position: fixed; left: 50%; transform: translateX(-50%) rotate(-.6deg); z-index: 30;
+  top: calc(12px + env(safe-area-inset-top, 0px)); width: min(520px, calc(100% - 32px));
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--wob2);
+  padding: 8px 10px 8px 14px; box-shadow: 3px 4px 0 var(--ink); font-size: 14px;
+}
+.update-bar button { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 3px 12px; box-shadow: 2px 2px 0 var(--ink); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%) rotate(-1deg); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--money-hi); color: var(--ink); border: 2px solid var(--ink); padding: 6px 16px; border-radius: var(--wob1); font-size: 15px; box-shadow: 3px 3px 0 var(--ink); max-width: calc(100% - 32px); }
 
 @media (max-width: 480px) {
@@ -502,7 +510,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   </section>
 
   <footer>
-    <span class="sync on" id="sync">数据只存在这台设备上</span>
+    <span class="sync on" id="sync">数据只存在这台设备上</span> <span id="appVersion"></span>
     <span>
       <button type="button" class="link" id="clearSamples" hidden>清除示例数据</button>
     </span>
@@ -531,6 +539,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <span>记录</span>
   </button>
 </nav>
+<div class="update-bar" id="updateBar" role="status" hidden>
+  <span>有新版本了，你的记录不会受影响</span>
+  <button type="button" id="updateBtn">点这里更新</button>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -1053,8 +1065,40 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   renderAll();
   // 请求持久存储，降低浏览器自动清理数据的概率
   try { navigator.storage?.persist?.(); } catch (e) {}
+  // ---------- 安全更新 ----------
+  // 1) 每次回到 App（包括从桌面图标切回来）都检查一次新版本
+  // 2) 新版本在后台下载好后弹出提示，点了才切换，不会在记到一半时刷新
+  // 3) 更新只替换 App 文件，localStorage 里的记录不受影响
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
-    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (!refreshing) { refreshing = true; location.reload(); } });
+    const offer = (worker) => {
+      const bar = $("updateBar"); bar.hidden = false;
+      $("updateBtn").onclick = () => { $("updateBtn").textContent = "正在更新…"; worker.postMessage("skipWaiting"); };
+    };
+    const watch = (reg) => {
+      if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
+      reg.addEventListener("updatefound", () => {
+        const w = reg.installing; if (!w) return;
+        w.addEventListener("statechange", () => { if (w.state === "installed" && navigator.serviceWorker.controller) offer(w); });
+      });
+    };
+    const showVersion = () => {
+      const c = navigator.serviceWorker.controller; if (!c) return;
+      const ch = new MessageChannel();
+      ch.port1.onmessage = (e) => { $("appVersion").textContent = "版本 " + e.data; };
+      c.postMessage("version", [ch.port2]);
+    };
+    window.addEventListener("load", async () => {
+      try {
+        const reg = await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+        watch(reg); showVersion();
+        const check = () => reg.update().catch(() => {});
+        document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+        window.addEventListener("online", check);
+        setInterval(check, 30 * 60 * 1000);
+      } catch (e) {}
+    });
   }
 })();
 </script>
