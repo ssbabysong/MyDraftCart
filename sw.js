@@ -1,5 +1,5 @@
 // 加班夜记 service worker：离线可用。改了页面文件后把 VERSION 加一，用户下次打开会自动更新。
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL = `shell-${VERSION}`;
 const FONTS = "fonts";
 const ASSETS = ["./", "index.html", "manifest.webmanifest", "icons/icon.svg", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];

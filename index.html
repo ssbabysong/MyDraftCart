@@ -192,7 +192,7 @@ textarea#note {
 body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
   background: var(--paper); border-top: 2px solid var(--ink);
   border-radius: 18px 22px 0 0 / 10px 12px 0 0;
@@ -207,9 +207,39 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .tabbar button[aria-current="page"] svg { transform: rotate(-6deg) scale(1.08); }
 .tabbar button[aria-current="page"] span { background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 92%, transparent 92%); padding: 0 4px; }
 .tabbar button[data-go="tonight"][aria-current="page"] svg { fill: var(--money); }
+.tabbar button[data-go="wishes"][aria-current="page"] svg { fill: var(--body-hi); }
 .tabbar button:active svg { transform: scale(.9); }
 @media (min-width: 700px) { .tabbar { left: 50%; right: auto; width: 520px; transform: translateX(-50%); border: 2px solid var(--ink); border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .tab { animation: none; } }
+
+/* wishlist */
+.wish-sum { padding: 16px; border-radius: var(--wob2); display: flex; flex-direction: column; gap: 6px; }
+.wish-sum .big-total { font-family: var(--f-num); font-size: 40px; line-height: 1; }
+.wish-sum .big-total span { background: linear-gradient(transparent 55%, var(--body-hi) 55%, var(--body-hi) 90%, transparent 90%); padding: 0 4px; }
+.wish-sum p { margin: 0; font-size: 14px; color: var(--pencil); }
+.wish-sum p b { font-family: var(--f-num); font-weight: 400; font-size: 17px; color: var(--ink); }
+form.wish { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: end; }
+form.wish input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
+form.wish input[type=number] { font-family: var(--f-num); font-size: 18px; }
+form.wish .add { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--body-hi); padding: 6px 16px; box-shadow: 2px 3px 0 var(--ink); }
+form.wish .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
+ul.wishes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+ul.wishes li { border: 2px solid var(--ink); background: var(--card); padding: 12px 12px 12px 14px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; }
+ul.wishes li:nth-child(odd) { border-radius: var(--wob1); transform: rotate(-.4deg); }
+ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4deg); }
+.wbox { width: 26px; height: 26px; margin-top: 2px; border: 2px solid var(--ink); background: transparent; padding: 0; display: grid; place-items: center; border-radius: 6px 9px 7px 8px / 8px 6px 9px 7px; color: transparent; }
+.wbox svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.got .wbox { color: var(--burn); }
+.wbody { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.wname { font-size: 17px; overflow-wrap: anywhere; }
+.got .wname { text-decoration: line-through; text-decoration-color: var(--burn); text-decoration-thickness: 2px; color: var(--pencil); }
+.wmeta { font-size: 13px; color: var(--pencil); }
+.wprice { font-family: var(--f-num); font-size: 22px; line-height: 1.1; text-align: right; white-space: nowrap; }
+.wprice small { display: block; }
+.wbar { height: 8px; border: 1.5px solid var(--ink); border-radius: 6px 8px 7px 5px; overflow: hidden; background: var(--paper); }
+.wbar i { display: block; height: 100%; background: repeating-linear-gradient(-45deg, var(--body) 0 3px, transparent 3px 6px); }
+.wish-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.got-head { font-size: 14px; color: var(--pencil); }
 
 /* backup */
 .backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--wob3); }
@@ -350,11 +380,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     </div>
 
     <div class="receipt">
-      <div class="receipt-head"><span class="eyebrow">今晚买了</span><span class="total" id="nightTotal">¥0</span></div>
+      <div class="receipt-head"><span class="eyebrow">今晚买了</span><span class="total" id="nightTotal">$0</span></div>
       <ul class="items" id="items"></ul>
       <form class="buy" id="buyForm" autocomplete="off">
         <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
-        <input type="number" id="buyAmt" placeholder="金额 ¥" min="0" step="0.01" inputmode="decimal" aria-label="金额">
+        <input type="number" id="buyAmt" placeholder="金额 $" min="0" step="0.01" inputmode="decimal" aria-label="金额">
         <button type="submit" class="add">记一笔</button>
       </form>
       <div class="chips" id="chips" aria-label="常买"></div>
@@ -403,8 +433,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     </div>
     <div class="tiles">
       <div class="tile"><span class="v" id="sNights">0</span><span class="k">加班晚数</span></div>
-      <div class="tile money"><span class="v" id="sSpend">¥0</span><span class="k">总花费</span></div>
-      <div class="tile money"><span class="v" id="sAvg">¥0</span><span class="k">平均每晚</span></div>
+      <div class="tile money"><span class="v" id="sSpend">$0</span><span class="k">总花费</span></div>
+      <div class="tile money"><span class="v" id="sAvg">$0</span><span class="k">平均每晚</span></div>
       <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 次数</span></div>
       <div class="tile body"><span class="v" id="sBody">0</span><span class="k">身体不行次数</span></div>
       <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
@@ -420,6 +450,26 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="plot" id="plot"></div>
       <div class="marks" id="marks"></div>
     </div>
+  </section>
+  </main>
+
+  <main class="tab" id="tab-wishes" data-tab="wishes" hidden>
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="wishTitle">
+    <h2 class="underlined" id="wishTitle">愿望清单</h2>
+    <div class="wish-sum sketch">
+      <span class="eyebrow">还想买的，一共</span>
+      <div class="big-total"><span id="wishTotal">$0</span></div>
+      <p id="wishCompare"></p>
+    </div>
+    <form class="wish" id="wishForm" autocomplete="off">
+      <input type="text" id="wishName" placeholder="想买什么" maxlength="40" aria-label="想买的东西">
+      <input type="number" id="wishPrice" placeholder="价格 $" min="0" step="0.01" inputmode="decimal" aria-label="价格">
+      <button type="submit" class="add">许个愿</button>
+    </form>
+    <ul class="wishes" id="wishList"></ul>
+    <div class="empty" id="wishEmpty" hidden></div>
+    <div class="got-head" id="gotHead" hidden></div>
+    <ul class="wishes" id="gotList"></ul>
   </section>
   </main>
 
@@ -464,6 +514,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27.5 Q16 26.8 28 27.6"/><path d="M8 26 L8 17 L12.5 17 L12.5 26"/><path d="M14.5 26 L14.5 9 L19 9 L19 26"/><path d="M21 26 L21 14 L25.5 14 L25.5 26"/></svg>
     <span>统计</span>
   </button>
+  <button type="button" data-go="wishes">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 L19.6 11.2 L28 12.2 L21.8 17.9 L23.4 26.3 L16 22.2 L8.6 26.4 L10.2 17.9 L4 12.3 L12.4 11.1Z"/></svg>
+    <span>愿望</span>
+  </button>
   <button type="button" data-go="records">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 4.5 Q17 4 25 5 Q25.8 16 25 27.5 Q16 28 8 27.2 Q7.3 16 8 4.5Z"/><path d="M5 9 L10 9M5 16 L10 16M5 23 L10 23"/><path d="M13 11 Q17 10.6 21 11.2M13 16 Q17 15.6 21 16.2M13 21 Q15.5 20.7 18 21.1"/></svg>
     <span>记录</span>
@@ -476,7 +530,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const $ = (id) => document.getElementById(id);
   const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
   const LS_KEY = "overtime-nights-v1";
-  const CHIPS = [["咖啡", 18], ["外卖", 35], ["能量饮料", 7], ["零食", 15], ["打车回家", 42], ["奶茶", 16]];
+  const CHIPS = [["咖啡", 5.5], ["外卖", 16], ["能量饮料", 3.5], ["零食", 4], ["打车回家", 22], ["奶茶", 6.5]];
 
   let nights = {};            // date -> {date, items:[{name, amount}], burnout, body, end, note, sample?}
   let store = null, loaded = false;
@@ -489,7 +543,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
   // 加班的"今晚"：凌晨 6 点前仍算前一天
   const nightOf = (d = new Date()) => { const x = new Date(d); if (x.getHours() < 6) x.setDate(x.getDate() - 1); return ymd(x); };
-  const money = (n) => "¥" + (Math.round(n * 100) / 100).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+  const money = (n) => "$" + (Math.round(n * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(Math.round(n * 100) / 100) ? 0 : 2, maximumFractionDigits: 2 });
   const sum = (n) => (n.items || []).reduce((a, i) => a + (Number(i.amount) || 0), 0);
   // 下班时间排序：凌晨 0–5 点算作 24–29 点
   const lateKey = (t) => { if (!t) return -1; const [h, m] = t.split(":").map(Number); return (h < 6 ? h + 24 : h) * 60 + m; };
@@ -584,7 +638,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const spend = list.reduce((a, n) => a + sum(n), 0);
     $("sNights").textContent = list.length;
     $("sSpend").textContent = money(spend);
-    $("sAvg").textContent = list.length ? money(spend / list.length) : "¥0";
+    $("sAvg").textContent = list.length ? money(spend / list.length) : "$0";
     $("sBurn").textContent = list.reduce((a, n) => a + (n.burnout || 0), 0);
     $("sBody").textContent = list.reduce((a, n) => a + (n.body || 0), 0);
     const late = list.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
@@ -692,7 +746,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         if (n.body) { const x = document.createElement("span"); x.className = "p"; x.textContent = "×".repeat(Math.min(n.body, 3)); f.append(x); }
         b.append(f);
       }
-      const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? "¥" + Math.round(v) : "";
+      const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? "$" + Math.round(v) : "";
       b.append(a);
       let label = `${m}月${d}日`;
       if (n) label += `，花了 ${money(v)}` + (n.burnout ? `，burnout ${n.burnout} 次` : "") + (n.body ? `，身体不行 ${n.body} 次` : "");
@@ -701,17 +755,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     }
   }
 
-  function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); }
+  function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); renderWishes(); }
 
   // ---------- samples ----------
   function loadSamples() {
     const base = nightOf();
     const plan = [
-      [1, [["外卖", 38], ["咖啡", 18]], 1, 0, "22:40"], [2, [["能量饮料", 7], ["打车回家", 46]], 2, 1, "00:15"],
-      [3, [["奶茶", 16]], 0, 0, "21:30"], [5, [["外卖", 42], ["零食", 12], ["打车回家", 39]], 3, 2, "01:20"],
-      [6, [["咖啡", 22]], 1, 0, "22:05"], [8, [["外卖", 29], ["能量饮料", 7]], 1, 1, "23:10"],
-      [9, [["咖啡", 18], ["零食", 9]], 0, 1, "21:50"], [11, [["外卖", 35], ["打车回家", 44]], 2, 1, "00:40"],
-      [12, [["奶茶", 16], ["外卖", 31]], 1, 0, "22:20"],
+      [1, [["外卖", 17.5], ["咖啡", 5.5]], 1, 0, "22:40"], [2, [["能量饮料", 3.5], ["打车回家", 24]], 2, 1, "00:15"],
+      [3, [["奶茶", 6.5]], 0, 0, "21:30"], [5, [["外卖", 19], ["零食", 4.25], ["打车回家", 21]], 3, 2, "01:20"],
+      [6, [["咖啡", 6]], 1, 0, "22:05"], [8, [["外卖", 14], ["能量饮料", 3.5]], 1, 1, "23:10"],
+      [9, [["咖啡", 5.5], ["零食", 3]], 0, 1, "21:50"], [11, [["外卖", 16], ["打车回家", 23]], 2, 1, "00:40"],
+      [12, [["奶茶", 6.5], ["外卖", 13]], 1, 0, "22:20"],
     ];
     for (const [back, items, bo, bd, end] of plan) {
       const date = shift(base, -back);
@@ -742,7 +796,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("buyName").value = ""; $("buyAmt").value = ""; $("buyName").focus();
   });
   CHIPS.forEach(([name, amt]) => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} ¥${amt}`;
+    const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} $${amt}`;
     b.onclick = () => { $("buyName").value = name; $("buyAmt").value = amt; $("buyAmt").focus(); $("buyAmt").select(); };
     $("chips").append(b);
   });
@@ -792,8 +846,113 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     renderAll(); toast(`已清除 ${ds.length} 条示例`);
   });
 
+  // ---------- wishlist ----------
+  const WISH_KEY = "overtime-wishes-v1";
+  let wishes = [];   // {id, name, price, got, gotAt, created, sample?}
+  try { wishes = JSON.parse(localStorage.getItem(WISH_KEY) || "[]") || []; } catch (e) { wishes = []; }
+  const saveWishes = () => { try { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); } catch (e) {} };
+  const CHECK = '<svg viewBox="0 0 24 24"><path d="M4 13 Q8 16 10 19 Q14 10 21 4"/></svg>';
+
+  // 最近 30 晚平均每晚夜宵钱，用来换算"要少买几晚"
+  function nightlyAvg() {
+    const from = shift(nightOf(), -29);
+    const recent = Object.values(nights).filter(n => n.date >= from);
+    const spend = recent.reduce((a, n) => a + sum(n), 0);
+    return recent.length ? spend / recent.length : 0;
+  }
+  function wishRow(w, avg, monthSpend) {
+    const li = document.createElement("li"); li.dataset.id = w.id; if (w.got) li.className = "got";
+    const box = document.createElement("button"); box.type = "button"; box.className = "wbox"; box.dataset.act = "got";
+    box.innerHTML = CHECK; box.setAttribute("aria-label", w.got ? "改回还没买" : "标记为买到了");
+    const body = document.createElement("div"); body.className = "wbody";
+    const nm = document.createElement("span"); nm.className = "wname"; nm.textContent = w.name;
+    if (w.sample) { const t = document.createElement("span"); t.className = "sample-tag"; t.textContent = "示例"; nm.append(t); }
+    const meta = document.createElement("span"); meta.className = "wmeta";
+    body.append(nm);
+    if (w.got) {
+      const d = w.gotAt ? parse(w.gotAt) : null;
+      meta.textContent = d ? `${d.getMonth() + 1}月${d.getDate()}日 买到了` : "买到了";
+      body.append(meta);
+    } else {
+      const pct = w.price > 0 ? Math.min(100, (monthSpend / w.price) * 100) : 0;
+      const nightsNeeded = avg > 0 && w.price > 0 ? Math.ceil(w.price / avg) : 0;
+      meta.textContent = nightsNeeded ? `≈ ${nightsNeeded} 晚的加班花销` : "记几晚加班花销，就能算出要省几晚";
+      body.append(meta);
+      if (monthSpend > 0 && w.price > 0) {
+        const bar = document.createElement("div"); bar.className = "wbar"; bar.title = `这个月加班花的钱，够买它的 ${Math.round(pct)}%`;
+        const i = document.createElement("i"); i.style.width = pct + "%"; bar.append(i); body.append(bar);
+      }
+    }
+    const side = document.createElement("div"); side.className = "wish-actions";
+    const pr = document.createElement("span"); pr.className = "wprice"; pr.textContent = money(w.price || 0);
+    const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.dataset.act = "del"; x.textContent = "×"; x.setAttribute("aria-label", "删除 " + w.name);
+    side.append(pr, x);
+    li.append(box, body, side);
+    return li;
+  }
+  function renderWishes() {
+    const open = wishes.filter(w => !w.got).sort((a, b) => (a.price || 0) - (b.price || 0));
+    const got = wishes.filter(w => w.got).sort((a, b) => (b.gotAt || "").localeCompare(a.gotAt || ""));
+    const total = open.reduce((a, w) => a + (Number(w.price) || 0), 0);
+    const month = nightOf().slice(0, 7);
+    const monthSpend = Object.values(nights).filter(n => n.date.slice(0, 7) === month).reduce((a, n) => a + sum(n), 0);
+    const avg = nightlyAvg();
+    $("wishTotal").textContent = money(total);
+    const cmp = $("wishCompare"); cmp.textContent = "";
+    if (open.length && monthSpend > 0) {
+      const b1 = document.createElement("b"); b1.textContent = money(monthSpend);
+      const b2 = document.createElement("b"); b2.textContent = Math.round((monthSpend / total) * 100) + "%";
+      cmp.append("这个月加班已经花掉 ", b1, "，相当于愿望清单的 ", b2, "。");
+      const cheapest = open.find(w => w.price > 0);
+      if (cheapest && monthSpend >= cheapest.price) cmp.append(`这些钱已经够买「${cheapest.name}」了。`);
+    } else if (open.length) cmp.textContent = `${open.length} 个愿望。每条下面会算出它相当于几晚的加班花销。`;
+    else cmp.textContent = "把想买的东西和价格写下来，看看加班的零碎花销能换成什么。";
+
+    const ul = $("wishList"); ul.textContent = "";
+    open.forEach(w => ul.append(wishRow(w, avg, monthSpend)));
+    const g = $("gotList"); g.textContent = "";
+    got.forEach(w => g.append(wishRow(w, avg, monthSpend)));
+    $("gotHead").hidden = !got.length;
+    $("gotHead").textContent = got.length ? `已经买到 ${got.length} 个，一共 ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))}` : "";
+
+    const e = $("wishEmpty"); e.hidden = wishes.length > 0; e.textContent = "";
+    if (!wishes.length) {
+      const st = document.createElement("strong"); st.textContent = "还没有愿望";
+      const p = document.createElement("span"); p.textContent = "在上面写下想买的东西和价格，点「许个愿」。";
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn-ghost"; btn.textContent = "载入示例愿望";
+      btn.onclick = () => {
+        const now = Date.now();
+        wishes = [["降噪耳机", 249], ["机械键盘", 129], ["周末去海边的机票", 320], ["一双好跑鞋", 140], ["按摩一次", 80]]
+          .map(([name, price], i) => ({ id: "s" + (now + i).toString(36), name, price, got: false, created: now + i, sample: true }));
+        saveWishes(); renderWishes(); toast("已载入 5 个示例愿望，可以随时删除");
+      };
+      e.append(st, p, btn);
+    }
+  }
+  $("wishForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("wishName").value.trim(), price = parseFloat($("wishPrice").value);
+    if (!name) { $("wishName").focus(); return; }
+    if (!(price >= 0)) { $("wishPrice").focus(); toast("请填一个价格，比如 49.99"); return; }
+    wishes.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, price: Math.round(price * 100) / 100, got: false, created: Date.now() });
+    saveWishes(); renderWishes();
+    $("wishName").value = ""; $("wishPrice").value = ""; $("wishName").focus();
+  });
+  const onWishClick = (e) => {
+    const el = e.target.closest("[data-act]"); if (!el) return;
+    const id = el.closest("li").dataset.id, w = wishes.find(x => x.id === id); if (!w) return;
+    if (el.dataset.act === "got") {
+      w.got = !w.got; w.gotAt = w.got ? ymd(new Date()) : ""; saveWishes(); renderWishes();
+      if (w.got) toast(`恭喜，买到了「${w.name}」`);
+    } else if (el.dataset.act === "del") {
+      wishes = wishes.filter(x => x.id !== id); saveWishes(); renderWishes(); toast(`已删除「${w.name}」`);
+    }
+  };
+  $("wishList").addEventListener("click", onWishClick);
+  $("gotList").addEventListener("click", onWishClick);
+
   // ---------- tabs ----------
-  const TABS = ["tonight", "calendar", "stats", "records"];
+  const TABS = ["tonight", "calendar", "stats", "wishes", "records"];
   function showTab(name, save = true) {
     if (!TABS.includes(name)) name = "tonight";
     document.querySelectorAll(".tab").forEach(t => (t.hidden = t.dataset.tab !== name));
@@ -811,7 +970,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("lastBackup").textContent = t ? `上次导出：${t}` : "还没有导出过备份。";
   }
   $("exportBtn").onclick = () => {
-    const data = { app: "overtime-night-log", version: 1, exportedAt: new Date().toISOString(), nights };
+    const data = { app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = `overtime-log-backup-${ymd(new Date())}.json`;
@@ -835,9 +994,21 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
           end: typeof v.end === "string" ? v.end.slice(0, 5) : "", note: typeof v.note === "string" ? v.note.slice(0, 500) : "", ...(v.sample ? { sample: true } : {}) };
         added++;
       }
-      if (!added) throw new Error();
+      let wAdded = 0;
+      if (Array.isArray(raw.wishes)) {
+        for (const w of raw.wishes) {
+          if (!w || typeof w.name !== "string") continue;
+          const id = typeof w.id === "string" ? w.id.slice(0, 40) : Date.now().toString(36) + wAdded;
+          wishes = wishes.filter(x => x.id !== id);
+          wishes.push({ id, name: w.name.slice(0, 40), price: Math.max(0, Number(w.price) || 0), got: !!w.got,
+            gotAt: typeof w.gotAt === "string" ? w.gotAt.slice(0, 10) : "", created: Number(w.created) || Date.now(), ...(w.sample ? { sample: true } : {}) });
+          wAdded++;
+        }
+        saveWishes();
+      }
+      if (!added && !wAdded) throw new Error();
       try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {}
-      renderAll(); toast(`已导入 ${added} 晚的记录`);
+      renderAll(); toast(`已导入 ${added} 晚的记录` + (wAdded ? `和 ${wAdded} 个愿望` : ""));
     } catch (err) { toast("这个文件读不出来，请选择「导出备份」生成的 .json 文件"); }
   });
 
