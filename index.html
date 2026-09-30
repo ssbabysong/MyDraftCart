@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>加班夜记</title>
 <meta name="description" content="记录每晚加班买了什么、花了多少钱、burnout 和身体不适次数的手绘风小本子。数据只存在你自己的设备上。">
 <meta name="theme-color" content="#FAFAF4" media="(prefers-color-scheme: light)">
@@ -52,7 +52,10 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* 像 App 一样：禁止双击放大；输入框字号不小于 16px，避免 iPhone 点输入框时自动放大 */
+button, a, input, textarea, label { touch-action: manipulation; }
+input, textarea, select { font-size: max(16px, 1em); }
 body { margin: 0; -webkit-tap-highlight-color: transparent; }
 body {
   background-color: var(--paper); color: var(--ink);
@@ -1129,6 +1132,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   renderAll();
   // 请求持久存储，降低浏览器自动清理数据的概率
   try { navigator.storage?.persist?.(); } catch (e) {}
+  // ---------- 禁止双指缩放 ----------
+  // iPhone 的 Safari 会忽略 viewport 里的 user-scalable=no，这里再从手势层面拦一次
+  ["gesturestart", "gesturechange", "gestureend"].forEach(t => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
+  document.addEventListener("touchmove", (e) => { if (e.touches.length > 1 || (e.scale && e.scale !== 1)) e.preventDefault(); }, { passive: false });
+
   // ---------- 安全更新 ----------
   // 1) 每次回到 App（包括从桌面图标切回来）都检查一次新版本
   // 2) 新版本在后台下载好后弹出提示，点了才切换，不会在记到一半时刷新
