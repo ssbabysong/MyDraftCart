@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>加班夜记</title>
+<meta name="description" content="记录每晚加班买了什么、花了多少钱、burnout 和身体不适次数的手绘风小本子。数据只存在你自己的设备上。">
+<meta name="theme-color" content="#FAFAF4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1E2926" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="加班夜记">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Patrick+Hand&display=swap">
+<style>
+/* Layout: a hand-drawn notebook page — grid paper, ink-sketched boxes with wobbly edges, 正-tally counters, hatched bar chart */
+:root {
+  --paper: #FAFAF4;        /* 方格本 */
+  --grid: #DCE6EF;
+  --ink: #26354D;          /* 蓝黑圆珠笔 */
+  --pencil: #7A8494;
+  --card: #FFFFFF;
+  --money: #F5C21B;        /* 荧光笔黄 */
+  --money-hi: #FFEB7A;
+  --burn: #D9483B;         /* 红笔 */
+  --burn-hi: #FFD3CC;
+  --body: #7550C8;         /* 紫笔 */
+  --body-hi: #E4D8FF;
+  --f-title: "Ma Shan Zheng", "Kaiti SC", "STKaiti", "KaiTi", cursive;
+  --f-hand: "ZCOOL KuaiLe", "Hannotate SC", "HanziPen SC", "Kaiti SC", "KaiTi", system-ui, sans-serif;
+  --f-num: "Patrick Hand", "Comic Sans MS", "ZCOOL KuaiLe", cursive;
+  --wob1: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --wob2: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  --wob3: 225px 20px 255px 15px / 20px 255px 15px 225px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1E2926; --grid: #2A3733; --ink: #ECEDE3; --pencil: #9AA7A1; --card: #24312D;
+    --money: #F2D35B; --money-hi: #5A4E1E; --burn: #F4887C; --burn-hi: #53302C; --body: #C3A8F6; --body-hi: #3C3355;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1E2926; --grid: #2A3733; --ink: #ECEDE3; --pencil: #9AA7A1; --card: #24312D;
+  --money: #F2D35B; --money-hi: #5A4E1E; --burn: #F4887C; --burn-hi: #53302C; --body: #C3A8F6; --body-hi: #3C3355;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background-color: var(--paper); color: var(--ink);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font-family: var(--f-hand); font-size: 16px; line-height: 1.6;
+  padding: 0 16px; padding-block: 32px 64px;
+}
+.wrap { max-width: 660px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+.num { font-family: var(--f-num); }
+.eyebrow { font-family: var(--f-hand); font-size: 14px; color: var(--pencil); letter-spacing: .06em; }
+
+/* sketchy primitives */
+.sketch { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--card); box-shadow: 3px 4px 0 var(--ink); }
+.hl { background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 88%, transparent 88%); padding: 0 4px; }
+
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+h1 { font-family: var(--f-title); font-weight: 400; font-size: clamp(40px, 10vw, 58px); line-height: 1; margin: 4px 0 0; transform: rotate(-2deg); transform-origin: left bottom; }
+h1 .hl { background: linear-gradient(transparent 60%, var(--burn-hi) 60%, var(--burn-hi) 90%, transparent 90%); }
+.clock { text-align: right; transform: rotate(1.5deg); }
+.clock b { display: block; font-family: var(--f-num); font-weight: 400; font-size: 34px; line-height: 1; }
+.clock span { font-size: 14px; color: var(--pencil); }
+h2 { font-family: var(--f-hand); font-weight: 400; font-size: 24px; margin: 0; text-wrap: balance; }
+h2.underlined { display: inline-block; background: linear-gradient(var(--ink), var(--ink)) no-repeat 0 100% / 100% 2px; padding-bottom: 2px; align-self: flex-start; }
+
+/* tonight card */
+.card { padding: 22px 20px; display: flex; flex-direction: column; gap: 22px; position: relative; }
+.card::before { /* 胶带 */
+  content: ""; position: absolute; top: -12px; left: 50%; width: 110px; height: 24px; transform: translateX(-50%) rotate(-3deg);
+  background: var(--money-hi); opacity: .85; border-left: 2px dotted var(--paper); border-right: 2px dotted var(--paper);
+}
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.datepick { display: flex; align-items: center; gap: 6px; }
+.datepick button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.datepick button:disabled { opacity: .3; cursor: default; }
+.datepick input, .field-inline input {
+  background: transparent; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 2px 4px; height: 34px; font-family: var(--f-num); font-size: 18px;
+}
+.field-inline { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.counter { border: 2px solid var(--ink); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.counter.burn { border-radius: var(--wob2); background: var(--burn-hi); }
+.counter.body { border-radius: var(--wob3); background: var(--body-hi); transform: rotate(.6deg); }
+.counter.burn { transform: rotate(-.6deg); }
+.counter .label { font-size: 18px; }
+.counter .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.big { font-family: var(--f-num); font-size: 48px; line-height: .9; }
+.counter.burn .big { color: var(--burn); }
+.counter.body .big { color: var(--body); }
+.pm { display: flex; gap: 8px; }
+.pm button { width: 42px; height: 42px; border: 2px solid var(--ink); font-size: 22px; line-height: 1; background: var(--card); border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; transition: transform .1s; }
+.pm button:active { transform: scale(.92) rotate(-6deg); }
+.pm .plus { box-shadow: 2px 2px 0 var(--ink); }
+.pm button:disabled { opacity: .3; cursor: default; }
+.tally { display: flex; flex-wrap: wrap; gap: 4px; min-height: 30px; align-items: center; }
+.tally svg { width: 28px; height: 28px; overflow: visible; }
+.tally path { fill: none; stroke-width: 2.4; stroke-linecap: round; }
+.counter.burn .tally path { stroke: var(--burn); }
+.counter.body .tally path { stroke: var(--body); }
+.tally .none { font-size: 13px; color: var(--pencil); }
+.counter .hint { font-size: 13px; color: var(--pencil); }
+
+/* receipt */
+.receipt { display: flex; flex-direction: column; gap: 10px; }
+.receipt-head { display: flex; justify-content: space-between; align-items: baseline; }
+.receipt-head .total { font-family: var(--f-num); font-size: 30px; }
+ul.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ul.items li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 6px 2px; border-bottom: 2px dashed var(--grid); }
+ul.items .name { min-width: 0; overflow-wrap: anywhere; }
+ul.items .amt { font-family: var(--f-num); font-size: 20px; }
+.x { border: 0; background: transparent; color: var(--pencil); font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 50%; }
+.x:hover, .x:focus-visible { color: var(--burn); }
+.no-items { font-size: 14px; color: var(--pencil); padding: 6px 2px; }
+form.buy { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: end; }
+form.buy input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
+form.buy input[type=number] { font-family: var(--f-num); font-size: 18px; }
+form.buy .add { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 6px 16px; box-shadow: 2px 3px 0 var(--ink); }
+form.buy .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips button { border: 1.5px dashed var(--ink); background: transparent; border-radius: var(--wob2); padding: 2px 12px; font-size: 14px; }
+.chips button:nth-child(odd) { transform: rotate(-1.5deg); }
+.chips button:nth-child(even) { transform: rotate(1.2deg); }
+.chips button:hover { background: var(--money-hi); }
+textarea#note {
+  width: 100%; min-height: 80px; resize: vertical; border: 0; padding: 4px 6px; color: var(--ink); line-height: 28px;
+  background: repeating-linear-gradient(transparent 0 27px, var(--grid) 27px 28px); background-color: transparent;
+}
+.saved { font-size: 13px; color: var(--pencil); text-align: right; min-height: 1em; }
+
+/* stats */
+.stats-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.seg { display: inline-flex; gap: 6px; }
+.seg button { border: 2px solid transparent; background: transparent; padding: 2px 12px; font-size: 16px; border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; }
+.seg button[aria-pressed="true"] { border-color: var(--ink); }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tile { border: 2px solid var(--ink); background: var(--card); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile:nth-child(3n+1) { border-radius: var(--wob1); transform: rotate(-.8deg); }
+.tile:nth-child(3n+2) { border-radius: var(--wob2); transform: rotate(.6deg); }
+.tile:nth-child(3n) { border-radius: var(--wob3); transform: rotate(-.3deg); }
+.tile .v { font-family: var(--f-num); font-size: 30px; line-height: 1.1; overflow-wrap: anywhere; }
+.tile .k { font-size: 14px; color: var(--pencil); }
+.tile.money .v { align-self: flex-start; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); }
+.tile.burn .v { color: var(--burn); }
+.tile.body .v { color: var(--body); }
+.top-buys { font-size: 15px; color: var(--pencil); }
+.top-buys b { color: var(--ink); font-weight: 400; }
+
+/* chart */
+.chart { padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--wob3); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--pencil); }
+.legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid var(--ink); border-radius: 3px; }
+.plot { position: relative; height: 150px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; align-items: end; border-bottom: 2px solid var(--ink); }
+.gridline { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--grid); pointer-events: none; }
+.gridline span { position: absolute; right: 0; top: -20px; font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
+.bar {
+  position: relative; border: 2px solid var(--ink); border-bottom: 0; border-radius: 6px 10px 0 0 / 10px 6px 0 0;
+  background: repeating-linear-gradient(-45deg, var(--money) 0 3px, transparent 3px 7px);
+}
+.bar[style*="height: 0%"] { border: 0; }
+.bar.today { background: var(--money); }
+.marks { display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; }
+.marks div { display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 40px; }
+.dots { display: flex; gap: 1px; flex-wrap: wrap; justify-content: center; font-family: var(--f-num); font-size: 13px; line-height: 1; }
+.dots.b { color: var(--burn); }
+.dots.p { color: var(--body); }
+.xlab { font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
+
+/* backup */
+.backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--wob3); }
+.backup p { margin: 0; font-size: 14px; color: var(--pencil); }
+.backup .row { display: flex; gap: 10px; flex-wrap: wrap; }
+.backup .btn-ghost { background: var(--card); }
+
+/* calendar */
+.cal { padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--wob2); }
+.cal-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cal-head .month { font-size: 22px; }
+.cal-head .month .num { font-size: 26px; }
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-nav button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.cal-nav button:disabled { opacity: .3; cursor: default; }
+.cal-sum { font-size: 14px; color: var(--pencil); }
+.cal-sum b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); padding: 0 3px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.cal-wd { text-align: center; font-size: 13px; color: var(--pencil); padding-bottom: 2px; }
+.cal-wd.we { color: var(--burn); }
+.day {
+  position: relative; min-width: 0; aspect-ratio: 1 / 1.1; max-width: 100%; border: 1.5px solid var(--grid); background: var(--card);
+  display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; padding: 3px 4px; text-align: left;
+  border-radius: 8px 12px 9px 11px / 11px 8px 12px 9px;
+}
+.day:nth-child(odd) { border-radius: 12px 8px 11px 9px / 9px 12px 8px 11px; }
+.day .d { font-family: var(--f-num); font-size: 15px; line-height: 1; color: var(--pencil); }
+.day .amt { font-family: var(--f-num); font-size: 15px; line-height: 1; text-align: right; overflow: hidden; white-space: nowrap; }
+.day .flags { position: absolute; top: 2px; right: 4px; font-family: var(--f-num); font-size: 12px; line-height: 1; letter-spacing: -1px; }
+.day .flags .b { color: var(--burn); }
+.day .flags .p { color: var(--body); }
+.day.has { border-color: var(--ink); }
+.day.has .d { color: var(--ink); }
+.day.future { opacity: .35; cursor: default; }
+.day.blank { visibility: hidden; }
+.day.today .d { display: inline-block; align-self: flex-start; border: 1.5px solid var(--burn); border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; padding: 1px 3px; color: var(--burn); }
+.day.sel { box-shadow: 2px 3px 0 var(--ink); border-width: 2px; border-color: var(--ink); }
+.day:not(.future):hover { border-color: var(--ink); }
+.cal-key { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--pencil); }
+.cal-key .ramp { display: inline-flex; gap: 2px; vertical-align: middle; margin: 0 4px; }
+.cal-key .ramp i { width: 14px; height: 12px; border: 1px solid var(--ink); border-radius: 3px; }
+
+/* history */
+ul.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+ul.history li button {
+  width: 100%; text-align: left; background: var(--card); border: 2px solid var(--ink); padding: 10px 14px;
+  display: grid; grid-template-columns: 70px 1fr auto; gap: 12px; align-items: center;
+}
+ul.history li:nth-child(odd) button { border-radius: var(--wob1); }
+ul.history li:nth-child(even) button { border-radius: var(--wob2); }
+ul.history li button:hover { box-shadow: 3px 3px 0 var(--ink); }
+ul.history li.active button { box-shadow: 3px 3px 0 var(--ink); background: var(--money-hi); }
+.h-date { font-family: var(--f-num); font-size: 22px; line-height: 1.1; }
+.h-date small { display: block; font-family: var(--f-hand); color: var(--pencil); font-size: 12px; }
+.h-mid { min-width: 0; font-size: 14px; color: var(--pencil); overflow-wrap: anywhere; }
+.h-right { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.pill { font-family: var(--f-num); font-size: 16px; padding: 0 8px; white-space: nowrap; border: 1.5px solid currentColor; border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; }
+.pill.m { color: var(--ink); background: var(--money-hi); border-color: var(--ink); }
+.pill.b { color: var(--burn); }
+.pill.p { color: var(--body); }
+.sample-tag { font-size: 12px; color: var(--pencil); border: 1px dashed var(--pencil); border-radius: 4px; padding: 0 5px; margin-left: 6px; }
+
+.empty { border: 2px dashed var(--pencil); border-radius: var(--wob1); padding: 28px 20px; text-align: center; color: var(--pencil); display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.empty strong { font-size: 20px; color: var(--ink); font-weight: 400; }
+.btn-ghost { border: 2px solid var(--ink); background: var(--money-hi); color: var(--ink); border-radius: var(--wob2); padding: 4px 16px; font-size: 15px; box-shadow: 2px 2px 0 var(--ink); }
+footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--pencil); }
+.link { border: 0; background: none; color: var(--pencil); text-decoration: underline wavy; text-underline-offset: 4px; padding: 0; font-size: 14px; margin-left: 10px; }
+.link:hover { color: var(--burn); }
+.sync::before { content: "○"; margin-right: 4px; }
+.sync.on::before { content: "✓"; color: var(--ink); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%) rotate(-1deg); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--money-hi); color: var(--ink); border: 2px solid var(--ink); padding: 6px 16px; border-radius: var(--wob1); font-size: 15px; box-shadow: 3px 3px 0 var(--ink); max-width: calc(100% - 32px); }
+
+@media (max-width: 480px) {
+  .cal { padding: 14px 10px 12px; }
+  .cal-grid { gap: 3px; }
+  .day { padding: 2px 3px; }
+  .day .d, .day .amt { font-size: 13px; }
+  .day .flags { font-size: 10px; right: 2px; }
+  .card { padding: 18px 14px; }
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .big { font-size: 40px; }
+  .counter { padding: 12px 10px; }
+  .pm button { width: 38px; height: 38px; }
+  form.buy { grid-template-columns: 1fr 90px; }
+  form.buy .add { grid-column: 1 / -1; padding: 8px; }
+  ul.history li button { grid-template-columns: 58px 1fr; }
+  .h-right { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Overtime Night Log</div>
+      <h1>加班<span class="hl">夜记</span></h1>
+    </div>
+    <div class="clock"><b id="clock">--:--</b><span id="clockSub"></span></div>
+  </header>
+
+  <!-- Tonight -->
+  <section class="card sketch" aria-labelledby="nightTitle">
+    <div class="card-head">
+      <div>
+        <div class="eyebrow" id="nightEyebrow">今晚</div>
+        <h2 id="nightTitle">—</h2>
+      </div>
+      <div class="datepick">
+        <button type="button" id="prevDay" aria-label="前一天">‹</button>
+        <input type="date" id="datePick" aria-label="选择日期">
+        <button type="button" id="nextDay" aria-label="后一天">›</button>
+      </div>
+    </div>
+
+    <label class="field-inline" for="endTime">下班时间 <input type="time" id="endTime"></label>
+
+    <div class="counters">
+      <div class="counter burn">
+        <span class="label">Burnout</span>
+        <div class="row">
+          <span class="big" id="burnVal">0</span>
+          <div class="pm"><button type="button" id="burnMinus" aria-label="Burnout 减一">−</button><button type="button" class="plus" id="burnPlus" aria-label="Burnout 加一">+</button></div>
+        </div>
+        <div class="tally" id="burnTally" aria-hidden="true"></div>
+        <span class="hint">崩溃、想摆烂、脑子转不动</span>
+      </div>
+      <div class="counter body">
+        <span class="label">身体不行</span>
+        <div class="row">
+          <span class="big" id="bodyVal">0</span>
+          <div class="pm"><button type="button" id="bodyMinus" aria-label="身体不行 减一">−</button><button type="button" class="plus" id="bodyPlus" aria-label="身体不行 加一">+</button></div>
+        </div>
+        <div class="tally" id="bodyTally" aria-hidden="true"></div>
+        <span class="hint">头疼、心慌、胃不舒服、眼睛酸</span>
+      </div>
+    </div>
+
+    <div class="receipt">
+      <div class="receipt-head"><span class="eyebrow">今晚买了</span><span class="total" id="nightTotal">¥0</span></div>
+      <ul class="items" id="items"></ul>
+      <form class="buy" id="buyForm" autocomplete="off">
+        <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
+        <input type="number" id="buyAmt" placeholder="金额 ¥" min="0" step="0.01" inputmode="decimal" aria-label="金额">
+        <button type="submit" class="add">记一笔</button>
+      </form>
+      <div class="chips" id="chips" aria-label="常买"></div>
+    </div>
+
+    <div>
+      <label class="eyebrow" for="note">备注</label>
+      <textarea id="note" maxlength="500" placeholder="今晚在忙什么？为什么加班？"></textarea>
+      <div class="saved" id="saved"></div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="statsTitle">
+    <div class="stats-head">
+      <h2 class="underlined" id="statsTitle">统计</h2>
+      <div class="seg" role="group" aria-label="统计范围">
+        <button type="button" data-p="week" aria-pressed="false">本周</button>
+        <button type="button" data-p="month" aria-pressed="true">本月</button>
+        <button type="button" data-p="all" aria-pressed="false">全部</button>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><span class="v" id="sNights">0</span><span class="k">加班晚数</span></div>
+      <div class="tile money"><span class="v" id="sSpend">¥0</span><span class="k">总花费</span></div>
+      <div class="tile money"><span class="v" id="sAvg">¥0</span><span class="k">平均每晚</span></div>
+      <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 次数</span></div>
+      <div class="tile body"><span class="v" id="sBody">0</span><span class="k">身体不行次数</span></div>
+      <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
+    </div>
+    <div class="top-buys" id="topBuys"></div>
+
+    <div class="chart sketch" aria-label="最近 14 晚">
+      <div class="legend">
+        <span><i style="background:var(--money)"></i>每晚花费</span>
+        <span><i style="background:var(--burn-hi);border-color:var(--burn)"></i>Burnout ×</span>
+        <span><i style="background:var(--body-hi);border-color:var(--body)"></i>身体不行 ×</span>
+      </div>
+      <div class="plot" id="plot"></div>
+      <div class="marks" id="marks"></div>
+    </div>
+  </section>
+
+  <!-- Calendar -->
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="calTitle">
+    <h2 class="underlined" id="calTitle">日历</h2>
+    <div class="cal sketch">
+      <div class="cal-head">
+        <div class="month" id="calMonth">—</div>
+        <div class="cal-nav">
+          <button type="button" id="calPrev" aria-label="上个月">‹</button>
+          <button type="button" id="calToday" style="width:auto;padding:0 10px;font-size:14px">本月</button>
+          <button type="button" id="calNext" aria-label="下个月">›</button>
+        </div>
+      </div>
+      <div class="cal-sum" id="calSum"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-key">
+        <span>花得越多颜色越深<span class="ramp"><i style="background:var(--card)"></i><i style="background:color-mix(in srgb, var(--money) 30%, var(--card))"></i><i style="background:color-mix(in srgb, var(--money) 60%, var(--card))"></i><i style="background:var(--money)"></i></span></span>
+        <span><span style="color:var(--burn)">×</span> burnout　<span style="color:var(--body)">×</span> 身体不行</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section style="display:flex;flex-direction:column;gap:12px" aria-labelledby="histTitle">
+    <h2 class="underlined" id="histTitle">历史记录</h2>
+    <ul class="history" id="history"></ul>
+    <div class="empty" id="empty" hidden></div>
+  </section>
+
+  <!-- Backup -->
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="bkTitle">
+    <h2 class="underlined" id="bkTitle">备份</h2>
+    <div class="backup sketch">
+      <p>记录只存在这台设备的浏览器里，不会上传到任何地方。换手机或清理浏览器前，先导出一份备份。</p>
+      <div class="row">
+        <button type="button" class="btn-ghost" id="exportBtn">导出备份</button>
+        <button type="button" class="btn-ghost" id="importBtn">导入备份</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+      <p id="lastBackup"></p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="sync on" id="sync">数据只存在这台设备上</span>
+    <span>
+      <button type="button" class="link" id="clearSamples" hidden>清除示例数据</button>
+      <button type="button" class="link" id="deleteNight" hidden>删除这一晚</button>
+    </span>
+  </footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
+  const LS_KEY = "overtime-nights-v1";
+  const CHIPS = [["咖啡", 18], ["外卖", 35], ["能量饮料", 7], ["零食", 15], ["打车回家", 42], ["奶茶", 16]];
+
+  let nights = {};            // date -> {date, items:[{name, amount}], burnout, body, end, note, sample?}
+  let store = null, loaded = false;
+  let period = "month";
+  try { period = localStorage.getItem("overtime-period") || "month"; } catch (e) {}
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+  // 加班的"今晚"：凌晨 6 点前仍算前一天
+  const nightOf = (d = new Date()) => { const x = new Date(d); if (x.getHours() < 6) x.setDate(x.getDate() - 1); return ymd(x); };
+  const money = (n) => "¥" + (Math.round(n * 100) / 100).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+  const sum = (n) => (n.items || []).reduce((a, i) => a + (Number(i.amount) || 0), 0);
+  // 下班时间排序：凌晨 0–5 点算作 24–29 点
+  const lateKey = (t) => { if (!t) return -1; const [h, m] = t.split(":").map(Number); return (h < 6 ? h + 24 : h) * 60 + m; };
+
+  let current = nightOf();
+  let calMonth = current.slice(0, 7);
+
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2400); }
+
+  function tick() {
+    const d = new Date();
+    $("clock").textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    $("clockSub").textContent = `${d.getMonth() + 1}月${d.getDate()}日 星期${WEEK[d.getDay()]}`;
+  }
+  tick(); setInterval(tick, 30000);
+
+  const blank = (date) => ({ date, items: [], burnout: 0, body: 0, end: "", note: "" });
+  const get = (date) => nights[date] || blank(date);
+
+  // ---------- persistence (one write at a time per night) ----------
+  const queue = {};
+  function persist(n) {
+    const empty = !n.items.length && !n.burnout && !n.body && !n.end && !n.note;
+    if (empty) delete nights[n.date]; else nights[n.date] = n;
+    if (!store) { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {} showSaved(); return; }
+    const run = async () => {
+      try {
+        const latest = nights[n.date];
+        if (latest) await store.doc(n.date).set(JSON.parse(JSON.stringify(latest)));
+        else await store.doc(n.date).delete();
+        showSaved();
+      } catch (e) { toast("保存失败：" + (e?.message || "请检查网络后再试")); }
+    };
+    queue[n.date] = (queue[n.date] || Promise.resolve()).then(run);
+  }
+  function showSaved() { $("saved").textContent = "已保存 " + new Date().toTimeString().slice(0, 5); }
+
+  function update(fn) { const n = JSON.parse(JSON.stringify(get(current))); fn(n); delete n.sample; persist(n); renderAll(); }
+
+  // ---------- render: tonight ----------
+  function renderNight() {
+    const n = get(current), d = parse(current), isTonight = current === nightOf();
+    $("nightEyebrow").textContent = isTonight ? "今晚" : current < nightOf() ? "补记" : "未来";
+    $("nightTitle").textContent = `${d.getMonth() + 1}月${d.getDate()}日 星期${WEEK[d.getDay()]}`;
+    $("datePick").value = current;
+    $("nextDay").disabled = current >= nightOf();
+    if (document.activeElement !== $("endTime")) $("endTime").value = n.end || "";
+    if (document.activeElement !== $("note")) $("note").value = n.note || "";
+    $("burnVal").textContent = n.burnout || 0; $("burnMinus").disabled = !n.burnout;
+    $("bodyVal").textContent = n.body || 0; $("bodyMinus").disabled = !n.body;
+    drawTally($("burnTally"), n.burnout || 0); drawTally($("bodyTally"), n.body || 0);
+    $("nightTotal").textContent = money(sum(n));
+    const ul = $("items"); ul.textContent = "";
+    if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = "还没记。点下面的常买项，或者自己填。"; ul.append(li); }
+    n.items.forEach((it, i) => {
+      const li = document.createElement("li");
+      const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name;
+      const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0);
+      const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.i = i; x.setAttribute("aria-label", "删除 " + it.name);
+      li.append(nm, am, x); ul.append(li);
+    });
+    $("deleteNight").hidden = !nights[current];
+    $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
+  }
+
+  // 正字计数：每 5 次一个"正"，按笔顺一笔一笔画
+  const STROKES = ["M3 4.5 Q12 3.2 21 4.2", "M12 4.5 Q12.6 13 12 21.5", "M12.5 12.5 Q16 11.8 19 12.4", "M5.5 11.5 Q6 16 5.8 21.5", "M2 21.8 Q12 20.6 22 21.4"];
+  function drawTally(el, count) {
+    el.textContent = "";
+    if (!count) { const s = document.createElement("span"); s.className = "none"; s.textContent = "今晚还没有，挺好"; el.append(s); return; }
+    const NS = "http://www.w3.org/2000/svg";
+    for (let g = 0; g < Math.ceil(count / 5); g++) {
+      const svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 24 24");
+      svg.style.transform = `rotate(${((g * 37) % 7) - 3}deg)`;
+      const k = Math.min(5, count - g * 5);
+      for (let i = 0; i < k; i++) { const p = document.createElementNS(NS, "path"); p.setAttribute("d", STROKES[i]); svg.append(p); }
+      el.append(svg);
+    }
+  }
+
+  // ---------- render: stats ----------
+  function inPeriod(date) {
+    const today = nightOf();
+    if (period === "all") return true;
+    if (period === "month") return date.slice(0, 7) === today.slice(0, 7);
+    const d = parse(today), dow = (d.getDay() + 6) % 7; // 周一开始
+    return date >= shift(today, -dow) && date <= today;
+  }
+  function renderStats() {
+    document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === period)));
+    const list = Object.values(nights).filter(n => inPeriod(n.date));
+    const spend = list.reduce((a, n) => a + sum(n), 0);
+    $("sNights").textContent = list.length;
+    $("sSpend").textContent = money(spend);
+    $("sAvg").textContent = list.length ? money(spend / list.length) : "¥0";
+    $("sBurn").textContent = list.reduce((a, n) => a + (n.burnout || 0), 0);
+    $("sBody").textContent = list.reduce((a, n) => a + (n.body || 0), 0);
+    const late = list.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
+    $("sLate").textContent = late ? late.end : "—";
+    const tally = {};
+    list.forEach(n => n.items.forEach(i => { const k = i.name.trim(); if (!k) return; tally[k] = tally[k] || { c: 0, s: 0 }; tally[k].c++; tally[k].s += Number(i.amount) || 0; }));
+    const top = Object.entries(tally).sort((a, b) => b[1].s - a[1].s).slice(0, 3);
+    const tb = $("topBuys"); tb.textContent = "";
+    if (top.length) {
+      tb.append("花得最多：");
+      top.forEach(([k, v], i) => { const b = document.createElement("b"); b.textContent = `${k} ${money(v.s)}（${v.c} 次）`; tb.append(b); if (i < top.length - 1) tb.append("、"); });
+    }
+  }
+
+  // ---------- render: 14-night chart ----------
+  function niceMax(v) { if (v <= 0) return 50; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; }
+  function renderChart() {
+    const end = nightOf(), days = [];
+    for (let i = 13; i >= 0; i--) days.push(shift(end, -i));
+    const max = niceMax(Math.max(0, ...days.map(d => nights[d] ? sum(nights[d]) : 0)));
+    const plot = $("plot"), marks = $("marks"); plot.textContent = ""; marks.textContent = "";
+    [0.5, 1].forEach(f => {
+      const g = document.createElement("div"); g.className = "gridline"; g.style.bottom = f * 100 + "%";
+      const s = document.createElement("span"); s.textContent = money(max * f); g.append(s); plot.append(g);
+    });
+    days.forEach(d => {
+      const n = nights[d], v = n ? sum(n) : 0;
+      const bar = document.createElement("div"); bar.className = "bar" + (d === end ? " today" : "");
+      bar.style.height = (v / max) * 100 + "%"; bar.title = `${d.slice(5)}  ${money(v)}`;
+      plot.append(bar);
+      const col = document.createElement("div");
+      const b = document.createElement("div"); b.className = "dots b";
+      b.textContent = "×".repeat(Math.min(n?.burnout || 0, 5));
+      const p = document.createElement("div"); p.className = "dots p";
+      p.textContent = "×".repeat(Math.min(n?.body || 0, 5));
+      const x = document.createElement("span"); x.className = "xlab"; x.textContent = parse(d).getDate();
+      col.append(b, p, x); marks.append(col);
+    });
+  }
+
+  // ---------- render: history ----------
+  function renderHistory() {
+    const ul = $("history"); ul.textContent = "";
+    const list = Object.values(nights).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 60);
+    list.forEach(n => {
+      const li = document.createElement("li"); if (n.date === current) li.className = "active";
+      const b = document.createElement("button"); b.type = "button"; b.dataset.date = n.date;
+      const d = parse(n.date);
+      const dt = document.createElement("span"); dt.className = "h-date";
+      dt.textContent = `${d.getMonth() + 1}/${d.getDate()}`;
+      const sm = document.createElement("small"); sm.textContent = `周${WEEK[d.getDay()]}` + (n.end ? ` · ${n.end}` : ""); dt.append(sm);
+      const mid = document.createElement("span"); mid.className = "h-mid";
+      mid.textContent = n.items.length ? n.items.map(i => i.name).join("、") : (n.note || "没买东西");
+      if (n.sample) { const t = document.createElement("span"); t.className = "sample-tag"; t.textContent = "示例"; mid.append(t); }
+      const r = document.createElement("span"); r.className = "h-right";
+      const pm = document.createElement("span"); pm.className = "pill m"; pm.textContent = money(sum(n)); r.append(pm);
+      if (n.burnout) { const x = document.createElement("span"); x.className = "pill b"; x.textContent = "burnout ×" + n.burnout; r.append(x); }
+      if (n.body) { const x = document.createElement("span"); x.className = "pill p"; x.textContent = "身体 ×" + n.body; r.append(x); }
+      b.append(dt, mid, r); li.append(b); ul.append(li);
+    });
+    const e = $("empty");
+    e.hidden = !loaded || list.length > 0; e.textContent = "";
+    if (!e.hidden) {
+      const s = document.createElement("strong"); s.textContent = "还没有记录";
+      const p = document.createElement("span"); p.textContent = "在上面的卡片里点 + 或记一笔，今晚就会出现在这里。想先看看效果，可以载入两周的示例数据。";
+      const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn-ghost"; btn.id = "loadSamples"; btn.textContent = "载入示例数据";
+      btn.onclick = loadSamples; e.append(s, p, btn);
+    }
+  }
+
+  // ---------- render: calendar ----------
+  function renderCal() {
+    const [y, m] = calMonth.split("-").map(Number);
+    const today = nightOf(), thisMonth = today.slice(0, 7);
+    $("calMonth").innerHTML = `<span class="num">${y}</span> 年 <span class="num">${m}</span> 月`;
+    $("calNext").disabled = calMonth >= thisMonth;
+    $("calToday").hidden = calMonth === thisMonth;
+    const days = new Date(y, m, 0).getDate();
+    const recs = Object.values(nights).filter(n => n.date.slice(0, 7) === calMonth);
+    const spend = recs.reduce((a, n) => a + sum(n), 0);
+    const maxN = Math.max(0, ...recs.map(sum));
+    const sumEl = $("calSum"); sumEl.textContent = "";
+    if (recs.length) {
+      const b1 = document.createElement("b"); b1.textContent = recs.length;
+      const b2 = document.createElement("b"); b2.textContent = money(spend);
+      sumEl.append("这个月加班 ", b1, " 晚，一共花了 ", b2);
+      const top = recs.slice().sort((a, b) => sum(b) - sum(a))[0];
+      if (sum(top) > 0) { const d = parse(top.date); sumEl.append(`，最贵的一晚是 ${d.getMonth() + 1}月${d.getDate()}日 ${money(sum(top))}`); }
+    } else sumEl.textContent = "这个月还没有加班记录";
+
+    const g = $("calGrid"); g.textContent = "";
+    ["一", "二", "三", "四", "五", "六", "日"].forEach((w, i) => { const e = document.createElement("div"); e.className = "cal-wd" + (i > 4 ? " we" : ""); e.textContent = w; g.append(e); });
+    const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+    for (let i = 0; i < lead; i++) { const e = document.createElement("div"); e.className = "day blank"; g.append(e); }
+    for (let d = 1; d <= days; d++) {
+      const date = `${calMonth}-${pad(d)}`, n = nights[date], v = n ? sum(n) : 0;
+      const b = document.createElement("button"); b.type = "button"; b.dataset.date = date;
+      b.className = "day" + (n ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === current ? " sel" : "");
+      if (date > today) b.disabled = true;
+      if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${Math.round(20 + 80 * v / (maxN || 1))}%, var(--card))`;
+      const dn = document.createElement("span"); dn.className = "d"; dn.textContent = d; b.append(dn);
+      if (n && (n.burnout || n.body)) {
+        const f = document.createElement("span"); f.className = "flags";
+        if (n.burnout) { const x = document.createElement("span"); x.className = "b"; x.textContent = "×".repeat(Math.min(n.burnout, 3)); f.append(x); }
+        if (n.body) { const x = document.createElement("span"); x.className = "p"; x.textContent = "×".repeat(Math.min(n.body, 3)); f.append(x); }
+        b.append(f);
+      }
+      const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? "¥" + Math.round(v) : "";
+      b.append(a);
+      let label = `${m}月${d}日`;
+      if (n) label += `，花了 ${money(v)}` + (n.burnout ? `，burnout ${n.burnout} 次` : "") + (n.body ? `，身体不行 ${n.body} 次` : "");
+      b.setAttribute("aria-label", label); b.title = label;
+      g.append(b);
+    }
+  }
+
+  function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); }
+
+  // ---------- samples ----------
+  function loadSamples() {
+    const base = nightOf();
+    const plan = [
+      [1, [["外卖", 38], ["咖啡", 18]], 1, 0, "22:40"], [2, [["能量饮料", 7], ["打车回家", 46]], 2, 1, "00:15"],
+      [3, [["奶茶", 16]], 0, 0, "21:30"], [5, [["外卖", 42], ["零食", 12], ["打车回家", 39]], 3, 2, "01:20"],
+      [6, [["咖啡", 22]], 1, 0, "22:05"], [8, [["外卖", 29], ["能量饮料", 7]], 1, 1, "23:10"],
+      [9, [["咖啡", 18], ["零食", 9]], 0, 1, "21:50"], [11, [["外卖", 35], ["打车回家", 44]], 2, 1, "00:40"],
+      [12, [["奶茶", 16], ["外卖", 31]], 1, 0, "22:20"],
+    ];
+    for (const [back, items, bo, bd, end] of plan) {
+      const date = shift(base, -back);
+      if (nights[date]) continue;
+      const n = { date, items: items.map(([name, amount]) => ({ name, amount })), burnout: bo, body: bd, end, note: "示例数据", sample: true };
+      nights[date] = n;
+      persistRaw(n);
+    }
+    renderAll(); toast("已载入示例数据，底部可以一键清除");
+  }
+  function persistRaw(n) {
+    if (!store) { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {} return; }
+    queue[n.date] = (queue[n.date] || Promise.resolve()).then(() => store.doc(n.date).set(JSON.parse(JSON.stringify(n))).catch(() => {}));
+  }
+
+  // ---------- events ----------
+  $("burnPlus").onclick = () => update(n => n.burnout = (n.burnout || 0) + 1);
+  $("burnMinus").onclick = () => update(n => n.burnout = Math.max(0, (n.burnout || 0) - 1));
+  $("bodyPlus").onclick = () => update(n => n.body = (n.body || 0) + 1);
+  $("bodyMinus").onclick = () => update(n => n.body = Math.max(0, (n.body || 0) - 1));
+
+  $("buyForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("buyName").value.trim(), amt = parseFloat($("buyAmt").value);
+    if (!name) { $("buyName").focus(); return; }
+    if (!(amt >= 0)) { $("buyAmt").focus(); toast("请填一个金额，比如 18"); return; }
+    update(n => n.items.push({ name, amount: Math.round(amt * 100) / 100 }));
+    $("buyName").value = ""; $("buyAmt").value = ""; $("buyName").focus();
+  });
+  CHIPS.forEach(([name, amt]) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} ¥${amt}`;
+    b.onclick = () => { $("buyName").value = name; $("buyAmt").value = amt; $("buyAmt").focus(); $("buyAmt").select(); };
+    $("chips").append(b);
+  });
+  $("items").addEventListener("click", (e) => {
+    const x = e.target.closest(".x"); if (!x) return;
+    update(n => n.items.splice(Number(x.dataset.i), 1));
+  });
+
+  $("endTime").addEventListener("change", () => update(n => n.end = $("endTime").value));
+  let noteT;
+  $("note").addEventListener("input", () => { clearTimeout(noteT); const v = $("note").value; const d = current; noteT = setTimeout(() => { if (d === current) update(n => n.note = v); }, 700); });
+  $("note").addEventListener("blur", () => { clearTimeout(noteT); if ($("note").value !== (get(current).note || "")) update(n => n.note = $("note").value); });
+
+  const go = (date) => { if (!date) return; current = date > nightOf() ? nightOf() : date; calMonth = current.slice(0, 7); renderAll(); };
+  const monthShift = (k) => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m - 1 + k, 1); calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; renderCal(); };
+  $("calPrev").onclick = () => monthShift(-1);
+  $("calNext").onclick = () => monthShift(1);
+  $("calToday").onclick = () => { calMonth = nightOf().slice(0, 7); renderCal(); };
+  $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) { go(b.dataset.date); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("prevDay").onclick = () => go(shift(current, -1));
+  $("nextDay").onclick = () => go(shift(current, 1));
+  $("datePick").addEventListener("change", (e) => go(e.target.value));
+  $("history").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b) { go(b.dataset.date); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+
+  document.querySelector(".seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    period = b.dataset.p; try { localStorage.setItem("overtime-period", period); } catch (err) {}
+    renderStats();
+  });
+
+  let armed = null;
+  function twoStep(btn, label, act) {
+    if (armed === btn) { armed = null; btn.textContent = label; act(); return; }
+    armed = btn; btn.textContent = "再点一次确认";
+    setTimeout(() => { if (armed === btn) { armed = null; btn.textContent = label; } }, 3000);
+  }
+  $("deleteNight").onclick = (e) => twoStep(e.target, "删除这一晚", () => {
+    const d = current; delete nights[d];
+    if (store) queue[d] = (queue[d] || Promise.resolve()).then(() => store.doc(d).delete().catch(() => toast("删除失败，请再试一次")));
+    else { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {} }
+    renderAll(); toast("已删除这一晚的记录");
+  });
+  $("clearSamples").onclick = (e) => twoStep(e.target, "清除示例数据", () => {
+    const ds = Object.values(nights).filter(n => n.sample).map(n => n.date);
+    ds.forEach(d => { delete nights[d]; if (store) queue[d] = (queue[d] || Promise.resolve()).then(() => store.doc(d).delete().catch(() => {})); });
+    if (!store) { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {} }
+    renderAll(); toast(`已清除 ${ds.length} 条示例`);
+  });
+
+  // ---------- backup ----------
+  const BK_KEY = "overtime-last-backup";
+  function showLastBackup() {
+    let t = null; try { t = localStorage.getItem(BK_KEY); } catch (e) {}
+    $("lastBackup").textContent = t ? `上次导出：${t}` : "还没有导出过备份。";
+  }
+  $("exportBtn").onclick = () => {
+    const data = { app: "overtime-night-log", version: 1, exportedAt: new Date().toISOString(), nights };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `overtime-log-backup-${ymd(new Date())}.json`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    const stamp = `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`;
+    try { localStorage.setItem(BK_KEY, stamp); } catch (e) {}
+    showLastBackup(); toast(`已导出 ${Object.keys(nights).length} 晚的记录`);
+  };
+  $("importBtn").onclick = () => $("importFile").click();
+  $("importFile").addEventListener("change", async (e) => {
+    const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+    try {
+      const raw = JSON.parse(await file.text());
+      const src = raw && typeof raw === "object" ? (raw.nights || raw) : null;
+      if (!src || typeof src !== "object") throw new Error();
+      let added = 0;
+      for (const [date, v] of Object.entries(src)) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !v || typeof v !== "object") continue;
+        const items = Array.isArray(v.items) ? v.items.filter(i => i && typeof i.name === "string").map(i => ({ name: i.name.slice(0, 40), amount: Math.max(0, Number(i.amount) || 0) })) : [];
+        nights[date] = { date, items, burnout: Math.max(0, parseInt(v.burnout) || 0), body: Math.max(0, parseInt(v.body) || 0),
+          end: typeof v.end === "string" ? v.end.slice(0, 5) : "", note: typeof v.note === "string" ? v.note.slice(0, 500) : "", ...(v.sample ? { sample: true } : {}) };
+        added++;
+      }
+      if (!added) throw new Error();
+      try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {}
+      renderAll(); toast(`已导入 ${added} 晚的记录`);
+    } catch (err) { toast("这个文件读不出来，请选择「导出备份」生成的 .json 文件"); }
+  });
+
+  // ---------- boot ----------
+  try { nights = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch (e) { nights = {}; }
+  loaded = true;
+  $("sync").textContent = "数据只存在这台设备上";
+  showLastBackup();
+  renderAll();
+  // 请求持久存储，降低浏览器自动清理数据的概率
+  try { navigator.storage?.persist?.(); } catch (e) {}
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+})();
+</script>
+</body>
+</html>
