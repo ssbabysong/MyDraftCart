@@ -129,9 +129,18 @@ h2.underlined { display: inline-block; background: linear-gradient(var(--ink), v
 .receipt-head { display: flex; justify-content: space-between; align-items: baseline; }
 .receipt-head .total { font-family: var(--f-num); font-size: 30px; }
 ul.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-ul.items li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 6px 2px; border-bottom: 2px dashed var(--grid); }
+ul.items li { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; padding: 6px 2px; border-bottom: 2px dashed var(--grid); }
 ul.items .name { min-width: 0; overflow-wrap: anywhere; }
 ul.items .amt { font-family: var(--f-num); font-size: 20px; }
+ul.items .name, ul.items .amt { cursor: pointer; }
+ul.items .name:hover, ul.items .amt:hover { text-decoration: underline wavy var(--pencil); text-underline-offset: 4px; }
+ul.items li.editing { display: block; padding: 8px 2px 10px; }
+.iedit { display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: end; }
+.iedit input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px; }
+.iedit input[type=number] { font-family: var(--f-num); font-size: 18px; }
+.iedit .btns { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
+.iedit .save { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 3px 16px; box-shadow: 2px 2px 0 var(--ink); }
+.iedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 .x { border: 0; background: transparent; color: var(--pencil); font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 50%; }
 .x:hover, .x:focus-visible { color: var(--burn); }
 .no-items { font-size: 14px; color: var(--pencil); padding: 6px 2px; }
@@ -685,12 +694,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("nightTotal").textContent = money(sum(n));
     const ul = $("items"); ul.textContent = "";
     if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = "还没记。点下面的常买项，或者自己填。"; ul.append(li); }
+    if (editingItem && (editingItem.date !== current || !n.items[editingItem.i])) editingItem = null;
     n.items.forEach((it, i) => {
       const li = document.createElement("li");
-      const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name;
-      const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0);
+      if (editingItem && editingItem.i === i) { li.className = "editing"; li.append(itemEditForm(it, i)); ul.append(li); return; }
+      const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name; nm.dataset.edit = i; nm.title = "点一下修改";
+      const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0); am.dataset.edit = i; am.title = "点一下修改";
       const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.i = i; x.setAttribute("aria-label", "删除 " + it.name);
-      li.append(nm, am, x); ul.append(li);
+      li.append(logoFor(it.name, true), nm, am, x); ul.append(li);
     });
     $("deleteNight").hidden = !nights[current];
     $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
@@ -709,6 +720,31 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       for (let i = 0; i < k; i++) { const p = document.createElementNS(NS, "path"); p.setAttribute("d", STROKES[i]); svg.append(p); }
       el.append(svg);
     }
+  }
+
+  // 今晚已添加的商品：点名称或金额就地修改
+  let editingItem = null;   // {date, i}
+  function itemEditForm(it, i) {
+    const f = document.createElement("form"); f.className = "iedit"; f.autocomplete = "off";
+    const n = document.createElement("input"); n.type = "text"; n.id = "iedit-name"; n.maxLength = 40; n.value = it.name; n.setAttribute("aria-label", "买了什么");
+    const p = document.createElement("input"); p.type = "number"; p.id = "iedit-amt"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = it.amount; p.setAttribute("aria-label", "金额 $");
+    const btns = document.createElement("div"); btns.className = "btns";
+    const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = "取消";
+    const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = "保存";
+    btns.append(c, ok); f.append(n, p, btns);
+    c.onclick = () => { editingItem = null; renderNight(); };
+    f.onkeydown = (e) => { if (e.key === "Escape") c.onclick(); };
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      const name = n.value.trim(), amt = parseFloat(p.value);
+      if (!name) { n.focus(); return; }
+      if (!(amt >= 0)) { p.focus(); toast("请填一个金额，比如 5.5"); return; }
+      editingItem = null;
+      update(night => { if (night.items[i]) night.items[i] = { name, amount: Math.round(amt * 100) / 100 }; });
+      toast("已保存");
+    };
+    setTimeout(() => { n.focus(); n.select(); });
+    return f;
   }
 
   // ---------- render: stats ----------
@@ -1035,7 +1071,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("chips").append(b);
   });
   $("items").addEventListener("click", (e) => {
+    const ed = e.target.closest("[data-edit]");
+    if (ed) { editingItem = { date: current, i: Number(ed.dataset.edit) }; renderNight(); return; }
     const x = e.target.closest(".x"); if (!x) return;
+    editingItem = null;
     update(n => n.items.splice(Number(x.dataset.i), 1));
   });
 
