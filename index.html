@@ -323,6 +323,7 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .gh-form label { font-size: 15px; }
 .gh-form input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
 .gh-form button { grid-column: 1 / -1; justify-self: start; }
+.gh-hint { grid-column: 1 / -1; font-size: 13px; color: var(--pencil); margin-top: -4px; }
 .gh-status { font-size: 15px !important; color: var(--ink) !important; }
 .gh-status::before { content: "✓ "; color: var(--burn); }
 .gh-status.busy::before { content: "↻ "; }
@@ -606,16 +607,19 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <details>
           <summary>第一次用？先准备两样东西</summary>
           <ol>
-            <li>在 GitHub 新建一个<b>私有</b>仓库，比如 <code>overtime-data</code>。不要用放 App 的公开仓库。</li>
+            <li>在 GitHub 新建一个<b>私有</b>仓库专门放数据（可以和你其他 App 共用）。不要用放 App 的公开仓库。</li>
             <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> 新建 Token：Repository access 选 <b>Only select repositories</b> 并勾上这个仓库；Permissions 里把 <b>Contents</b> 设为 <b>Read and write</b>。</li>
             <li>把仓库名和 Token 填到下面。Token 只存在这台手机上。</li>
           </ol>
         </details>
         <form id="ghForm" class="gh-form" autocomplete="off">
           <label for="ghRepo">仓库</label>
-          <input type="text" id="ghRepo" placeholder="你的用户名/overtime-data" autocapitalize="off" spellcheck="false">
+          <input type="text" id="ghRepo" placeholder="你的用户名/仓库名" autocapitalize="off" spellcheck="false">
           <label for="ghToken">Token</label>
           <input type="password" id="ghToken" placeholder="github_pat_…" autocapitalize="off" spellcheck="false">
+          <label for="ghPath">存放位置</label>
+          <input type="text" id="ghPath" value="overtime-night-log/data.json" autocapitalize="off" spellcheck="false">
+          <span class="gh-hint">同一个仓库可以放多个 App 的数据，每个 App 用自己的文件夹，互不影响。</span>
           <button type="submit" class="btn-ghost" id="ghConnect">连接并同步</button>
         </form>
       </div>
@@ -1366,7 +1370,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // ---------- 同步到 GitHub ----------
   // 数据存成私有仓库里的一个 JSON 文件。每次同步：拉取远端 → 按「每晚 / 每个愿望」三方合并
   // （和上次同步时的快照比：只有一边改了就取改的那边；两边都改了以这台手机为准）→ 有变化才提交。
-  const GH_KEY = "overtime-github", GH_BASE = "overtime-github-base", GH_PATH = "overtime-data.json";
+  const GH_KEY = "overtime-github", GH_BASE = "overtime-github-base";
+  // 一个数据仓库可以放好几个 App：每个 App 一个文件夹，这个 App 默认用 overtime-night-log/data.json
+  const GH_DEFAULT_PATH = "overtime-night-log/data.json", GH_APP = "加班夜记";
+  const ghPath = () => (gh && gh.path) || "overtime-data.json";   // 旧版本连接过的保持原位置
+  const ghPathUrl = (p) => p.split("/").map(encodeURIComponent).join("/");
   let gh = null; try { gh = JSON.parse(localStorage.getItem(GH_KEY) || "null"); } catch (e) {}
   let ghBusy = false;
   const ghSave = () => { try { gh ? localStorage.setItem(GH_KEY, JSON.stringify(gh)) : localStorage.removeItem(GH_KEY); } catch (e) {} };
@@ -1397,9 +1405,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function ghRender(msg, busy) {
     $("ghSetup").hidden = !!gh; $("ghConnected").hidden = !gh;
     if (gh) {
-      $("ghOpen").href = `https://github.com/${gh.repo}/commits/HEAD/${GH_PATH}`;
+      $("ghOpen").href = `https://github.com/${gh.repo}/commits/HEAD/${ghPathUrl(ghPath())}`;
       const st = $("ghStatus"); st.className = "gh-status" + (busy ? " busy" : "");
-      st.textContent = msg || (gh.lastSync ? `已同步到 ${gh.repo} · ${gh.lastSync}` : `已连接 ${gh.repo}`);
+      st.textContent = msg || (gh.lastSync ? `已同步到 ${gh.repo}/${ghPath()} · ${gh.lastSync}` : `已连接 ${gh.repo}`);
       $("sync").textContent = gh.lastSync ? `已同步到 GitHub · ${gh.lastSync}` : "已连接 GitHub";
     } else $("sync").textContent = "数据只存在这台设备上";
   }
@@ -1412,12 +1420,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     ghBusy = true; ghRender("正在同步…", true);
     try {
       for (let attempt = 0; attempt < 2; attempt++) {
-        const enc = encodeURIComponent(GH_PATH);
+        const enc = ghPathUrl(ghPath());
         const res = await ghApi(`/repos/${gh.repo}/contents/${enc}`);
         let remote = { nights: {}, wishes: [] }, sha;
         if (res.status === 200) {
           const j = await res.json(); sha = j.sha;
-          try { remote = JSON.parse(b64decode(j.content)); } catch (e) { throw new Error("仓库里的 " + GH_PATH + " 不是这个 App 的数据文件，请换一个仓库。"); }
+          try { remote = JSON.parse(b64decode(j.content)); } catch (e) { throw new Error("仓库里的 " + ghPath() + " 不是这个 App 的数据文件，请换一个存放位置。"); }
         } else if (res.status !== 404) throw new Error(ghExplain(res.status));
         let base = { nights: {}, wishes: {} }; try { base = JSON.parse(localStorage.getItem(GH_BASE) || "null") || base; } catch (e) {}
         const mergedNights = merge3(base.nights || {}, nights, remote.nights || {});
@@ -1433,7 +1441,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
           const doc = { app: "overtime-night-log", version: 3, currency: "USD", updatedAt: new Date().toISOString(), nights: mergedNights, wishes: Object.values(mergedWishes) };
           const stamp = `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`;
           const put = await ghApi(`/repos/${gh.repo}/contents/${enc}`, { method: "PUT", body: JSON.stringify({
-            message: `同步 ${stamp} · ${Object.keys(mergedNights).length} 晚 / ${Object.keys(mergedWishes).length} 个愿望`, content: b64encode(JSON.stringify(doc, null, 2)), ...(sha ? { sha } : {}) }) });
+            message: `[${GH_APP}] 同步 ${stamp} · ${Object.keys(mergedNights).length} 晚 / ${Object.keys(mergedWishes).length} 个愿望`, content: b64encode(JSON.stringify(doc, null, 2)), ...(sha ? { sha } : {}) }) });
           if (put.status === 409 || put.status === 422) continue;   // 另一台设备刚好也在同步：重新拉取再合并一次
           if (!put.ok) throw new Error(ghExplain(put.status));
         }
@@ -1451,8 +1459,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const token = $("ghToken").value.trim();
     if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { ghError("仓库请写成「用户名/仓库名」，比如 ssbabysong/overtime-data"); $("ghRepo").focus(); return; }
     if (!token) { ghError("请填入 Token"); $("ghToken").focus(); return; }
+    const path = ($("ghPath").value.trim() || GH_DEFAULT_PATH).replace(/^\/+/, "");
+    if (!/^[\w.\-]+(\/[\w.\-]+)*\.json$/.test(path) || path.split("/").some(seg => seg === "." || seg === "..")) {
+      ghError("存放位置请写成「文件夹/文件名.json」，比如 overtime-night-log/data.json"); $("ghPath").focus(); return;
+    }
     $("ghConnect").textContent = "正在检查…"; ghError("");
-    gh = { repo, token };
+    gh = { repo, token, path };
     try {
       const res = await ghApi(`/repos/${repo}`);
       if (!res.ok) throw new Error(ghExplain(res.status));

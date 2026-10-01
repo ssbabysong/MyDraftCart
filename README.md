@@ -46,9 +46,11 @@ Branch 选 `main`、目录 `/ (root)`，保存。一两分钟后 App 就在
 
 ## 同步到 GitHub（可选）
 
-在「记录」页最下面打开。记录会存成你**私有**仓库里的 `overtime-data.json`，每次同步是一次 commit。
+在「记录」页最下面打开。记录会存成你**私有**数据仓库里的 `overtime-night-log/data.json`，每次同步是一次 commit（提交信息带 `[加班夜记]` 前缀）。
 
-1. 新建一个**私有**仓库（例如 `overtime-data`）。不要用放 App 的这个公开仓库，否则谁都能看到你的记录。
+一个数据仓库可以给多个 App 共用：每个 App 用自己的文件夹，互不影响。连接时可以在「存放位置」里改路径。
+
+1. 新建一个**私有**仓库专门放数据（例如 `overtime-d`，可以和其他 App 共用）。不要用放 App 的这个公开仓库，否则谁都能看到你的记录。
 2. 在 https://github.com/settings/personal-access-tokens/new 新建 Fine-grained token：
    Repository access 选 **Only select repositories** 并勾上数据仓库；Permissions → **Contents: Read and write**。
 3. 在 App 里填「用户名/仓库名」和 Token，点「连接并同步」。
