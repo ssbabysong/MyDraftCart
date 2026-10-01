@@ -314,6 +314,19 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .backup p { margin: 0; font-size: 14px; color: var(--pencil); }
 .backup .row { display: flex; gap: 10px; flex-wrap: wrap; }
 .backup .btn-ghost { background: var(--card); }
+.backup .btn-icloud { background: var(--money-hi); }
+.restore-tip { font-size: 14px; color: var(--pencil); }
+.restore-tip summary { cursor: pointer; color: var(--ink); }
+.restore-tip p { margin-top: 6px !important; line-height: 1.5; }
+.restore-tip code { font-family: var(--f-num); background: var(--money-hi); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.bk-remind {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  background: var(--money-hi); border: 2px solid var(--ink); border-radius: var(--wob2); box-shadow: 3px 4px 0 var(--ink);
+  padding: 10px 12px 10px 16px; font-size: 15px; transform: rotate(-.6deg);
+}
+.bk-remind .acts { display: flex; gap: 8px; align-items: center; }
+.bk-remind .go { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--card); padding: 3px 12px; box-shadow: 2px 2px 0 var(--ink); }
+.bk-remind .later { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; padding: 3px 4px; }
 .gh details { font-size: 14px; color: var(--pencil); }
 .gh summary { cursor: pointer; color: var(--ink); }
 .gh ol { margin: 8px 0 4px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; line-height: 1.5; }
@@ -432,6 +445,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     </div>
     <div class="clock"><b id="clock">--:--</b><span id="clockSub"></span></div>
   </header>
+
+  <div class="bk-remind" id="bkRemind" role="status" hidden>
+    <span id="bkRemindText">已经 7 天没备份了</span>
+    <span class="acts">
+      <button type="button" class="go" id="bkRemindGo">备份到 iCloud</button>
+      <button type="button" class="later" id="bkRemindLater">明天再说</button>
+    </span>
+  </div>
 
   <main class="tab" id="tab-tonight" data-tab="tonight">
   <section class="card sketch" aria-labelledby="nightTitle">
@@ -589,13 +610,18 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="bkTitle">
     <h2 class="underlined" id="bkTitle">备份</h2>
     <div class="backup sketch">
-      <p>记录默认只存在这台设备的浏览器里。换手机或清理浏览器前，先导出一份备份，或者打开下面的 GitHub 同步。</p>
+      <p>记录默认只存在这台设备的浏览器里。点「备份到 iCloud」，在弹出的菜单里选「存储到文件」→「iCloud 云盘」，就存好了。</p>
       <div class="row">
+        <button type="button" class="btn-ghost btn-icloud" id="icloudBtn">备份到 iCloud</button>
         <button type="button" class="btn-ghost" id="exportBtn">导出备份</button>
         <button type="button" class="btn-ghost" id="importBtn">导入备份</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
       <p id="lastBackup"></p>
+      <details class="restore-tip">
+        <summary>换手机了，怎么从 iCloud 恢复？</summary>
+        <p>点「导入备份」→「浏览」→「iCloud 云盘」，选最新的 <code>overtime-log-backup-日期.json</code>。导入会和手机上已有的记录合并，不会清空。</p>
+      </details>
     </div>
   </section>
 
@@ -1319,21 +1345,67 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   { let t = location.hash.slice(1); if (!TABS.includes(t)) { try { t = localStorage.getItem("overtime-tab") || "tonight"; } catch (e) { t = "tonight"; } } showTab(t, false); }
 
   // ---------- backup ----------
-  const BK_KEY = "overtime-last-backup";
-  function showLastBackup() {
-    let t = null; try { t = localStorage.getItem(BK_KEY); } catch (e) {}
-    $("lastBackup").textContent = t ? `上次导出：${t}` : "还没有导出过备份。";
+  const BK_KEY = "overtime-last-backup", BK_AT = "overtime-last-backup-at", BK_SNOOZE = "overtime-backup-snooze";
+  const DAY = 86400000;
+  const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  function lastBackupAt() {
+    const at = Number(lsGet(BK_AT)); if (at) return at;
+    const t = lsGet(BK_KEY); const p = t ? Date.parse(t.replace(" ", "T")) : NaN;   // 旧版本只存了文字时间
+    return isNaN(p) ? 0 : p;
   }
-  $("exportBtn").onclick = () => {
-    const data = { app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  function showLastBackup() {
+    const t = lsGet(BK_KEY);
+    $("lastBackup").textContent = t ? `上次备份：${t}` : "还没有备份过。";
+    checkBackupReminder();
+  }
+  const backupJSON = () => JSON.stringify({ app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes }, null, 2);
+  const backupName = () => `overtime-log-backup-${ymd(new Date())}.json`;
+  function markBackedUp(how) {
+    lsSet(BK_KEY, `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`);
+    lsSet(BK_AT, String(Date.now()));
+    showLastBackup();
+    toast(how === "icloud" ? `已备份 ${Object.keys(nights).length} 晚的记录` : `已导出 ${Object.keys(nights).length} 晚的记录`);
+  }
+  function downloadBackup() {
+    const blob = new Blob([backupJSON()], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = `overtime-log-backup-${ymd(new Date())}.json`;
+    a.href = URL.createObjectURL(blob); a.download = backupName();
     document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    const stamp = `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`;
-    try { localStorage.setItem(BK_KEY, stamp); } catch (e) {}
-    showLastBackup(); toast(`已导出 ${Object.keys(nights).length} 晚的记录`);
-  };
+    markBackedUp("download");
+  }
+  // 备份到 iCloud：调起系统分享菜单，选「存储到文件」→ iCloud 云盘。不支持分享文件的浏览器就直接下载。
+  async function backupToICloud() {
+    const file = new File([backupJSON()], backupName(), { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: "加班夜记备份" });
+        markBackedUp("icloud");
+      } catch (e) {
+        if (e && e.name === "AbortError") return;   // 用户自己关掉了菜单
+        downloadBackup();
+      }
+    } else {
+      downloadBackup();
+      toast("已下载备份文件，可以在「文件」里把它移到 iCloud 云盘");
+    }
+  }
+  // 每周提醒：有记录、7 天没备份（从没备份过且记了 3 晚以上也提醒）、没在 GitHub 自动同步、没点过「明天再说」
+  function checkBackupReminder() {
+    const count = Object.keys(nights).length;
+    const last = lastBackupAt(), now = Date.now();
+    const snoozed = Number(lsGet(BK_SNOOZE)) > now;
+    const ghFresh = typeof gh !== "undefined" && gh && gh.lastSyncAt && now - gh.lastSyncAt < 7 * DAY;
+    const due = last ? now - last >= 7 * DAY : count >= 3;
+    const show = count > 0 && due && !snoozed && !ghFresh;
+    $("bkRemind").hidden = !show;
+    if (show) $("bkRemindText").textContent = last ? `已经 ${Math.round((parse(ymd(new Date(now))) - parse(ymd(new Date(last)))) / DAY)} 天没备份了` : `已经记了 ${count} 晚，还没备份过`;
+  }
+  $("icloudBtn").onclick = backupToICloud;
+  $("bkRemindGo").onclick = backupToICloud;
+  $("bkRemindLater").onclick = () => { lsSet(BK_SNOOZE, String(Date.now() + DAY)); $("bkRemind").hidden = true; };
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkBackupReminder(); });
+  $("exportBtn").onclick = downloadBackup;
   $("importBtn").onclick = () => $("importFile").click();
   $("importFile").addEventListener("change", async (e) => {
     const file = e.target.files[0]; e.target.value = ""; if (!file) return;
@@ -1446,7 +1518,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
           if (!put.ok) throw new Error(ghExplain(put.status));
         }
         try { localStorage.setItem(GH_BASE, JSON.stringify({ nights: mergedNights, wishes: mergedWishes })); } catch (e) {}
-        gh.lastSync = `${ymd(new Date()).slice(5).replace("-", "/")} ${new Date().toTimeString().slice(0, 5)}`; ghSave();
+        gh.lastSync = `${ymd(new Date()).slice(5).replace("-", "/")} ${new Date().toTimeString().slice(0, 5)}`; gh.lastSyncAt = Date.now(); ghSave(); checkBackupReminder();
         ghError(""); break;
       }
     } catch (e) {
