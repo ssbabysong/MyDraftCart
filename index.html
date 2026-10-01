@@ -314,6 +314,20 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .backup p { margin: 0; font-size: 14px; color: var(--pencil); }
 .backup .row { display: flex; gap: 10px; flex-wrap: wrap; }
 .backup .btn-ghost { background: var(--card); }
+.gh details { font-size: 14px; color: var(--pencil); }
+.gh summary { cursor: pointer; color: var(--ink); }
+.gh ol { margin: 8px 0 4px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; line-height: 1.5; }
+.gh a { color: var(--ink); overflow-wrap: anywhere; }
+.gh code { font-family: var(--f-num); background: var(--money-hi); padding: 0 4px; border-radius: 3px; }
+.gh-form { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; align-items: center; margin-top: 10px; }
+.gh-form label { font-size: 15px; }
+.gh-form input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
+.gh-form button { grid-column: 1 / -1; justify-self: start; }
+.gh-status { font-size: 15px !important; color: var(--ink) !important; }
+.gh-status::before { content: "✓ "; color: var(--burn); }
+.gh-status.busy::before { content: "↻ "; }
+.gh-err { color: var(--burn) !important; font-size: 14px; }
+a.btn-ghost { text-decoration: none; display: inline-block; }
 
 /* calendar */
 .cal { padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--wob2); }
@@ -574,13 +588,46 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="bkTitle">
     <h2 class="underlined" id="bkTitle">备份</h2>
     <div class="backup sketch">
-      <p>记录只存在这台设备的浏览器里，不会上传到任何地方。换手机或清理浏览器前，先导出一份备份。</p>
+      <p>记录默认只存在这台设备的浏览器里。换手机或清理浏览器前，先导出一份备份，或者打开下面的 GitHub 同步。</p>
       <div class="row">
         <button type="button" class="btn-ghost" id="exportBtn">导出备份</button>
         <button type="button" class="btn-ghost" id="importBtn">导入备份</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
       <p id="lastBackup"></p>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="ghTitle">
+    <h2 class="underlined" id="ghTitle">同步到 GitHub</h2>
+    <div class="backup sketch gh">
+      <p id="ghIntro">把记录自动存到你自己的<b>私有</b> GitHub 仓库，每次同步都是一次 commit，换手机、误删都能找回。不开也完全不影响使用。</p>
+      <div id="ghSetup">
+        <details>
+          <summary>第一次用？先准备两样东西</summary>
+          <ol>
+            <li>在 GitHub 新建一个<b>私有</b>仓库，比如 <code>overtime-data</code>。不要用放 App 的公开仓库。</li>
+            <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> 新建 Token：Repository access 选 <b>Only select repositories</b> 并勾上这个仓库；Permissions 里把 <b>Contents</b> 设为 <b>Read and write</b>。</li>
+            <li>把仓库名和 Token 填到下面。Token 只存在这台手机上。</li>
+          </ol>
+        </details>
+        <form id="ghForm" class="gh-form" autocomplete="off">
+          <label for="ghRepo">仓库</label>
+          <input type="text" id="ghRepo" placeholder="你的用户名/overtime-data" autocapitalize="off" spellcheck="false">
+          <label for="ghToken">Token</label>
+          <input type="password" id="ghToken" placeholder="github_pat_…" autocapitalize="off" spellcheck="false">
+          <button type="submit" class="btn-ghost" id="ghConnect">连接并同步</button>
+        </form>
+      </div>
+      <div id="ghConnected" hidden>
+        <p class="gh-status" id="ghStatus"></p>
+        <div class="row">
+          <button type="button" class="btn-ghost" id="ghSyncNow">立即同步</button>
+          <a class="btn-ghost" id="ghOpen" target="_blank" rel="noopener">在 GitHub 查看</a>
+          <button type="button" class="link" id="ghDisconnect">断开</button>
+        </div>
+      </div>
+      <p class="gh-err" id="ghErr" hidden></p>
     </div>
   </section>
 
@@ -1316,12 +1363,134 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     } catch (err) { toast("这个文件读不出来，请选择「导出备份」生成的 .json 文件"); }
   });
 
+  // ---------- 同步到 GitHub ----------
+  // 数据存成私有仓库里的一个 JSON 文件。每次同步：拉取远端 → 按「每晚 / 每个愿望」三方合并
+  // （和上次同步时的快照比：只有一边改了就取改的那边；两边都改了以这台手机为准）→ 有变化才提交。
+  const GH_KEY = "overtime-github", GH_BASE = "overtime-github-base", GH_PATH = "overtime-data.json";
+  let gh = null; try { gh = JSON.parse(localStorage.getItem(GH_KEY) || "null"); } catch (e) {}
+  let ghBusy = false;
+  const ghSave = () => { try { gh ? localStorage.setItem(GH_KEY, JSON.stringify(gh)) : localStorage.removeItem(GH_KEY); } catch (e) {} };
+  const b64encode = (str) => { const bytes = new TextEncoder().encode(str); let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(bin); };
+  const b64decode = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), c => c.charCodeAt(0)));
+  const wishMap = (list) => Object.fromEntries((list || []).filter(w => w && w.id).map(w => [w.id, w]));
+  function merge3(base, local, remote) {
+    const out = {};
+    for (const k of new Set([...Object.keys(base), ...Object.keys(local), ...Object.keys(remote)])) {
+      const b = JSON.stringify(base[k]), l = JSON.stringify(local[k]), r = JSON.stringify(remote[k]);
+      const pick = l === r ? local[k] : l === b ? remote[k] : r === b ? local[k] : local[k];
+      if (pick !== undefined) out[k] = pick;
+    }
+    return out;
+  }
+  async function ghApi(path, opts = {}) {
+    const res = await fetch("https://api.github.com" + path, { ...opts, cache: "no-store", headers: {
+      Accept: "application/vnd.github+json", Authorization: "Bearer " + gh.token, "X-GitHub-Api-Version": "2022-11-28",
+      ...(opts.body ? { "Content-Type": "application/json" } : {}) } });
+    return res;
+  }
+  function ghExplain(status, fallback) {
+    if (status === 401) return "Token 无效或已过期，请重新生成一个再连接。";
+    if (status === 403) return "Token 没有写入权限：请把 Contents 设为 Read and write，并确认勾选了这个仓库。";
+    if (status === 404) return "找不到这个仓库，或者 Token 没有勾选它。请检查「用户名/仓库名」是否写对。";
+    return fallback || `GitHub 返回了错误（${status}），稍后会自动重试。`;
+  }
+  function ghRender(msg, busy) {
+    $("ghSetup").hidden = !!gh; $("ghConnected").hidden = !gh;
+    if (gh) {
+      $("ghOpen").href = `https://github.com/${gh.repo}/commits/HEAD/${GH_PATH}`;
+      const st = $("ghStatus"); st.className = "gh-status" + (busy ? " busy" : "");
+      st.textContent = msg || (gh.lastSync ? `已同步到 ${gh.repo} · ${gh.lastSync}` : `已连接 ${gh.repo}`);
+      $("sync").textContent = gh.lastSync ? `已同步到 GitHub · ${gh.lastSync}` : "已连接 GitHub";
+    } else $("sync").textContent = "数据只存在这台设备上";
+  }
+  function ghError(text) { const e = $("ghErr"); e.textContent = text || ""; e.hidden = !text; }
+  const editingNow = () => { const a = document.activeElement; return a && (a.closest?.(".iedit, .wedit") || a.id === "note"); };
+
+  async function ghSync(reason) {
+    if (!gh || ghBusy || !navigator.onLine) return;
+    if (reason === "auto" && editingNow()) return;   // 正在编辑时先不动，下一轮再同步
+    ghBusy = true; ghRender("正在同步…", true);
+    try {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const enc = encodeURIComponent(GH_PATH);
+        const res = await ghApi(`/repos/${gh.repo}/contents/${enc}`);
+        let remote = { nights: {}, wishes: [] }, sha;
+        if (res.status === 200) {
+          const j = await res.json(); sha = j.sha;
+          try { remote = JSON.parse(b64decode(j.content)); } catch (e) { throw new Error("仓库里的 " + GH_PATH + " 不是这个 App 的数据文件，请换一个仓库。"); }
+        } else if (res.status !== 404) throw new Error(ghExplain(res.status));
+        let base = { nights: {}, wishes: {} }; try { base = JSON.parse(localStorage.getItem(GH_BASE) || "null") || base; } catch (e) {}
+        const mergedNights = merge3(base.nights || {}, nights, remote.nights || {});
+        const mergedWishes = merge3(base.wishes || {}, wishMap(wishes), wishMap(remote.wishes));
+        const localChanged = JSON.stringify(mergedNights) !== JSON.stringify(nights) || JSON.stringify(mergedWishes) !== JSON.stringify(wishMap(wishes));
+        if (localChanged) {
+          nights = mergedNights; wishes = Object.values(mergedWishes);
+          try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {}
+          saveWishes(); renderAll();
+        }
+        const remoteChanged = res.status === 404 || JSON.stringify(mergedNights) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mergedWishes) !== JSON.stringify(wishMap(remote.wishes));
+        if (remoteChanged) {
+          const doc = { app: "overtime-night-log", version: 3, currency: "USD", updatedAt: new Date().toISOString(), nights: mergedNights, wishes: Object.values(mergedWishes) };
+          const stamp = `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`;
+          const put = await ghApi(`/repos/${gh.repo}/contents/${enc}`, { method: "PUT", body: JSON.stringify({
+            message: `同步 ${stamp} · ${Object.keys(mergedNights).length} 晚 / ${Object.keys(mergedWishes).length} 个愿望`, content: b64encode(JSON.stringify(doc, null, 2)), ...(sha ? { sha } : {}) }) });
+          if (put.status === 409 || put.status === 422) continue;   // 另一台设备刚好也在同步：重新拉取再合并一次
+          if (!put.ok) throw new Error(ghExplain(put.status));
+        }
+        try { localStorage.setItem(GH_BASE, JSON.stringify({ nights: mergedNights, wishes: mergedWishes })); } catch (e) {}
+        gh.lastSync = `${ymd(new Date()).slice(5).replace("-", "/")} ${new Date().toTimeString().slice(0, 5)}`; ghSave();
+        ghError(""); break;
+      }
+    } catch (e) {
+      ghError(e instanceof TypeError ? "连不上 GitHub，有网络时会自动再试。" : (e.message || "同步失败，稍后会自动重试。"));
+    } finally { ghBusy = false; ghRender(); }
+  }
+  $("ghForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const repo = $("ghRepo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "").replace(/\/$/, "");
+    const token = $("ghToken").value.trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { ghError("仓库请写成「用户名/仓库名」，比如 ssbabysong/overtime-data"); $("ghRepo").focus(); return; }
+    if (!token) { ghError("请填入 Token"); $("ghToken").focus(); return; }
+    $("ghConnect").textContent = "正在检查…"; ghError("");
+    gh = { repo, token };
+    try {
+      const res = await ghApi(`/repos/${repo}`);
+      if (!res.ok) throw new Error(ghExplain(res.status));
+      const info = await res.json();
+      if (!info.private) throw new Error("这个仓库是公开的，任何人都能看到你的记录。请换成私有仓库，或者在仓库 Settings 里改成 Private。");
+      if (info.permissions && !info.permissions.push) throw new Error(ghExplain(403));
+      ghSave(); $("ghToken").value = "";
+      await ghSync("connect");
+      if (!$("ghErr").hidden) return;
+      toast("已连接，之后会自动同步");
+    } catch (err) {
+      gh = null; ghSave();
+      ghError(err instanceof TypeError ? "连不上 GitHub，请检查网络。" : err.message);
+    } finally { $("ghConnect").textContent = "连接并同步"; ghRender(); }
+  });
+  $("ghSyncNow").onclick = () => ghSync("manual");
+  $("ghDisconnect").onclick = (e) => twoStep(e.target, "断开", () => {
+    gh = null; ghSave(); try { localStorage.removeItem(GH_BASE); } catch (err) {}
+    ghError(""); ghRender(); toast("已断开。记录还在这台手机上，GitHub 里的文件也还在");
+  });
+  // 自动同步：打开 / 切回 App、恢复联网时拉一次；有改动时 20 秒内推上去；切到后台前再推一次
+  let ghLastLocal = "";
+  setInterval(() => {
+    if (!gh) return;
+    const now = JSON.stringify([nights, wishes]);
+    if (now !== ghLastLocal) { ghLastLocal = now; ghSync("auto"); }
+  }, 20000);
+  document.addEventListener("visibilitychange", () => { if (gh) ghSync("auto"); });
+  window.addEventListener("online", () => { if (gh) ghSync("auto"); });
+
   // ---------- boot ----------
   try { nights = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch (e) { nights = {}; }
   loaded = true;
   $("sync").textContent = "数据只存在这台设备上";
   showLastBackup();
   renderAll();
+  ghRender();
+  if (gh) { ghLastLocal = JSON.stringify([nights, wishes]); ghSync("open"); }
   // 请求持久存储，降低浏览器自动清理数据的概率
   try { navigator.storage?.persist?.(); } catch (e) {}
   // ---------- 禁止双指缩放 ----------

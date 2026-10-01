@@ -43,3 +43,17 @@ Branch 选 `main`、目录 `/ (root)`，保存。一两分钟后 App 就在
 - 「记录」页底部会显示当前版本号，方便确认有没有更新成功。
 
 **注意：** iPhone 上，Safari 里打开的网页和「添加到主屏幕」后的 App 是两份独立的数据，互相看不到。请固定只用桌面图标打开来记录；需要搬数据时用「导出备份 / 导入备份」。
+
+## 同步到 GitHub（可选）
+
+在「记录」页最下面打开。记录会存成你**私有**仓库里的 `overtime-data.json`，每次同步是一次 commit。
+
+1. 新建一个**私有**仓库（例如 `overtime-data`）。不要用放 App 的这个公开仓库，否则谁都能看到你的记录。
+2. 在 https://github.com/settings/personal-access-tokens/new 新建 Fine-grained token：
+   Repository access 选 **Only select repositories** 并勾上数据仓库；Permissions → **Contents: Read and write**。
+3. 在 App 里填「用户名/仓库名」和 Token，点「连接并同步」。
+
+- 打开 App、切回 App、恢复联网时会自动拉取；有改动后 20 秒内自动推送。
+- 多台设备同时用：按「每一晚 / 每个愿望」合并，两边都改了同一晚时以正在操作的这台为准。
+- Token 只存在这台设备上；点「断开」会清掉它，记录和仓库里的文件都保留。
+- App 会拒绝连接公开仓库。
