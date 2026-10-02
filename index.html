@@ -24,13 +24,13 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Patrick+Hand&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Patrick+Hand&family=Noto+Sans+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&family=ZCOOL+QingKe+HuangYou&family=Archivo+Black&display=swap">
 <style>
 /* Layout: a hand-drawn notebook page — grid paper, ink-sketched boxes with wobbly edges, 正-tally counters, hatched bar chart */
 :root {
   --paper: #FAFAF4;        /* 方格本 */
   --grid: #DCE6EF;
-  --ink: #26354D;          /* 蓝黑圆珠笔 */
+  --ink: var(--on-money, #26354D);          /* 蓝黑圆珠笔 */
   --pencil: #7A8494;
   --card: #FFFFFF;
   --money: #F5C21B;        /* 荧光笔黄 */
@@ -67,9 +67,7 @@ input, textarea, select { font-size: max(16px, 1em); }
 body { margin: 0; -webkit-tap-highlight-color: transparent; }
 body {
   background-color: var(--paper); color: var(--ink);
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-image: var(--paper-img, linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px));
   background-size: 24px 24px;
   font-family: var(--f-hand); font-size: 16px; line-height: 1.6;
   padding: 0 16px; padding-block: 32px 64px;
@@ -77,18 +75,18 @@ body {
 .wrap { max-width: 660px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+:focus-visible { outline: var(--bw, 2px) dashed var(--bc, var(--ink)); outline-offset: 3px; }
 .num { font-family: var(--f-num); }
 .eyebrow { font-family: var(--f-hand); font-size: 14px; color: var(--pencil); letter-spacing: .06em; }
 
 /* sketchy primitives */
-.sketch { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--card); box-shadow: 3px 4px 0 var(--ink); }
+.sketch { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--card); box-shadow: var(--sh-hard, 3px 4px 0 var(--ink)); }
 .hl { background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 88%, transparent 88%); padding: 0 4px; }
 
 header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
-h1 { font-family: var(--f-title); font-weight: 400; font-size: clamp(40px, 10vw, 58px); line-height: 1; margin: 4px 0 0; transform: rotate(-2deg); transform-origin: left bottom; }
+h1 { font-family: var(--f-title); font-weight: 400; font-size: clamp(40px, 10vw, 58px); line-height: 1; margin: 4px 0 0; transform: rotate(calc(-2deg * var(--tilt, 1))); transform-origin: left bottom; }
 h1 .hl { background: linear-gradient(transparent 60%, var(--burn-hi) 60%, var(--burn-hi) 90%, transparent 90%); }
-.clock { text-align: right; transform: rotate(1.5deg); }
+.clock { text-align: right; transform: rotate(calc(1.5deg * var(--tilt, 1))); }
 .clock b { display: block; font-family: var(--f-num); font-weight: 400; font-size: 34px; line-height: 1; }
 .clock span { font-size: 14px; color: var(--pencil); }
 h2 { font-family: var(--f-hand); font-weight: 400; font-size: 24px; margin: 0; text-wrap: balance; }
@@ -97,32 +95,33 @@ h2.underlined { display: inline-block; background: linear-gradient(var(--ink), v
 /* tonight card */
 .card { padding: 22px 20px; display: flex; flex-direction: column; gap: 22px; position: relative; }
 .card::before { /* 胶带 */
-  content: ""; position: absolute; top: -12px; left: 50%; width: 110px; height: 24px; transform: translateX(-50%) rotate(-3deg);
+  display: var(--tape, block);
+  content: ""; position: absolute; top: -12px; left: 50%; width: 110px; height: 24px; transform: translateX(-50%) rotate(calc(-3deg * var(--tilt, 1)));
   background: var(--money-hi); opacity: .85; border-left: 2px dotted var(--paper); border-right: 2px dotted var(--paper);
 }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .datepick { display: flex; align-items: center; gap: 6px; }
-.datepick button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.datepick button { width: 34px; height: 34px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); font-size: 18px; line-height: 1; }
 .datepick button:disabled { opacity: .3; cursor: default; }
 .datepick input, .field-inline input {
-  background: transparent; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 2px 4px; height: 34px; font-family: var(--f-num); font-size: 18px;
+  background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: 0; padding: 2px 4px; height: 34px; font-family: var(--f-num); font-size: 18px;
 }
 .field-inline { display: flex; align-items: center; gap: 10px; font-size: 16px; }
 
 .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.counter { border: 2px solid var(--ink); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.counter.burn { border-radius: var(--wob2); background: var(--burn-hi); }
-.counter.body { border-radius: var(--wob3); background: var(--body-hi); transform: rotate(.6deg); }
-.counter.burn { transform: rotate(-.6deg); }
+.counter { border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.counter.burn { border-radius: var(--rad, var(--wob2)); background: var(--burn-hi); }
+.counter.body { border-radius: var(--rad, var(--wob3)); background: var(--body-hi); transform: rotate(calc(.6deg * var(--tilt, 1))); }
+.counter.burn { transform: rotate(calc(-.6deg * var(--tilt, 1))); }
 .counter .label { font-size: 18px; }
 .counter .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .big { font-family: var(--f-num); font-size: 48px; line-height: .9; }
 .counter.burn .big { color: var(--burn); }
 .counter.body .big { color: var(--body); }
 .pm { display: flex; gap: 8px; }
-.pm button { width: 42px; height: 42px; border: 2px solid var(--ink); font-size: 22px; line-height: 1; background: var(--card); border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; transition: transform .1s; }
-.pm button:active { transform: scale(.92) rotate(-6deg); }
-.pm .plus { box-shadow: 2px 2px 0 var(--ink); }
+.pm button { width: 42px; height: 42px; border: var(--bw, 2px) solid var(--bc, var(--ink)); font-size: 22px; line-height: 1; background: var(--card); border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); transition: transform .1s; }
+.pm button:active { transform: scale(.92) rotate(calc(-6deg * var(--tilt, 1))); }
+.pm .plus { box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 .pm button:disabled { opacity: .3; cursor: default; }
 .tally { display: flex; flex-wrap: wrap; gap: 4px; min-height: 30px; align-items: center; }
 .tally svg { width: 28px; height: 28px; overflow: visible; }
@@ -144,23 +143,23 @@ ul.items .name, ul.items .amt { cursor: pointer; }
 ul.items .name:hover, ul.items .amt:hover { text-decoration: underline wavy var(--pencil); text-underline-offset: 4px; }
 ul.items li.editing { display: block; padding: 8px 2px 10px; }
 .iedit { display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: end; }
-.iedit input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px; }
+.iedit input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 4px; }
 .iedit input[type=number] { font-family: var(--f-num); font-size: 18px; }
 .iedit .btns { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
-.iedit .save { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 3px 16px; box-shadow: 2px 2px 0 var(--ink); }
+.iedit .save { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money); color: var(--on-money, #26354D); padding: 3px 16px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 .iedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 .x { border: 0; background: transparent; color: var(--pencil); font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 50%; }
 .x:hover, .x:focus-visible { color: var(--burn); }
 .no-items { font-size: 14px; color: var(--pencil); padding: 6px 2px; }
 form.buy { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: end; }
-form.buy input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
+form.buy input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
 form.buy input[type=number] { font-family: var(--f-num); font-size: 18px; }
-form.buy .add { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 6px 16px; box-shadow: 2px 3px 0 var(--ink); }
+form.buy .add { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money); color: var(--on-money, #26354D); padding: 6px 16px; box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); }
 form.buy .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chips button { border: 1.5px dashed var(--ink); background: transparent; border-radius: var(--wob2); padding: 2px 12px; font-size: 14px; }
-.chips button:nth-child(odd) { transform: rotate(-1.5deg); }
-.chips button:nth-child(even) { transform: rotate(1.2deg); }
+.chips button { border: var(--bw, 1.5px) dashed var(--bc, var(--ink)); background: transparent; border-radius: var(--rad, var(--wob2)); padding: 2px 12px; font-size: 14px; }
+.chips button:nth-child(odd) { transform: rotate(calc(-1.5deg * var(--tilt, 1))); }
+.chips button:nth-child(even) { transform: rotate(calc(1.2deg * var(--tilt, 1))); }
 .chips button:hover { background: var(--money-hi); }
 textarea#note {
   width: 100%; min-height: 80px; resize: vertical; border: 0; padding: 4px 6px; color: var(--ink); line-height: 28px;
@@ -171,13 +170,13 @@ textarea#note {
 /* stats */
 .stats-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .seg { display: inline-flex; gap: 6px; }
-.seg button { border: 2px solid transparent; background: transparent; padding: 2px 12px; font-size: 16px; border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; }
+.seg button { border: 2px solid transparent; background: transparent; padding: 2px 12px; font-size: 16px; border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); }
 .seg button[aria-pressed="true"] { border-color: var(--ink); }
 .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.tile { border: 2px solid var(--ink); background: var(--card); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.tile:nth-child(3n+1) { border-radius: var(--wob1); transform: rotate(-.8deg); }
-.tile:nth-child(3n+2) { border-radius: var(--wob2); transform: rotate(.6deg); }
-.tile:nth-child(3n) { border-radius: var(--wob3); transform: rotate(-.3deg); }
+.tile { border: var(--bw, 2px) solid var(--bc, var(--ink)); background: var(--card); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile:nth-child(3n+1) { border-radius: var(--rad, var(--wob1)); transform: rotate(calc(-.8deg * var(--tilt, 1))); }
+.tile:nth-child(3n+2) { border-radius: var(--rad, var(--wob2)); transform: rotate(calc(.6deg * var(--tilt, 1))); }
+.tile:nth-child(3n) { border-radius: var(--rad, var(--wob3)); transform: rotate(calc(-.3deg * var(--tilt, 1))); }
 .tile .v { font-family: var(--f-num); font-size: 30px; line-height: 1.1; overflow-wrap: anywhere; }
 .tile .k { font-size: 14px; color: var(--pencil); }
 .tile.money .v { align-self: flex-start; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); }
@@ -187,14 +186,14 @@ textarea#note {
 .top-buys b { color: var(--ink); font-weight: 400; }
 
 /* chart */
-.chart { padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--wob3); }
+.chart { padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--rad, var(--wob3)); }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--pencil); }
-.legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid var(--ink); border-radius: 3px; }
-.plot { position: relative; height: 150px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; align-items: end; border-bottom: 2px solid var(--ink); }
+.legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: 3px; }
+.plot { position: relative; height: 150px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; align-items: end; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); }
 .gridline { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--grid); pointer-events: none; }
 .gridline span { position: absolute; right: 0; top: -20px; font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
 .bar {
-  position: relative; border: 2px solid var(--ink); border-bottom: 0; border-radius: 6px 10px 0 0 / 10px 6px 0 0;
+  position: relative; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-bottom: 0; border-radius: var(--rad-bar, 6px 10px 0 0 / 10px 6px 0 0);
   background: repeating-linear-gradient(-45deg, var(--money) 0 3px, transparent 3px 7px);
 }
 .bar[style*="height: 0%"] { border: 0; }
@@ -214,8 +213,8 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
   display: grid; grid-template-columns: repeat(5, 1fr);
   padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
-  background: var(--paper); border-top: 2px solid var(--ink);
-  border-radius: 18px 22px 0 0 / 10px 12px 0 0;
+  background: var(--paper); border-top: var(--bw, 2px) solid var(--bc, var(--ink));
+  border-radius: var(--rad-top, 18px 22px 0 0 / 10px 12px 0 0);
   box-shadow: 0 -3px 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .tabbar button {
@@ -224,28 +223,28 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 }
 .tabbar svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
 .tabbar button[aria-current="page"] { color: var(--ink); }
-.tabbar button[aria-current="page"] svg { transform: rotate(-6deg) scale(1.08); }
+.tabbar button[aria-current="page"] svg { transform: rotate(calc(-6deg * var(--tilt, 1))) scale(1.08); }
 .tabbar button[aria-current="page"] span { background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 92%, transparent 92%); padding: 0 4px; }
 .tabbar button[data-go="tonight"][aria-current="page"] svg { fill: var(--money); }
 .tabbar button[data-go="wishes"][aria-current="page"] svg { fill: var(--body-hi); }
 .tabbar button:active svg { transform: scale(.9); }
-@media (min-width: 700px) { .tabbar { left: 50%; right: auto; width: 520px; transform: translateX(-50%); border: 2px solid var(--ink); border-bottom: 0; } }
+@media (min-width: 700px) { .tabbar { left: 50%; right: auto; width: 520px; transform: translateX(-50%); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .tab { animation: none; } }
 
 /* calendar: items view */
 .items-view { display: flex; flex-direction: column; gap: 12px; }
 .item-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
-.wall-card { border: 2px solid var(--ink); background: var(--card); padding: 10px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; }
-.wall-card:nth-child(3n+1) { border-radius: var(--wob1); transform: rotate(-1deg); }
-.wall-card:nth-child(3n+2) { border-radius: var(--wob2); transform: rotate(.8deg); }
-.wall-card:nth-child(3n) { border-radius: var(--wob3); transform: rotate(-.4deg); }
+.wall-card { border: var(--bw, 2px) solid var(--bc, var(--ink)); background: var(--card); padding: 10px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; }
+.wall-card:nth-child(3n+1) { border-radius: var(--rad, var(--wob1)); transform: rotate(calc(-1deg * var(--tilt, 1))); }
+.wall-card:nth-child(3n+2) { border-radius: var(--rad, var(--wob2)); transform: rotate(calc(.8deg * var(--tilt, 1))); }
+.wall-card:nth-child(3n) { border-radius: var(--rad, var(--wob3)); transform: rotate(calc(-.4deg * var(--tilt, 1))); }
 .wall-card .nm { font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
 .wall-card .ct { font-family: var(--f-num); font-size: 15px; color: var(--pencil); line-height: 1; }
 .wall-card .sm { font-family: var(--f-num); font-size: 19px; line-height: 1; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); padding: 0 3px; }
-.logo { display: inline-grid; place-items: center; flex: none; width: 48px; height: 48px; border: 2px solid var(--ink); border-radius: 50% 44% 52% 47% / 46% 53% 45% 52%; color: var(--ink); }
+.logo { display: inline-grid; place-items: center; flex: none; width: 48px; height: 48px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 44% 52% 47% / 46% 53% 45% 52%); color: var(--ink); }
 .logo svg { width: 70%; height: 70%; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
 .logo svg .fill { fill: currentColor; stroke: none; }
-.logo .ch { font-family: var(--f-title); font-size: 24px; line-height: 1; transform: rotate(-6deg); }
+.logo .ch { font-family: var(--f-title); font-size: 24px; line-height: 1; transform: rotate(calc(-6deg * var(--tilt, 1))); }
 .logo.sm { width: 32px; height: 32px; border-width: 1.5px; }
 .logo.sm .ch { font-size: 17px; }
 .lg-0 { background: var(--money-hi); } .lg-1 { background: var(--body-hi); } .lg-2 { background: var(--burn-hi); } .lg-3 { background: var(--card); }
@@ -256,7 +255,7 @@ ol.night-list > li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; 
 .nl-date small { font-size: 12px; color: var(--pencil); }
 .nl-date .t { font-family: var(--f-num); font-size: 15px; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); align-self: flex-start; }
 .nl-items { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; align-content: flex-start; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border: 1.5px solid var(--ink); background: var(--card); border-radius: 999px 900px 999px 950px / 950px 999px 900px 999px; max-width: 100%; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); background: var(--card); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); max-width: 100%; }
 .chip .n { font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
 .chip .p { font-family: var(--f-num); font-size: 16px; white-space: nowrap; }
 .nl-none { font-size: 14px; color: var(--pencil); align-self: center; }
@@ -264,7 +263,7 @@ ol.night-list > li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; 
 .nl-flags .b { color: var(--burn); } .nl-flags .p2 { color: var(--body); }
 
 /* calendar day detail */
-.day-detail { padding: 16px; border-radius: var(--wob1); display: flex; flex-direction: column; gap: 10px; scroll-margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+.day-detail { padding: 16px; border-radius: var(--rad, var(--wob1)); display: flex; flex-direction: column; gap: 10px; scroll-margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .dd-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .dd-head h3 { margin: 0; font-weight: 400; font-size: 20px; }
 .dd-head .total { font-family: var(--f-num); font-size: 28px; background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); padding: 0 4px; }
@@ -277,25 +276,25 @@ ol.night-list > li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; 
 .dd-empty { margin: 0; color: var(--pencil); font-size: 15px; }
 .dd-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
 .dd-nav { display: flex; gap: 6px; }
-.dd-nav button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.dd-nav button { width: 34px; height: 34px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); font-size: 18px; line-height: 1; }
 .dd-nav button:disabled { opacity: .3; cursor: default; }
 
 /* wishlist */
-.wish-sum { padding: 16px; border-radius: var(--wob2); display: flex; flex-direction: column; gap: 6px; }
+.wish-sum { padding: 16px; border-radius: var(--rad, var(--wob2)); display: flex; flex-direction: column; gap: 6px; }
 .wish-sum .big-total { font-family: var(--f-num); font-size: 40px; line-height: 1; }
 .wish-sum .big-total span { background: linear-gradient(transparent 55%, var(--body-hi) 55%, var(--body-hi) 90%, transparent 90%); padding: 0 4px; }
 .wish-sum p { margin: 0; font-size: 14px; color: var(--pencil); }
 .wish-sum p b { font-family: var(--f-num); font-weight: 400; font-size: 17px; color: var(--ink); }
 form.wish { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: end; }
-form.wish input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 6px 4px; }
+form.wish input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
 form.wish input[type=number] { font-family: var(--f-num); font-size: 18px; }
-form.wish .add { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--body-hi); padding: 6px 16px; box-shadow: 2px 3px 0 var(--ink); }
+form.wish .add { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--body-hi); padding: 6px 16px; box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); }
 form.wish .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
 ul.wishes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-ul.wishes li { border: 2px solid var(--ink); background: var(--card); padding: 12px 12px 12px 14px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; }
-ul.wishes li:nth-child(odd) { border-radius: var(--wob1); transform: rotate(-.4deg); }
-ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4deg); }
-.wbox { width: 26px; height: 26px; margin-top: 2px; border: 2px solid var(--ink); background: transparent; padding: 0; display: grid; place-items: center; border-radius: 6px 9px 7px 8px / 8px 6px 9px 7px; color: transparent; }
+ul.wishes li { border: var(--bw, 2px) solid var(--bc, var(--ink)); background: var(--card); padding: 12px 12px 12px 14px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; }
+ul.wishes li:nth-child(odd) { border-radius: var(--rad, var(--wob1)); transform: rotate(calc(-.4deg * var(--tilt, 1))); }
+ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform: rotate(calc(.4deg * var(--tilt, 1))); }
+.wbox { width: 26px; height: 26px; margin-top: 2px; border: var(--bw, 2px) solid var(--bc, var(--ink)); background: transparent; padding: 0; display: grid; place-items: center; border-radius: var(--rad, 6px 9px 7px 8px / 8px 6px 9px 7px); color: transparent; }
 .wbox svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .got .wbox { color: var(--burn); }
 .wbody { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -304,76 +303,106 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .wmeta { font-size: 13px; color: var(--pencil); }
 .wprice { font-family: var(--f-num); font-size: 22px; line-height: 1.1; text-align: right; white-space: nowrap; }
 .wprice small { display: block; }
-.wbar { height: 8px; border: 1.5px solid var(--ink); border-radius: 6px 8px 7px 5px; overflow: hidden; background: var(--paper); }
+.wbar { height: 8px; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--rad, 6px 8px 7px 5px); overflow: hidden; background: var(--paper); }
 .wbar i { display: block; height: 100%; background: repeating-linear-gradient(-45deg, var(--body) 0 3px, transparent 3px 6px); }
 .wish-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .got-head { font-size: 14px; color: var(--pencil); }
 .wname, .wprice { cursor: pointer; }
 .wname:hover, .wprice:hover { text-decoration: underline wavy var(--pencil); text-underline-offset: 4px; }
 .wedit { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 100px; gap: 10px; align-items: end; }
-.wedit input { min-width: 0; background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px; }
+.wedit input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 4px; }
 .wedit input[type=number] { font-family: var(--f-num); font-size: 18px; }
 .wedit .btns { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
-.wedit .save { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--body-hi); padding: 3px 16px; box-shadow: 2px 2px 0 var(--ink); }
+.wedit .save { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--body-hi); padding: 3px 16px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 .wedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 
 /* skins：四种额外主题，各自固定一套配色 */
-:root[data-skin="kraft"] {
-  --paper: #E9D6B4; --grid: #D7BF96; --ink: #3B2A1A; --pencil: #7A6248; --card: #F6EAD3;
-  --money: #E8962A; --money-hi: #F6C676; --burn: #B23A1F; --burn-hi: #F0B9A3; --body: #5B4A9B; --body-hi: #D8CDEE; color-scheme: light;
-}
-:root[data-skin="midnight"] {
-  --paper: #121A2C; --grid: #1D2740; --ink: #E8ECF6; --pencil: #93A0BB; --card: #1A2338;
-  --money: #FFC94D; --money-hi: #4D411C; --burn: #FF7A6B; --burn-hi: #4A2529; --body: #B9A2FF; --body-hi: #362D55; color-scheme: dark;
-}
+/* 樱花：手绘风，换一套粉色 */
 :root[data-skin="sakura"] {
   --paper: #FFF3F6; --grid: #F5D7E0; --ink: #4A2338; --pencil: #9A6F84; --card: #FFFFFF;
   --money: #F4A261; --money-hi: #FFDDC4; --burn: #D6336C; --burn-hi: #FFD0DD; --body: #7E57C2; --body-hi: #E9DDFB; color-scheme: light;
 }
-:root[data-skin="mint"] {
-  --paper: #EFF9F4; --grid: #CBE8DB; --ink: #1E3D3A; --pencil: #5D7E77; --card: #FFFFFF;
-  --money: #F2C94C; --money-hi: #FFEFAE; --burn: #E0603F; --burn-hi: #FFD6CA; --body: #5C6BC0; --body-hi: #DCE0FA; color-scheme: light;
+/* 其他风格：不只是换颜色，字体、圆角、阴影、倾斜一起换 */
+:root[data-skin="clean"] {
+  --paper: #F3F4F6; --grid: #E3E5EA; --ink: #1A2230; --pencil: #6A7282; --card: #FFFFFF;
+  --money: #F2A93B; --money-hi: #FCE7C3; --burn: #E5484D; --burn-hi: #FDE0E1; --body: #7C5CE0; --body-hi: #ECE6FD; --on-money: #1A2230;
+  --f-title: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; --f-hand: var(--f-title); --f-num: "Noto Sans SC", system-ui, sans-serif;
+  --tilt: 0; --rad: 16px; --round: 999px; --rad-top: 22px 22px 0 0; --rad-bar: 4px 4px 0 0; --bw: 1px; --bc: var(--grid);
+  --sh-hard: 0 1px 2px rgba(26,34,48,.06), 0 8px 24px rgba(26,34,48,.06); --paper-img: none; --tape: none; color-scheme: light;
 }
+:root[data-skin="receipt"] {
+  --paper: #E8E5DE; --grid: #D5D0C5; --ink: #1B1B1B; --pencil: #75716A; --card: #FFFDF7;
+  --money: #F1CB3B; --money-hi: #FAEA9C; --burn: #D2261E; --burn-hi: #F7D2CE; --body: #2D4FD6; --body-hi: #D7DEFA; --on-money: #1B1B1B;
+  --f-title: "JetBrains Mono", "Noto Sans SC", ui-monospace, monospace; --f-hand: var(--f-title); --f-num: var(--f-title);
+  --tilt: 0; --rad: 0; --round: 2px; --rad-top: 0; --rad-bar: 0; --bw: 1px; --bc: var(--ink);
+  --sh-hard: 0 1px 0 rgba(0,0,0,.12); --paper-img: none; --tape: none; color-scheme: light;
+}
+:root[data-skin="terminal"] {
+  --paper: #0E0B07; --grid: #2A2215; --ink: #FFC766; --pencil: #A88B57; --card: #15110B;
+  --money: #FFB000; --money-hi: #3D2C07; --burn: #FF6B4A; --burn-hi: #3A170E; --body: #9EC5FF; --body-hi: #16253D; --on-money: #120D04;
+  --f-title: "JetBrains Mono", "Noto Sans SC", ui-monospace, monospace; --f-hand: var(--f-title); --f-num: var(--f-title);
+  --tilt: 0; --rad: 3px; --round: 3px; --rad-top: 6px 6px 0 0; --rad-bar: 0; --bw: 1px; --bc: color-mix(in srgb, var(--ink) 55%, transparent);
+  --sh-hard: none; --paper-img: repeating-linear-gradient(transparent 0 3px, rgba(255,199,102,.035) 3px 4px); --tape: none; color-scheme: dark;
+}
+:root[data-skin="pop"] {
+  --paper: #FFF3D1; --grid: #F0DC9E; --ink: #111111; --pencil: #4A4A4A; --card: #FFFFFF;
+  --money: #FFCF24; --money-hi: #FFE680; --burn: #FF4F4F; --burn-hi: #FFC9C9; --body: #4361EE; --body-hi: #CED6FF; --on-money: #111111;
+  --f-title: "ZCOOL QingKe HuangYou", "Noto Sans SC", sans-serif; --f-hand: "Noto Sans SC", system-ui, sans-serif; --f-num: "Archivo Black", "Noto Sans SC", sans-serif;
+  --tilt: 0; --rad: 12px; --round: 999px; --rad-top: 16px 16px 0 0; --rad-bar: 3px 3px 0 0; --bw: 3px; --bc: #111111;
+  --sh-hard: 4px 4px 0 #111111; --paper-img: radial-gradient(rgba(17,17,17,.13) 1.3px, transparent 1.6px); --tape: none; color-scheme: light;
+}
+:root[data-skin="clean"] h1, :root[data-skin="receipt"] h1, :root[data-skin="terminal"] h1 { font-weight: 700; letter-spacing: -.01em; }
+:root[data-skin="clean"] h2, :root[data-skin="receipt"] h2, :root[data-skin="terminal"] h2 { font-weight: 700; }
+:root[data-skin="receipt"] h1, :root[data-skin="terminal"] h1 { font-size: clamp(30px, 8vw, 42px); }
+:root[data-skin="receipt"] h1 .hl, :root[data-skin="terminal"] h1 .hl { background: none; }
+:root[data-skin="receipt"] .card { border-style: dashed; }
+:root[data-skin="terminal"] h1 { text-shadow: 0 0 12px color-mix(in srgb, var(--ink) 45%, transparent); }
+:root[data-skin="pop"] h1 { font-size: clamp(42px, 11vw, 60px); }
+:root[data-skin="pop"] .tabbar { border-top-width: 3px; }
+.cur-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
+.cur-row select, .cur-row input { font: inherit; color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px 2px; min-width: 0; }
+.cur-row input { width: 7em; font-family: var(--f-num); font-size: 17px; }
+.cur-hint { font-size: 13px; color: var(--pencil); }
 .settings { gap: 14px; }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .set-k { font-size: 16px; }
 .skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
-.skin { border: 2px solid var(--grid); border-radius: 12px 14px 11px 13px / 13px 11px 14px 12px; background: var(--card); padding: 6px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; color: var(--ink); font-size: 14px; }
-.skin[aria-pressed="true"] { border-color: var(--ink); box-shadow: 2px 3px 0 var(--ink); }
+.skin { border: 2px solid var(--grid); border-radius: var(--rad, 12px 14px 11px 13px / 13px 11px 14px 12px); background: var(--card); padding: 6px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; color: var(--ink); font-size: 14px; }
+.skin[aria-pressed="true"] { border-color: var(--ink); box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); }
 .skin .sw { height: 54px; border-radius: 8px; border: 1.5px solid rgba(0,0,0,.18); position: relative; overflow: hidden; }
 .skin .sw i { position: absolute; border-radius: 50%; width: 14px; height: 14px; bottom: 7px; border: 1.5px solid rgba(0,0,0,.25); }
-.skin .sw b { position: absolute; left: 8px; right: 8px; top: 12px; height: 3px; border-radius: 2px; }
+.skin .sw em { position: absolute; left: 8px; top: 8px; font-style: normal; font-size: 17px; line-height: 1.1; }
 .skin small { display: block; font-size: 11px; color: var(--pencil); }
 
 /* share card */
 .share-cta {
   display: flex; align-items: center; gap: 14px; text-align: left; width: 100%;
-  border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money-hi); color: #26354D;
-  padding: 12px 16px; box-shadow: 3px 4px 0 var(--ink); font-size: 18px; transform: rotate(-.4deg);
+  border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money-hi); color: var(--on-money, #26354D);
+  padding: 12px 16px; box-shadow: var(--sh-hard, 3px 4px 0 var(--ink)); font-size: 18px; transform: rotate(calc(-.4deg * var(--tilt, 1)));
 }
-.share-cta:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.share-cta:active { transform: translate(2px, 2px); box-shadow: var(--sh-hard, 1px 1px 0 var(--ink)); }
 .share-cta svg { width: 34px; height: 34px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .share-cta small { display: block; font-size: 13px; opacity: .75; }
 .share-modal { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, #10151f 55%, transparent); display: flex; align-items: flex-end; justify-content: center; }
 .share-sheet {
-  width: min(560px, 100%); max-height: 100%; overflow-y: auto; background: var(--paper); border: 2px solid var(--ink); border-bottom: 0;
-  border-radius: 22px 26px 0 0 / 14px 16px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  width: min(560px, 100%); max-height: 100%; overflow-y: auto; background: var(--paper); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-bottom: 0;
+  border-radius: var(--rad-top, 22px 26px 0 0 / 14px 16px 0 0); padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column; gap: 12px;
 }
 .share-head { display: grid; grid-template-columns: 40px 1fr 40px 40px; align-items: center; gap: 6px; }
 .share-head h3 { margin: 0; text-align: center; font-weight: 400; font-size: 20px; }
-.share-head button { height: 36px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.share-head button { height: 36px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); font-size: 18px; line-height: 1; }
 .share-head button:disabled { opacity: .3; }
 .share-head .close { border: 0; background: none; font-size: 26px; color: var(--pencil); }
-.share-img { border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; background: var(--card); aspect-ratio: 3 / 4; max-height: 62vh; margin: 0 auto; max-width: 100%; }
+.share-img { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: 10px; overflow: hidden; background: var(--card); aspect-ratio: 3 / 4; max-height: 62vh; margin: 0 auto; max-width: 100%; }
 .share-img img { display: block; width: 100%; height: 100%; object-fit: contain; transition: opacity .2s; }
 .share-img img.loading { opacity: .3; }
-.share-go { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 10px; font-size: 18px; box-shadow: 3px 3px 0 var(--ink); }
+.share-go { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money); color: var(--on-money, #26354D); padding: 10px; font-size: 18px; box-shadow: var(--sh-hard, 3px 3px 0 var(--ink)); }
 .share-go:disabled { opacity: .5; }
 .share-hint { margin: 0; font-size: 13px; color: var(--pencil); text-align: center; }
 
 /* backup */
-.backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--wob3); }
+.backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--rad, var(--wob3)); }
 .backup p { margin: 0; font-size: 14px; color: var(--pencil); }
 .backup .row { display: flex; gap: 10px; flex-wrap: wrap; }
 .backup .btn-ghost { background: var(--card); }
@@ -384,20 +413,20 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .restore-tip code { font-family: var(--f-num); background: var(--money-hi); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
 .bk-remind {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  background: var(--money-hi); border: 2px solid var(--ink); border-radius: var(--wob2); box-shadow: 3px 4px 0 var(--ink);
-  padding: 10px 12px 10px 16px; font-size: 15px; transform: rotate(-.6deg);
+  background: var(--money-hi); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); box-shadow: var(--sh-hard, 3px 4px 0 var(--ink));
+  padding: 10px 12px 10px 16px; font-size: 15px; transform: rotate(calc(-.6deg * var(--tilt, 1)));
 }
 .bk-remind .acts { display: flex; gap: 8px; align-items: center; }
-.bk-remind .go { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--card); padding: 3px 12px; box-shadow: 2px 2px 0 var(--ink); }
+.bk-remind .go { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--card); padding: 3px 12px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 .bk-remind .later { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; padding: 3px 4px; }
 
 /* calendar */
-.cal { padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--wob2); }
+.cal { padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--rad, var(--wob2)); }
 .cal-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .cal-head .month { font-size: 22px; }
 .cal-head .month .num { font-size: 26px; }
 .cal-nav { display: flex; align-items: center; gap: 8px; }
-.cal-nav button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.cal-nav button { width: 34px; height: 34px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); font-size: 18px; line-height: 1; }
 .cal-nav button:disabled { opacity: .3; cursor: default; }
 .cal-sum { font-size: 14px; color: var(--pencil); }
 .cal-sum b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 90%, transparent 90%); padding: 0 3px; }
@@ -407,9 +436,9 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .day {
   position: relative; min-width: 0; aspect-ratio: 1 / 1.1; max-width: 100%; border: 1.5px solid var(--grid); background: var(--card);
   display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; padding: 3px 4px; text-align: left;
-  border-radius: 8px 12px 9px 11px / 11px 8px 12px 9px;
+  border-radius: var(--rad, 8px 12px 9px 11px / 11px 8px 12px 9px);
 }
-.day:nth-child(odd) { border-radius: 12px 8px 11px 9px / 9px 12px 8px 11px; }
+.day:nth-child(odd) { border-radius: var(--rad, 12px 8px 11px 9px / 9px 12px 8px 11px); }
 .day .d { font-family: var(--f-num); font-size: 15px; line-height: 1; color: var(--pencil); }
 .day .amt { font-family: var(--f-num); font-size: 15px; line-height: 1; text-align: right; overflow: hidden; white-space: nowrap; }
 .day .flags { position: absolute; top: 2px; right: 4px; font-family: var(--f-num); font-size: 12px; line-height: 1; letter-spacing: -1px; }
@@ -418,51 +447,52 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .day.has { border-color: var(--ink); }
 .day.has .d { color: var(--ink); }
 .day.future { opacity: .35; cursor: default; }
+.day.hot .d, .day.hot .amt { color: var(--on-money, var(--ink)); }
 .day.blank { visibility: hidden; }
-.day.today .d { display: inline-block; align-self: flex-start; border: 1.5px solid var(--burn); border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; padding: 1px 3px; color: var(--burn); }
-.day.sel { box-shadow: 2px 3px 0 var(--ink); border-width: 2px; border-color: var(--ink); }
+.day.today .d { display: inline-block; align-self: flex-start; border: 1.5px solid var(--burn); border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); padding: 1px 3px; color: var(--burn); }
+.day.sel { box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); border-width: 2px; border-color: var(--ink); }
 .day:not(.future):hover { border-color: var(--ink); }
 .cal-key { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--pencil); }
 .cal-key .ramp { display: inline-flex; gap: 2px; vertical-align: middle; margin: 0 4px; }
-.cal-key .ramp i { width: 14px; height: 12px; border: 1px solid var(--ink); border-radius: 3px; }
+.cal-key .ramp i { width: 14px; height: 12px; border: var(--bw, 1px) solid var(--bc, var(--ink)); border-radius: 3px; }
 
 /* history */
 ul.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 ul.history li button {
-  width: 100%; text-align: left; background: var(--card); border: 2px solid var(--ink); padding: 10px 14px;
+  width: 100%; text-align: left; background: var(--card); border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 10px 14px;
   display: grid; grid-template-columns: 70px 1fr auto; gap: 12px; align-items: center;
 }
-ul.history li:nth-child(odd) button { border-radius: var(--wob1); }
-ul.history li:nth-child(even) button { border-radius: var(--wob2); }
-ul.history li button:hover { box-shadow: 3px 3px 0 var(--ink); }
-ul.history li.active button { box-shadow: 3px 3px 0 var(--ink); background: var(--money-hi); }
+ul.history li:nth-child(odd) button { border-radius: var(--rad, var(--wob1)); }
+ul.history li:nth-child(even) button { border-radius: var(--rad, var(--wob2)); }
+ul.history li button:hover { box-shadow: var(--sh-hard, 3px 3px 0 var(--ink)); }
+ul.history li.active button { box-shadow: var(--sh-hard, 3px 3px 0 var(--ink)); background: var(--money-hi); }
 .h-date { font-family: var(--f-num); font-size: 22px; line-height: 1.1; }
 .h-date small { display: block; font-family: var(--f-hand); color: var(--pencil); font-size: 12px; }
 .h-mid { min-width: 0; font-size: 14px; color: var(--pencil); overflow-wrap: anywhere; }
 .h-right { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-.pill { font-family: var(--f-num); font-size: 16px; padding: 0 8px; white-space: nowrap; border: 1.5px solid currentColor; border-radius: 50% 45% 55% 48% / 48% 55% 45% 52%; }
+.pill { font-family: var(--f-num); font-size: 16px; padding: 0 8px; white-space: nowrap; border: 1.5px solid currentColor; border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); }
 .pill.m { color: var(--ink); background: var(--money-hi); border-color: var(--ink); }
 .pill.b { color: var(--burn); }
 .pill.p { color: var(--body); }
 .sample-tag { font-size: 12px; color: var(--pencil); border: 1px dashed var(--pencil); border-radius: 4px; padding: 0 5px; margin-left: 6px; }
 
-.empty { border: 2px dashed var(--pencil); border-radius: var(--wob1); padding: 28px 20px; text-align: center; color: var(--pencil); display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.empty { border: 2px dashed var(--pencil); border-radius: var(--rad, var(--wob1)); padding: 28px 20px; text-align: center; color: var(--pencil); display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .empty strong { font-size: 20px; color: var(--ink); font-weight: 400; }
-.btn-ghost { border: 2px solid var(--ink); background: var(--money-hi); color: var(--ink); border-radius: var(--wob2); padding: 4px 16px; font-size: 15px; box-shadow: 2px 2px 0 var(--ink); }
+.btn-ghost { border: var(--bw, 2px) solid var(--bc, var(--ink)); background: var(--money-hi); color: var(--ink); border-radius: var(--rad, var(--wob2)); padding: 4px 16px; font-size: 15px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--pencil); }
 .link { border: 0; background: none; color: var(--pencil); text-decoration: underline wavy; text-underline-offset: 4px; padding: 0; font-size: 14px; margin-left: 10px; }
 .link:hover { color: var(--burn); }
 .sync::before { content: "○"; margin-right: 4px; }
 .sync.on::before { content: "✓"; color: var(--ink); }
 .update-bar {
-  position: fixed; left: 50%; transform: translateX(-50%) rotate(-.6deg); z-index: 30;
+  position: fixed; left: 50%; transform: translateX(-50%) rotate(calc(-.6deg * var(--tilt, 1))); z-index: 30;
   top: calc(12px + env(safe-area-inset-top, 0px)); width: min(520px, calc(100% - 32px));
   display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--wob2);
-  padding: 8px 10px 8px 14px; box-shadow: 3px 4px 0 var(--ink); font-size: 14px;
+  background: var(--card); color: var(--ink); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2));
+  padding: 8px 10px 8px 14px; box-shadow: var(--sh-hard, 3px 4px 0 var(--ink)); font-size: 14px;
 }
-.update-bar button { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 3px 12px; box-shadow: 2px 2px 0 var(--ink); }
-.toast { position: fixed; left: 50%; transform: translateX(-50%) rotate(-1deg); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--money-hi); color: var(--ink); border: 2px solid var(--ink); padding: 6px 16px; border-radius: var(--wob1); font-size: 15px; box-shadow: 3px 3px 0 var(--ink); max-width: calc(100% - 32px); }
+.update-bar button { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money); color: var(--on-money, #26354D); padding: 3px 12px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%) rotate(calc(-1deg * var(--tilt, 1))); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--money-hi); color: var(--ink); border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 16px; border-radius: var(--rad, var(--wob1)); font-size: 15px; box-shadow: var(--sh-hard, 3px 3px 0 var(--ink)); max-width: calc(100% - 32px); }
 
 @media (max-width: 480px) {
   .cal { padding: 14px 10px 12px; }
@@ -663,6 +693,16 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
           <button type="button" data-lang="en" aria-pressed="false" lang="en">English</button>
         </div>
       </div>
+      <div class="set-row">
+        <label class="set-k" for="curSel">货币</label>
+        <div class="cur-row"><select id="curSel"></select></div>
+      </div>
+      <div class="cur-row" id="rateRow">
+        <span>1 USD =</span>
+        <input type="number" id="curRate" min="0" step="any" inputmode="decimal" aria-label="汇率">
+        <span id="rateCode">CNY</span>
+      </div>
+      <span class="cur-hint" id="curHint">参考汇率，请按实际修改。只改变显示，已记录的数据不会被改动。</span>
       <span class="set-k">主题</span>
       <div class="skins" id="skinList" role="group" aria-label="主题"></div>
     </div>
@@ -769,7 +809,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "身体不行次数": "Unwell", "最晚下班": "Latest finish", "每晚花费": "Spent per night",
     "生成我的月度加班账单": "Make my monthly overtime bill", "一张手绘风长图，可以直接发小红书": "A hand-drawn image, ready to post",
     "愿望": "Wishes", "愿望清单": "Wishlist", "还想买的，一共": "Still on my list", "许个愿": "Make a wish",
-    "记录": "Log", "设置": "Settings", "语言": "Language", "主题": "Theme", "历史记录": "History", "备份": "Backup",
+    "记录": "Log", "设置": "Settings", "语言": "Language", "主题": "Theme", "货币": "Currency", "汇率": "Exchange rate",
+    "参考汇率，请按实际修改。只改变显示，已记录的数据不会被改动。": "A reference rate. Change it to the real one. It only changes how amounts are shown; saved records stay the same.", "历史记录": "History", "备份": "Backup",
     "记录默认只存在这台设备的浏览器里。点「备份到 iCloud」，在弹出的菜单里选「存储到文件」→「iCloud 云盘」，就存好了。": "Your records live only in this browser on this device. Tap Back up to iCloud, then choose Save to Files → iCloud Drive.",
     "备份到 iCloud": "Back up to iCloud", "导出备份": "Export backup", "导入备份": "Import backup",
     "换手机了，怎么从 iCloud 恢复？": "New phone? Restore from iCloud",
@@ -823,7 +864,29 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
   // 加班的"今晚"：凌晨 6 点前仍算前一天
   const nightOf = (d = new Date()) => { const x = new Date(d); if (x.getHours() < 6) x.setDate(x.getDate() - 1); return ymd(x); };
-  const money = (n) => "$" + (Math.round(n * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(Math.round(n * 100) / 100) ? 0 : 2, maximumFractionDigits: 2 });
+  // ---------- 货币与汇率 ----------
+  // 记录一律按美元保存；显示和输入用你选的货币，按你填的汇率换算。换货币、改汇率都不会改动已存的数据。
+  const CUR_KEY = "overtime-currency";
+  const CURRENCIES = [["USD", 1, "美元", "US dollar"], ["CNY", 7.1, "人民币", "Chinese yuan"], ["EUR", 0.92, "欧元", "Euro"], ["GBP", 0.78, "英镑", "British pound"],
+    ["JPY", 150, "日元", "Japanese yen"], ["HKD", 7.8, "港币", "Hong Kong dollar"], ["TWD", 32, "新台币", "New Taiwan dollar"], ["CAD", 1.37, "加元", "Canadian dollar"],
+    ["AUD", 1.52, "澳元", "Australian dollar"], ["SGD", 1.34, "新加坡元", "Singapore dollar"], ["KRW", 1380, "韩元", "Korean won"]];
+  let cur = { code: "USD", rates: {} };
+  try { const c = JSON.parse(localStorage.getItem(CUR_KEY) || "null"); if (c && CURRENCIES.some(x => x[0] === c.code)) cur = { code: c.code, rates: c.rates || {} }; } catch (e) {}
+  const curRate = () => cur.code === "USD" ? 1 : (cur.rates[cur.code] > 0 ? cur.rates[cur.code] : CURRENCIES.find(x => x[0] === cur.code)[1]);
+  const noCents = () => cur.code === "JPY" || cur.code === "KRW";
+  const toDisp = (usd) => (Number(usd) || 0) * curRate();
+  const toBase = (v) => Math.round(v / curRate() * 1e6) / 1e6;
+  const dispRound = (v) => noCents() ? Math.round(v) : Math.round(v * 100) / 100;
+  const fmtCur = (v, frac) => {
+    const narrow = ["USD", "CNY", "EUR", "GBP", "JPY", "KRW"].includes(cur.code);
+    try { return new Intl.NumberFormat("en-US", { style: "currency", currency: cur.code, currencyDisplay: narrow ? "narrowSymbol" : "symbol", minimumFractionDigits: frac, maximumFractionDigits: frac }).format(v); }
+    catch (e) { return cur.code + " " + v.toFixed(frac); }
+  };
+  const curSym = () => fmtCur(0, 0).replace(/[\d\s.,]/g, "");
+  const money = (n) => { const v = dispRound(toDisp(n)); return fmtCur(v, noCents() || Number.isInteger(v) ? 0 : 2); };
+  const moneyShort = (n) => fmtCur(Math.round(toDisp(n)), 0);
+  // 常买项等预设金额按汇率换算后取个整，方便直接用
+  const niceDisp = (usd) => { const v = toDisp(usd); return noCents() || v >= 10 ? Math.round(v) : Math.round(v * 2) / 2; };
   const sum = (n) => (n.items || []).reduce((a, i) => a + (Number(i.amount) || 0), 0);
   // 下班时间排序：凌晨 0–5 点算作 24–29 点
   const lateKey = (t) => { if (!t) return -1; const [h, m] = t.split(":").map(Number); return (h < 6 ? h + 24 : h) * 60 + m; };
@@ -912,7 +975,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function itemEditForm(it, i) {
     const f = document.createElement("form"); f.className = "iedit"; f.autocomplete = "off";
     const n = document.createElement("input"); n.type = "text"; n.id = "iedit-name"; n.maxLength = 40; n.value = it.name; n.setAttribute("aria-label", L("买了什么", "What did you buy"));
-    const p = document.createElement("input"); p.type = "number"; p.id = "iedit-amt"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = it.amount; p.setAttribute("aria-label", L("金额 $", "Amount $"));
+    const p = document.createElement("input"); p.type = "number"; p.id = "iedit-amt"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = dispRound(toDisp(it.amount)); p.setAttribute("aria-label", L("金额 ", "Amount ") + curSym());
     const btns = document.createElement("div"); btns.className = "btns";
     const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = L("取消", "Cancel");
     const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = L("保存", "Save");
@@ -925,7 +988,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (!name) { n.focus(); return; }
       if (!(amt >= 0)) { p.focus(); toast(L("请填一个金额，比如 5.5", "Enter an amount, like 5.5")); return; }
       editingItem = null;
-      update(night => { if (night.items[i]) night.items[i] = { name, amount: Math.round(amt * 100) / 100 }; });
+      update(night => { if (night.items[i]) night.items[i] = { name, amount: toBase(amt) }; });
       toast(L("已保存", "Saved"));
     };
     setTimeout(() => { n.focus(); n.select(); });
@@ -946,7 +1009,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const spend = list.reduce((a, n) => a + sum(n), 0);
     $("sNights").textContent = list.length;
     $("sSpend").textContent = money(spend);
-    $("sAvg").textContent = list.length ? money(spend / list.length) : "$0";
+    $("sAvg").textContent = money(list.length ? spend / list.length : 0);
     $("sBurn").textContent = list.reduce((a, n) => a + (n.burnout || 0), 0);
     $("sBody").textContent = list.reduce((a, n) => a + (n.body || 0), 0);
     const late = list.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
@@ -1046,7 +1109,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const b = document.createElement("button"); b.type = "button"; b.dataset.date = date;
       b.className = "day" + (n ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
       if (date > today) b.disabled = true;
-      if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${Math.round(20 + 80 * v / (maxN || 1))}%, var(--card))`;
+      const heat = Math.round(20 + 80 * v / (maxN || 1));
+      if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${heat}%, var(--card))`;
+      if (v > 0 && heat >= 60) b.classList.add("hot");   // 颜色深的格子换成对比色文字
       const dn = document.createElement("span"); dn.className = "d"; dn.textContent = d; b.append(dn);
       if (n && (n.burnout || n.body)) {
         const f = document.createElement("span"); f.className = "flags";
@@ -1054,7 +1119,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         if (n.body) { const x = document.createElement("span"); x.className = "p"; x.textContent = "×".repeat(Math.min(n.body, 3)); f.append(x); }
         b.append(f);
       }
-      const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? "$" + Math.round(v) : "";
+      const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? moneyShort(v) : "";
       b.append(a);
       let label = fmtMD(new Date(y, m - 1, d));
       if (n) label += L(`，花了 ${money(v)}` + (n.burnout ? `，burnout ${n.burnout} 次` : "") + (n.body ? `，身体不行 ${n.body} 次` : ""), `, spent ${money(v)}` + (n.burnout ? `, burnout ×${n.burnout}` : "") + (n.body ? `, unwell ×${n.body}` : ""));
@@ -1247,14 +1312,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const name = $("buyName").value.trim(), amt = parseFloat($("buyAmt").value);
     if (!name) { $("buyName").focus(); return; }
     if (!(amt >= 0)) { $("buyAmt").focus(); toast(L("请填一个金额，比如 18", "Enter an amount, like 18")); return; }
-    update(n => n.items.push({ name, amount: Math.round(amt * 100) / 100 }));
+    update(n => n.items.push({ name, amount: toBase(amt) }));
     $("buyName").value = ""; $("buyAmt").value = ""; $("buyName").focus();
   });
   function renderChips() {
     $("chips").textContent = "";
     chipList().forEach(([name, amt]) => {
-      const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} $${amt}`;
-      b.onclick = () => { $("buyName").value = name; $("buyAmt").value = amt; $("buyAmt").focus(); $("buyAmt").select(); };
+      const shown = niceDisp(amt);
+      const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} ${fmtCur(shown, Number.isInteger(shown) ? 0 : 2)}`;
+      b.onclick = () => { $("buyName").value = name; $("buyAmt").value = shown; $("buyAmt").focus(); $("buyAmt").select(); };
       $("chips").append(b);
     });
   }
@@ -1333,7 +1399,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const li = document.createElement("li"); li.dataset.id = w.id;
     const f = document.createElement("form"); f.className = "wedit"; f.autocomplete = "off";
     const n = document.createElement("input"); n.type = "text"; n.id = "wedit-name"; n.maxLength = 40; n.value = w.name; n.setAttribute("aria-label", L("名称", "Name"));
-    const p = document.createElement("input"); p.type = "number"; p.id = "wedit-price"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = w.price; p.setAttribute("aria-label", L("价格 $", "Price $"));
+    const p = document.createElement("input"); p.type = "number"; p.id = "wedit-price"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = dispRound(toDisp(w.price)); p.setAttribute("aria-label", L("价格 ", "Price ") + curSym());
     const btns = document.createElement("div"); btns.className = "btns";
     const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = L("取消", "Cancel");
     const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = L("保存", "Save");
@@ -1344,7 +1410,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const name = n.value.trim(), price = parseFloat(p.value);
       if (!name) { n.focus(); return; }
       if (!(price >= 0)) { p.focus(); toast(L("请填一个价格，比如 49.99", "Enter a price, like 49.99")); return; }
-      w.name = name; w.price = Math.round(price * 100) / 100; delete w.sample;
+      w.name = name; w.price = toBase(price); delete w.sample;
       editingWish = null; saveWishes(); renderWishes(); toast(L("已保存", "Saved"));
     };
     f.onkeydown = (e) => { if (e.key === "Escape") c.onclick(); };
@@ -1426,7 +1492,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const name = $("wishName").value.trim(), price = parseFloat($("wishPrice").value);
     if (!name) { $("wishName").focus(); return; }
     if (!(price >= 0)) { $("wishPrice").focus(); toast(L("请填一个价格，比如 49.99", "Enter a price, like 49.99")); return; }
-    wishes.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, price: Math.round(price * 100) / 100, got: false, created: Date.now() });
+    wishes.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, price: toBase(price), got: false, created: Date.now() });
     saveWishes(); renderWishes();
     $("wishName").value = ""; $("wishPrice").value = ""; $("wishName").focus();
   });
@@ -1462,7 +1528,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
   // 固定种子的小抖动，让线条像手画的，但每次生成都一样
   function rng(seed) { let x = seed >>> 0 || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  // 分享图跟随风格：手绘风线条抖一抖，其他风格画规整的圆角矩形
+  const LOOKS = { grid: { hand: 1 }, sakura: { hand: 1 }, clean: { r: 22, lw: 2, soft: 1 }, receipt: { r: 0, lw: 2, dashed: 1 }, terminal: { r: 6, lw: 2 }, pop: { r: 16, lw: 5, shadow: 1, dots: 1 } };
+  const look = () => LOOKS[skin] || LOOKS.grid;
   function wobblyRect(ctx, x, y, w, h, r, seed) {
+    if (!look().hand) { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, look().r); else ctx.rect(x, y, w, h); return; }
     const j = () => (r() - .5) * 6;
     ctx.beginPath(); ctx.moveTo(x + j(), y + j());
     ctx.quadraticCurveTo(x + w / 2, y + j(), x + w + j(), y + j());
@@ -1474,9 +1544,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function sketchBox(ctx, x, y, w, h, fill, seed, shadow = true) {
     const r = rng(seed);
     ctx.save();
-    if (shadow) { ctx.fillStyle = SC.ink; wobblyRect(ctx, x + 7, y + 8, w, h, rng(seed)); ctx.fill(); }
+    const lk = look();
+    if (shadow && (lk.hand || lk.shadow)) { ctx.fillStyle = SC.ink; wobblyRect(ctx, x + 7, y + 8, w, h, rng(seed)); ctx.fill(); }
+    if (lk.soft) { ctx.shadowColor = "rgba(26,34,48,.08)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6; }
     ctx.fillStyle = fill; wobblyRect(ctx, x, y, w, h, r); ctx.fill();
-    ctx.strokeStyle = SC.ink; ctx.lineWidth = 4; ctx.lineJoin = "round"; wobblyRect(ctx, x, y, w, h, rng(seed)); ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = lk.soft ? SC.grid : SC.ink; ctx.lineWidth = lk.lw || 4; ctx.lineJoin = "round";
+    if (lk.dashed) ctx.setLineDash([10, 7]);
+    wobblyRect(ctx, x, y, w, h, rng(seed)); ctx.stroke(); ctx.setLineDash([]);
     ctx.restore();
   }
   function highlight(ctx, x, y, w, h, color) { ctx.save(); ctx.fillStyle = color; ctx.globalAlpha = .9; ctx.beginPath(); ctx.moveTo(x - 6, y + 4); ctx.lineTo(x + w + 6, y); ctx.lineTo(x + w + 4, y + h); ctx.lineTo(x - 4, y + h + 3); ctx.closePath(); ctx.fill(); ctx.restore(); }
@@ -1492,7 +1567,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     ctx.save(); ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round";
     for (let g = 0; g < groups; g++) {
       const gx = x + (g % perRow) * (size + gap), gy = y + Math.floor(g / perRow) * (size + gap);
-      ctx.save(); ctx.translate(gx + size / 2, gy + size / 2); ctx.rotate((((g * 37) % 7) - 3) * Math.PI / 180); ctx.translate(-size / 2, -size / 2); ctx.scale(size / 24, size / 24); ctx.lineWidth = 2.4;
+      ctx.save(); ctx.translate(gx + size / 2, gy + size / 2); ctx.rotate((look().hand ? (((g * 37) % 7) - 3) : 0) * Math.PI / 180); ctx.translate(-size / 2, -size / 2); ctx.scale(size / 24, size / 24); ctx.lineWidth = 2.4;
       for (let i = 0; i < Math.min(5, count - g * 5); i++) ctx.stroke(new Path2D(tallyStrokes()[i]));
       ctx.restore();
     }
@@ -1508,8 +1583,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   async function drawShareCard(month) {
     // 分享图跟随当前主题的配色
     const cs = getComputedStyle(document.documentElement), cv = (n, f) => (cs.getPropertyValue(n).trim() || f);
+    const SF0 = { title: '"Ma Shan Zheng", "Kaiti SC", KaiTi, serif', hand: '"ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif', num: '"Patrick Hand", "ZCOOL KuaiLe", sans-serif' };
+    Object.assign(SF, look().hand ? SF0 : { title: cv("--f-title", SF0.title), hand: cv("--f-hand", SF0.hand), num: cv("--f-num", SF0.num) });
     Object.assign(SC, { paper: cv("--paper", SC.paper), grid: cv("--grid", SC.grid), ink: cv("--ink", SC.ink), pencil: cv("--pencil", SC.pencil), card: cv("--card", SC.card),
       money: cv("--money", SC.money), moneyHi: cv("--money-hi", SC.moneyHi), burn: cv("--burn", SC.burn), burnHi: cv("--burn-hi", SC.burnHi), body: cv("--body", SC.body), bodyHi: cv("--body-hi", SC.bodyHi) });
+    SC.onMoney = cv("--on-money", SC.ink);
     const W = 1080, H = 1440, st = monthStats(month), [yy, mm] = month.split("-").map(Number);
     const icons = await Promise.all(st.top.map(t => iconImage(t.name)));
     const appUrl = (location.protocol.startsWith("http") ? location.host + location.pathname.replace(/index\.html$/, "") : "").replace(/\/$/, "");
@@ -1526,10 +1604,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         ctx.font = `${size}px ${font}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic"; ctx.fillText(text, x, y); return ctx.measureText(text).width; };
       // 方格纸
       ctx.fillStyle = SC.paper; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = SC.grid; ctx.lineWidth = 2; ctx.beginPath();
-      for (let gx = 0; gx <= W; gx += 54) { ctx.moveTo(gx, 0); ctx.lineTo(gx, H); }
-      for (let gy = 0; gy <= H; gy += 54) { ctx.moveTo(0, gy); ctx.lineTo(W, gy); }
-      ctx.stroke();
+      if (look().hand) {
+        ctx.strokeStyle = SC.grid; ctx.lineWidth = 2; ctx.beginPath();
+        for (let gx = 0; gx <= W; gx += 54) { ctx.moveTo(gx, 0); ctx.lineTo(gx, H); }
+        for (let gy = 0; gy <= H; gy += 54) { ctx.moveTo(0, gy); ctx.lineTo(W, gy); }
+        ctx.stroke();
+      } else if (look().dots) {
+        ctx.fillStyle = SC.grid; for (let gx = 18; gx < W; gx += 36) for (let gy = 18; gy < H; gy += 36) { ctx.beginPath(); ctx.arc(gx, gy, 2.4, 0, Math.PI * 2); ctx.fill(); }
+      }
       // 抬头
       T(L("加班夜记 · Overtime Night Log", "Overtime Night Log"), 64, 104, 34, SF.hand, SC.pencil);
       const t1 = L(`我的 ${mm} 月`, `My ${MONTH_EN[mm - 1]}`), tLabel = L("加班账单", "Overtime Bill");
@@ -1546,7 +1628,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const x = 64 + i * 330, y = 262;
         sketchBox(ctx, x, y, 300, 180, fill, 11 + i);
         T(k, x + 28, y + 52, 34, SF.hand, SC.pencil);
-        const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num);
+        const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num, SC.ink, "left", unit ? 160 : 248);
         if (unit) T(unit, x + 36 + vw, y + 142, 36, SF.hand, SC.pencil);
       });
       // 第二行：正字
@@ -1554,7 +1636,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const x = 64 + i * 495, y = 488, w = 460, h = 236;
         sketchBox(ctx, x, y, w, h, fill, 21 + i);
         T(k, x + 28, y + 54, 36, SF.hand, color);
-        T(L(`${v} 次`, `${v}×`), x + w - 28, y + 58, 52, SF.num, color, "right");
+        T(L(`${v} 次`, `${v}×`), x + w - 28, y + 58, 52, SF.num, color, "right", 190);
         if (v) drawTallies(ctx, v, x + 28, y + 86, 58, color, w - 56, h - 106);
         else T(L("这个月一次都没有，真好", "None this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil);
       });
@@ -1571,8 +1653,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         ctx.fillStyle = v > 0 ? SC.money : SC.card; ctx.globalAlpha = v > 0 ? .25 + .75 * v / (st.max || 1) : 1;
         wobblyRect(ctx, cx, cy, cw, ch, r); ctx.fill(); ctx.globalAlpha = 1;
         ctx.strokeStyle = n ? SC.ink : SC.grid; ctx.lineWidth = n ? 2.5 : 2; wobblyRect(ctx, cx, cy, cw, ch, rng(500 + d)); ctx.stroke(); ctx.restore();
-        T(`${d}`, cx + 10, cy + 22, 20, SF.num, n ? SC.ink : SC.pencil);
-        if (n) T(`$${Math.round(v)}`, cx + cw - 10, cy + ch - 10, 26, SF.num, SC.ink, "right");
+        const hot = v > 0 && .25 + .75 * v / (st.max || 1) >= .6, cellInk = hot ? SC.onMoney : SC.ink;
+        T(`${d}`, cx + 10, cy + 22, 20, SF.num, n ? cellInk : SC.pencil);
+        if (n) T(moneyShort(v), cx + cw - 10, cy + ch - 10, 26, SF.num, cellInk, "right", cw - 34);
         if (n && (n.burnout || n.body)) T("×".repeat(Math.min(3, n.burnout || 0)), cx + cw - 10, cy + 20, 18, SF.num, SC.burn, "right");
       }
       // 花得最多
@@ -1642,14 +1725,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // ---------- 设置：语言、主题 ----------
   const SKIN_KEY = "overtime-skin";
   const SKINS = [
-    { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "跟随系统深浅色", noteEn: "Follows light/dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"] },
-    { id: "kraft", zh: "牛皮纸", en: "Kraft", c: ["#E9D6B4", "#D7BF96", "#3B2A1A", "#E8962A", "#B23A1F"] },
-    { id: "midnight", zh: "深夜", en: "Midnight", c: ["#121A2C", "#1D2740", "#E8ECF6", "#FFC94D", "#FF7A6B"] },
-    { id: "sakura", zh: "樱花", en: "Sakura", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"] },
-    { id: "mint", zh: "薄荷", en: "Mint", c: ["#EFF9F4", "#CBE8DB", "#1E3D3A", "#F2C94C", "#E0603F"] },
+    { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "手绘 · 跟随深浅色", noteEn: "Hand-drawn · auto dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
+    { id: "sakura", zh: "樱花", en: "Sakura", noteZh: "手绘", noteEn: "Hand-drawn", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
+    { id: "clean", zh: "简约", en: "Clean", noteZh: "干净利落", noteEn: "Calm and tidy", c: ["#F3F4F6", "#E3E5EA", "#1A2230", "#F2A93B", "#E5484D"], font: '"Noto Sans SC", sans-serif', r: "10px" },
+    { id: "receipt", zh: "收据", en: "Receipt", noteZh: "小票等宽字", noteEn: "Till-roll mono", c: ["#FFFDF7", "#D5D0C5", "#1B1B1B", "#F1CB3B", "#D2261E"], font: '"JetBrains Mono", monospace', r: "0" },
+    { id: "terminal", zh: "终端", en: "Terminal", noteZh: "琥珀色屏幕", noteEn: "Amber screen", c: ["#0E0B07", "#2A2215", "#FFC766", "#FFB000", "#FF6B4A"], font: '"JetBrains Mono", monospace', r: "3px" },
+    { id: "pop", zh: "波普", en: "Pop", noteZh: "粗边撞色", noteEn: "Bold and bright", c: ["#FFF3D1", "#F0DC9E", "#111111", "#FFCF24", "#4361EE"], font: '"ZCOOL QingKe HuangYou", sans-serif', r: "8px", lines: "dots" },
   ];
   let skin = "grid"; try { skin = localStorage.getItem(SKIN_KEY) || "grid"; } catch (e) {}
-  if (!SKINS.some(k => k.id === skin)) skin = "grid";
+  if (!SKINS.some(k => k.id === skin)) { skin = "grid"; try { localStorage.setItem(SKIN_KEY, "grid"); } catch (e) {} }   // 旧版本的牛皮纸 / 深夜 / 薄荷已下线
   function applySkin() {
     if (skin === "grid") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", skin);
     const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
@@ -1658,17 +1742,41 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       m.content = skin === "grid" ? m.dataset.orig : paper;
     });
   }
+  function updateCurrencyLabels() {
+    $("buyAmt").placeholder = L("金额 ", "Amount ") + curSym(); $("buyAmt").setAttribute("aria-label", L("金额 ", "Amount ") + curSym());
+    $("wishPrice").placeholder = L("价格 ", "Price ") + curSym(); $("wishPrice").setAttribute("aria-label", L("价格 ", "Price ") + curSym());
+    $("buyAmt").step = $("wishPrice").step = noCents() ? "1" : "0.01";
+  }
+  function renderCurrency() {
+    const sel = $("curSel"); sel.textContent = "";
+    CURRENCIES.forEach(([code, , zh, en]) => { const o = document.createElement("option"); o.value = code; o.textContent = `${L(zh, en)} ${code}`; sel.append(o); });
+    sel.value = cur.code;
+    $("rateRow").hidden = $("curHint").hidden = cur.code === "USD";
+    $("rateCode").textContent = cur.code; $("curRate").value = curRate();
+  }
+  const saveCur = () => { try { localStorage.setItem(CUR_KEY, JSON.stringify(cur)); } catch (e) {} };
+  const applyCurrency = () => { saveCur(); renderCurrency(); updateCurrencyLabels(); renderChips(); renderAll(); };
+  $("curSel").addEventListener("change", (e) => { cur.code = e.target.value; applyCurrency(); });
+  $("curRate").addEventListener("change", (e) => {
+    const v = parseFloat(e.target.value);
+    if (!(v > 0)) { toast(L("汇率要大于 0", "The rate must be greater than 0")); e.target.value = curRate(); return; }
+    cur.rates[cur.code] = v; applyCurrency(); toast(L(`已按 1 USD = ${v} ${cur.code} 换算`, `Now using 1 USD = ${v} ${cur.code}`));
+  });
   function renderSettings() {
+    renderCurrency();
     document.querySelectorAll("#langSeg [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     const box = $("skinList"); box.textContent = "";
     SKINS.forEach(k => {
       const b = document.createElement("button"); b.type = "button"; b.className = "skin"; b.dataset.skin = k.id; b.setAttribute("aria-pressed", String(k.id === skin));
       const sw = document.createElement("span"); sw.className = "sw";
-      sw.style.background = `linear-gradient(${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, linear-gradient(90deg, ${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, ${k.c[0]}`;
-      const line = document.createElement("b"); line.style.background = k.c[2];
-      const d1 = document.createElement("i"); d1.style.cssText = `left:8px;background:${k.c[3]}`;
-      const d2 = document.createElement("i"); d2.style.cssText = `left:28px;background:${k.c[4]}`;
-      sw.append(line, d1, d2);
+      sw.style.background = k.lines === "grid" ? `linear-gradient(${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, linear-gradient(90deg, ${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, ${k.c[0]}`
+        : k.lines === "dots" ? `radial-gradient(${k.c[1]} 1.2px, transparent 1.5px) 0 0 / 8px 8px, ${k.c[0]}` : k.c[0];
+      sw.style.borderRadius = k.r;
+      const sample = document.createElement("em"); sample.textContent = L("加班 $12", "Aa $12");
+      sample.style.cssText = `font-family:${k.font};color:${k.c[2]};border-radius:${k.r}`;
+      const d1 = document.createElement("i"); d1.style.cssText = `right:26px;background:${k.c[3]};border-radius:${k.r === "0" ? "0" : "50%"}`;
+      const d2 = document.createElement("i"); d2.style.cssText = `right:8px;background:${k.c[4]};border-radius:${k.r === "0" ? "0" : "50%"}`;
+      sw.append(sample, d1, d2);
       const name = document.createElement("span"); name.textContent = L(k.zh, k.en);
       if (k.noteZh) { const sm = document.createElement("small"); sm.textContent = L(k.noteZh, k.noteEn); name.append(sm); }
       b.append(sw, name); box.append(b);
@@ -1685,7 +1793,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     applyLanguage();
   });
   function applyLanguage() {
-    applyStaticLang(); renderChips(); renderSettings(); tick();
+    applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings(); tick();
     if (loaded) { renderAll(); showLastBackup(); $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device"); }
   }
 
@@ -1799,7 +1907,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   ["overtime-github", "overtime-github-base"].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
 
   // ---------- boot ----------
-  applySkin(); applyStaticLang(); renderChips(); renderSettings();
+  applySkin(); applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings();
   try { nights = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch (e) { nights = {}; }
   loaded = true;
   $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device");
