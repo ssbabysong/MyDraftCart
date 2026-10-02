@@ -1,0 +1,14 @@
+{
+  "appId": "com.ssbabysong.overtimenightlog",
+  "appName": "加班夜记",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#FAFAF4"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#26354D"
+    }
+  }
+}

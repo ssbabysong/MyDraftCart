@@ -363,6 +363,16 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
 .cur-row select, .cur-row input { font: inherit; color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px 2px; min-width: 0; }
 .cur-row input { width: 7em; font-family: var(--f-num); font-size: 17px; }
 .cur-hint { font-size: 13px; color: var(--pencil); }
+.toggle { width: 22px; height: 22px; accent-color: var(--ink); }
+.set-row.remind-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+.remind-row .cur-row { justify-content: flex-start; gap: 14px; }
+.cur-row input.toggle { width: 22px; flex: none; }
+/* 英文标题比中文长，缩小一点，保证和时钟在同一行 */
+html[lang="en"] h1 { font-size: clamp(26px, 6.6vw, 36px); }
+html[lang="en"] header { flex-wrap: nowrap; }
+html[lang="en"] header > div:first-child { min-width: 0; }
+.cur-row input[type=time] { width: auto; }
+.icloud-status { font-size: 14px; color: var(--ink) !important; }
 .settings { gap: 14px; }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .set-k { font-size: 16px; }
@@ -703,6 +713,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <span id="rateCode">CNY</span>
       </div>
       <span class="cur-hint" id="curHint">参考汇率，请按实际修改。只改变显示，已记录的数据不会被改动。</span>
+      <div class="set-row remind-row native-only" hidden>
+        <label class="set-k" for="remindOn">每晚提醒</label>
+        <div class="cur-row">
+          <input type="checkbox" id="remindOn" class="toggle" aria-label="每晚提醒">
+          <input type="time" id="remindTime" value="21:30" aria-label="提醒时间">
+          <select id="remindDays" aria-label="提醒日期"><option value="work">工作日</option><option value="all">每天</option></select>
+        </div>
+      </div>
       <span class="set-k">主题</span>
       <div class="skins" id="skinList" role="group" aria-label="主题"></div>
     </div>
@@ -717,15 +735,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="bkTitle">
     <h2 class="underlined" id="bkTitle">备份</h2>
     <div class="backup sketch">
-      <p>记录默认只存在这台设备的浏览器里。点「备份到 iCloud」，在弹出的菜单里选「存储到文件」→「iCloud 云盘」，就存好了。</p>
+      <p class="web-only">记录默认只存在这台设备的浏览器里。点「备份到 iCloud」，在弹出的菜单里选「存储到文件」→「iCloud 云盘」，就存好了。</p>
+      <p class="native-only" hidden>记录会自动同步到你的 iCloud。换手机时登录同一个 Apple ID，打开 App 记录就回来了。</p>
+      <p class="native-only icloud-status" id="icloudStatus" hidden></p>
       <div class="row">
-        <button type="button" class="btn-ghost btn-icloud" id="icloudBtn">备份到 iCloud</button>
+        <button type="button" class="btn-ghost btn-icloud web-only" id="icloudBtn">备份到 iCloud</button>
         <button type="button" class="btn-ghost" id="exportBtn">导出备份</button>
         <button type="button" class="btn-ghost" id="importBtn">导入备份</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
       <p id="lastBackup"></p>
-      <details class="restore-tip">
+      <details class="restore-tip web-only">
         <summary>换手机了，怎么从 iCloud 恢复？</summary>
         <p>点「导入备份」→「浏览」→「iCloud 云盘」，选最新的 <code>overtime-log-backup-日期.json</code>。导入会和手机上已有的记录合并，不会清空。</p>
       </details>
@@ -736,6 +756,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <span class="sync on" id="sync">数据只存在这台设备上</span> <span id="appVersion"></span>
     <span>
       <button type="button" class="link" id="clearSamples" hidden>清除示例数据</button>
+      <a class="link" href="https://ssbabysong.github.io/MyDraftCart/privacy.html" target="_blank" rel="noopener">隐私政策</a>
+      <a class="link" href="https://ssbabysong.github.io/MyDraftCart/support.html" target="_blank" rel="noopener">技术支持</a>
     </span>
   </footer>
   </main>
@@ -785,6 +807,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 (() => {
   const $ = (id) => document.getElementById(id);
   const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
+  // 装成 iOS App（Capacitor）时为 true；网页版为 false
+  const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 
   // ---------- 语言：中文 / English ----------
   // 页面上固定的文字查对照表翻译；代码里生成的文字用 L("中文", "English") 当场挑一种。
@@ -809,6 +833,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "身体不行次数": "Unwell", "最晚下班": "Latest finish", "每晚花费": "Spent per night",
     "生成我的月度加班账单": "Make my monthly overtime bill", "一张手绘风长图，可以直接发小红书": "A hand-drawn image, ready to post",
     "愿望": "Wishes", "愿望清单": "Wishlist", "还想买的，一共": "Still on my list", "许个愿": "Make a wish",
+    "每晚提醒": "Nightly reminder", "提醒时间": "Reminder time", "提醒日期": "Reminder days", "工作日": "Weekdays", "每天": "Every day",
+    "记录会自动同步到你的 iCloud。换手机时登录同一个 Apple ID，打开 App 记录就回来了。": "Your records sync to your iCloud automatically. On a new phone, sign in with the same Apple ID and open the app.",
+    "隐私政策": "Privacy", "技术支持": "Support",
     "记录": "Log", "设置": "Settings", "语言": "Language", "主题": "Theme", "货币": "Currency", "汇率": "Exchange rate",
     "参考汇率，请按实际修改。只改变显示，已记录的数据不会被改动。": "A reference rate. Change it to the real one. It only changes how amounts are shown; saved records stay the same.", "历史记录": "History", "备份": "Backup",
     "记录默认只存在这台设备的浏览器里。点「备份到 iCloud」，在弹出的菜单里选「存储到文件」→「iCloud 云盘」，就存好了。": "Your records live only in this browser on this device. Tap Back up to iCloud, then choose Save to Files → iCloud Drive.",
@@ -1275,7 +1302,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     }
   }
 
-  function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); renderWishes(); }
+  function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); renderWishes(); pushWidget(); }
 
   // ---------- samples ----------
   function loadSamples() {
@@ -1712,6 +1739,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("shareNext").onclick = () => stepMonth(1);
   $("shareGo").onclick = async () => {
     if (!shareBlob) return;
+    if (NATIVE) { await nativeShareBlob(shareBlob, `overtime-bill-${shareMonth}.png`); return; }
     const file = new File([shareBlob], L(`加班账单-${shareMonth}.png`, `overtime-bill-${shareMonth}.png`), { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === "AbortError") return; }
@@ -1736,6 +1764,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (!SKINS.some(k => k.id === skin)) { skin = "grid"; try { localStorage.setItem(SKIN_KEY, "grid"); } catch (e) {} }   // 旧版本的牛皮纸 / 深夜 / 薄荷已下线
   function applySkin() {
     if (skin === "grid") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", skin);
+    syncStatusBar();
     const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
     document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
       if (!m.dataset.orig) m.dataset.orig = m.content;
@@ -1795,6 +1824,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function applyLanguage() {
     applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings(); tick();
     if (loaded) { renderAll(); showLastBackup(); $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device"); }
+    if (NATIVE) { renderICloud(); if (rem.on) applyReminder(); }
   }
 
   // ---------- tabs ----------
@@ -1834,6 +1864,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
   function downloadBackup() {
     const blob = new Blob([backupJSON()], { type: "application/json" });
+    if (NATIVE) { nativeShareBlob(blob, backupName()).then(ok => { if (ok) markBackedUp("download"); }); return; }
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = backupName();
     document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -1861,7 +1892,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const last = lastBackupAt(), now = Date.now();
     const snoozed = Number(lsGet(BK_SNOOZE)) > now;
     const due = last ? now - last >= 7 * DAY : count >= 3;
-    const show = count > 0 && due && !snoozed;
+    const show = count > 0 && due && !snoozed && !(NATIVE && icloud.on);   // App 里已经自动同步到 iCloud，就不用提醒
     $("bkRemind").hidden = !show;
     if (show) { const days = Math.round((parse(ymd(new Date(now))) - parse(ymd(new Date(last)))) / DAY); $("bkRemindText").textContent = last ? L(`已经 ${days} 天没备份了`, `${days} days since your last backup`) : L(`已经记了 ${count} 晚，还没备份过`, `${count} nights logged, no backup yet`); }
   }
@@ -1906,13 +1937,180 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 旧版本有过「同步到 GitHub」，已移除：清掉可能存着的 Token 和同步快照
   ["overtime-github", "overtime-github-base"].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
 
+  // ---------- iOS App（Capacitor）原生功能 ----------
+  // 网页版里这些都不会启用；装成 iOS App 后才有：iCloud 同步、每晚提醒、触感反馈、桌面小组件、原生分享。
+  function plug(name) {
+    if (!NATIVE) return null;
+    const C = window.Capacitor;
+    return (C.Plugins && C.Plugins[name]) || (C.registerPlugin ? C.registerPlugin(name) : null);
+  }
+  // 触感反馈：点 +、记一笔、勾掉愿望时轻轻震一下
+  function buzz(kind) {
+    const h = plug("Haptics"); if (!h) return;
+    try { kind === "success" ? h.notification({ type: "SUCCESS" }) : h.impact({ style: kind === "medium" ? "MEDIUM" : "LIGHT" }); } catch (e) {}
+  }
+  if (NATIVE) document.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.matches(".wbox") && !b.closest(".got")) buzz("success");
+    else if (b.matches(".x, #deleteNight")) buzz("medium");
+    else if (b.matches(".pm button, .add, .chips button, .tabbar button, .day, .skin, .share-cta")) buzz();
+  }, true);
+  // 状态栏：深色主题用浅色字
+  function syncStatusBar() {
+    const sb = plug("StatusBar"); if (!sb) return;
+    const hex = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim().replace("#", "");
+    const n = parseInt(hex.length === 3 ? hex.replace(/./g, "$&$&") : hex, 16);
+    const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    try { sb.setStyle({ style: lum < 0.5 ? "DARK" : "LIGHT" }); } catch (e) {}
+  }
+  if (NATIVE) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncStatusBar);
+  // 原生分享菜单：先把文件写进缓存目录，再交给系统分享（存到相册、文件、发给别人）
+  async function nativeShareBlob(blob, name) {
+    const fsys = plug("Filesystem"), share = plug("Share"); if (!fsys || !share) return false;
+    try {
+      const b64 = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+      const file = await fsys.writeFile({ path: name, data: b64, directory: "CACHE" });
+      await share.share({ files: [file.uri] });
+      return true;
+    } catch (e) {
+      if (/cancel/i.test(String((e && e.message) || e))) return false;
+      toast(L("分享失败，请再试一次", "Couldn't share. Try again.")); return false;
+    }
+  }
+
+  // iCloud 同步：整份数据存在用户 iCloud 的键值存储里。每次同步按「每一晚 / 每个愿望」和上次同步的快照做三方合并：
+  // 只有一边改了就取改的那边，两边都改了以这台手机为准。
+  const IC_KEY = "overtime-data-v1", IC_BASE = "overtime-icloud-base";
+  let icloud = { on: false, last: "", msg: "" }, icBusy = false, icAgain = false;
+  const wishMap = (list) => Object.fromEntries((list || []).filter(w => w && w.id).map(w => [w.id, w]));
+  function merge3(base, local, remote) {
+    const out = {};
+    for (const k of new Set([...Object.keys(base), ...Object.keys(local), ...Object.keys(remote)])) {
+      const b = JSON.stringify(base[k]), l = JSON.stringify(local[k]), r = JSON.stringify(remote[k]);
+      const pick = l === r ? local[k] : l === b ? remote[k] : local[k];
+      if (pick !== undefined) out[k] = pick;
+    }
+    return out;
+  }
+  function renderICloud() {
+    if (!NATIVE) return;
+    $("icloudStatus").textContent = icloud.msg || (icloud.on ? L(`✓ 已同步到 iCloud · ${icloud.last}`, `✓ Synced to iCloud · ${icloud.last}`) : "");
+  }
+  async function icloudSync() {
+    const ic = plug("ICloudSync"); if (!ic) return;
+    if (icBusy) { icAgain = true; return; }
+    const a = document.activeElement;
+    if (a && (a.closest?.(".iedit, .wedit") || a.id === "note")) return;   // 正在编辑就先不动，下一轮再同步
+    icBusy = true;
+    try {
+      const st = await ic.status();
+      if (!st || !st.available) {
+        icloud = { on: false, last: "", msg: L("没有登录 iCloud，记录只存在这台手机上。到「设置 → Apple 账户 → iCloud」里登录就能自动同步。", "Not signed in to iCloud, so records stay on this phone. Sign in under Settings → Apple Account → iCloud to sync.") };
+        return;
+      }
+      const got = await ic.get({ key: IC_KEY });
+      let remote = { nights: {}, wishes: [] };
+      if (got && got.value) { try { remote = JSON.parse(got.value) || remote; } catch (e) {} }
+      let base = { nights: {}, wishes: {} };
+      try { base = JSON.parse(localStorage.getItem(IC_BASE) || "null") || base; } catch (e) {}
+      const mN = merge3(base.nights || {}, nights, remote.nights || {});
+      const mW = merge3(base.wishes || {}, wishMap(wishes), wishMap(remote.wishes));
+      if (JSON.stringify(mN) !== JSON.stringify(nights) || JSON.stringify(mW) !== JSON.stringify(wishMap(wishes))) {
+        nights = mN; wishes = Object.values(mW);
+        try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {}
+        saveWishes(); renderAll();
+      }
+      if (!got || !got.value || JSON.stringify(mN) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mW) !== JSON.stringify(wishMap(remote.wishes))) {
+        await ic.set({ key: IC_KEY, value: JSON.stringify({ app: "overtime-night-log", version: 3, currency: "USD", updatedAt: new Date().toISOString(), nights: mN, wishes: Object.values(mW) }) });
+      }
+      try { localStorage.setItem(IC_BASE, JSON.stringify({ nights: mN, wishes: mW })); } catch (e) {}
+      icloud = { on: true, last: new Date().toTimeString().slice(0, 5), msg: "" };
+    } catch (e) {
+      icloud.msg = (e && e.code === "TOO_LARGE")
+        ? L("记录太多，超过了 iCloud 键值存储的 1 MB 上限。请先「导出备份」保存一份，再联系开发者。", "Your records exceed iCloud's 1 MB key-value limit. Export a backup first, then contact the developer.")
+        : L("iCloud 同步失败，稍后会自动重试。", "iCloud sync failed. It will retry automatically.");
+    } finally {
+      icBusy = false; renderICloud(); checkBackupReminder();
+      if (icAgain) { icAgain = false; setTimeout(icloudSync, 500); }
+    }
+  }
+  let icLastLocal = "";
+  if (NATIVE) {
+    const ic = plug("ICloudSync");
+    if (ic && ic.addListener) ic.addListener("change", () => icloudSync());
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") icloudSync(); else pushWidget(true); });
+    // 本地有改动：3 秒内推到 iCloud
+    setInterval(() => { const now = JSON.stringify([nights, wishes]); if (now !== icLastLocal) { icLastLocal = now; icloudSync(); } }, 3000);
+  }
+
+  // 每晚提醒：本地通知，不需要服务器。工作日是周一到周五（1 = 周日）。
+  const REM_KEY = "overtime-reminder";
+  let rem = { on: false, time: "21:30", days: "work" };
+  try { rem = { ...rem, ...(JSON.parse(localStorage.getItem(REM_KEY) || "null") || {}) }; } catch (e) {}
+  const saveRem = () => { try { localStorage.setItem(REM_KEY, JSON.stringify(rem)); } catch (e) {} };
+  function renderReminder() { $("remindOn").checked = rem.on; $("remindTime").value = rem.time; $("remindDays").value = rem.days; $("remindTime").disabled = $("remindDays").disabled = !rem.on; }
+  async function applyReminder() {
+    const ln = plug("LocalNotifications"); if (!ln) return;
+    try { await ln.cancel({ notifications: [1, 2, 3, 4, 5, 6, 7].map(id => ({ id })) }); } catch (e) {}
+    if (!rem.on) return;
+    let perm = await ln.checkPermissions();
+    if (perm.display !== "granted") perm = await ln.requestPermissions();
+    if (perm.display !== "granted") {
+      rem.on = false; saveRem(); renderReminder();
+      toast(L("没有通知权限。请到「设置 → 通知 → 加班夜记」里打开。", "Notifications are off. Turn them on in Settings → Notifications → Overtime Night Log."));
+      return;
+    }
+    const [h, m] = rem.time.split(":").map(Number);
+    const title = L("加班夜记", "Overtime Night Log");
+    const body = L("今晚加班了吗？花了什么、累不累，10 秒记一笔。", "Working late tonight? Log what you spent and how you feel in 10 seconds.");
+    const when = rem.days === "all" ? [null] : [2, 3, 4, 5, 6];
+    await ln.schedule({ notifications: when.map((wd, i) => ({ id: i + 1, title, body,
+      schedule: { on: wd ? { weekday: wd, hour: h, minute: m } : { hour: h, minute: m }, allowWhileIdle: true } })) });
+  }
+  if (NATIVE) {
+    $("remindOn").addEventListener("change", async (e) => {
+      rem.on = e.target.checked; saveRem(); renderReminder(); await applyReminder();
+      if (rem.on) toast(L(`好的，${rem.days === "all" ? "每天" : "工作日"} ${rem.time} 提醒你记一笔`, `Got it. Reminding you at ${rem.time} ${rem.days === "all" ? "every day" : "on weekdays"}.`));
+    });
+    $("remindTime").addEventListener("change", (e) => { if (!e.target.value) return; rem.time = e.target.value; saveRem(); applyReminder(); });
+    $("remindDays").addEventListener("change", (e) => { rem.days = e.target.value; saveRem(); applyReminder(); });
+  }
+
+  // 桌面小组件：把本月汇总交给原生端，内容没变就不重复刷新
+  let widgetLast = "";
+  function pushWidget(force) {
+    const wb = plug("WidgetBridge"); if (!wb || !loaded) return;
+    const month = nightOf().slice(0, 7), st = monthStats(month), m = Number(month.slice(5)), tn = nights[nightOf()];
+    const cs = getComputedStyle(document.documentElement), cv = (n) => cs.getPropertyValue(n).trim();
+    const json = JSON.stringify({
+      appName: L("加班夜记", "Overtime"), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
+      nights: st.recs.length, nightsLabel: L("晚", "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
+      burnout: st.burnout, body: st.body, burnoutLabel: "Burnout", bodyLabel: L("身体不行", "Unwell"),
+      tonight: tn ? money(sum(tn)) : "", tonightLabel: L("今晚", "Tonight"), emptyText: L("打开 App 记第一晚", "Open the app to log tonight"),
+      colors: { paper: cv("--paper"), ink: cv("--ink"), pencil: cv("--pencil"), card: cv("--card"), money: cv("--money"), moneyHi: cv("--money-hi"), burn: cv("--burn"), body: cv("--body") },
+    });
+    if (json === widgetLast && !force) return;
+    widgetLast = json;
+    try { wb.update({ json }); } catch (e) {}
+  }
+
   // ---------- boot ----------
+  if (NATIVE) {
+    document.documentElement.classList.add("native");
+    document.querySelectorAll(".web-only").forEach(e => (e.hidden = true));
+    document.querySelectorAll(".native-only").forEach(e => (e.hidden = false));
+  }
   applySkin(); applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings();
   try { nights = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch (e) { nights = {}; }
   loaded = true;
   $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device");
   showLastBackup();
   renderAll();
+  if (NATIVE) {
+    renderReminder(); renderICloud(); syncStatusBar();
+    icLastLocal = JSON.stringify([nights, wishes]); icloudSync();
+    if (rem.on) applyReminder();   // 每次启动重新排一次，防止系统清掉
+  }
   // 请求持久存储，降低浏览器自动清理数据的概率
   try { navigator.storage?.persist?.(); } catch (e) {}
   // ---------- 禁止双指缩放 ----------
@@ -1924,7 +2122,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 1) 每次回到 App（包括从桌面图标切回来）都检查一次新版本
   // 2) 新版本在后台下载好后弹出提示，点了才切换，不会在记到一半时刷新
   // 3) 更新只替换 App 文件，localStorage 里的记录不受影响
-  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  if ("serviceWorker" in navigator && location.protocol !== "file:" && !NATIVE) {   // iOS App 自带全部文件，不需要离线缓存和网页更新
     let refreshing = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => { if (!refreshing) { refreshing = true; location.reload(); } });
     const offer = (worker) => {

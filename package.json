@@ -1,0 +1,22 @@
+{
+  "name": "overtime-night-log",
+  "version": "1.0.0",
+  "private": true,
+  "description": "加班夜记 · Overtime Night Log",
+  "scripts": {
+    "build": "node scripts/build-www.mjs",
+    "ios": "npm run build && npx cap sync ios && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
+}

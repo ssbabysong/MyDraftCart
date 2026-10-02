@@ -52,3 +52,13 @@ Branch 选 `main`、目录 `/ (root)`，保存。一两分钟后 App 就在
 超过 7 天没备份（或记了 3 晚还从没备份过），页面顶部会出现提醒；点「明天再说」会隐藏一天。
 换手机恢复：「导入备份」→「浏览」→「iCloud 云盘」，选最新的备份文件，会和手机上已有的记录合并。
 
+
+## iOS App
+
+同一份 `index.html` 也用 [Capacitor](https://capacitorjs.com) 打包成 iPhone App（`ios/` 目录），额外有：iCloud 自动同步、每晚提醒、触感反馈、桌面小组件、原生分享。
+
+- 上架步骤：`appstore/RELEASE.md`
+- App Store 文案和截图：`appstore/metadata.md`、`appstore/screenshots/`
+- 隐私政策 / 技术支持页面：`privacy.html`、`support.html`
+
+在 Mac 上：`npm install && npm run ios`（打包网页、同步到 iOS 工程、打开 Xcode）。
