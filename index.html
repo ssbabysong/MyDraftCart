@@ -309,6 +309,33 @@ ul.wishes li:nth-child(even) { border-radius: var(--wob2); transform: rotate(.4d
 .wedit .save { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--body-hi); padding: 3px 16px; box-shadow: 2px 2px 0 var(--ink); }
 .wedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 
+/* share card */
+.share-cta {
+  display: flex; align-items: center; gap: 14px; text-align: left; width: 100%;
+  border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money-hi); color: #26354D;
+  padding: 12px 16px; box-shadow: 3px 4px 0 var(--ink); font-size: 18px; transform: rotate(-.4deg);
+}
+.share-cta:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.share-cta svg { width: 34px; height: 34px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.share-cta small { display: block; font-size: 13px; opacity: .75; }
+.share-modal { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, #10151f 55%, transparent); display: flex; align-items: flex-end; justify-content: center; }
+.share-sheet {
+  width: min(560px, 100%); max-height: 100%; overflow-y: auto; background: var(--paper); border: 2px solid var(--ink); border-bottom: 0;
+  border-radius: 22px 26px 0 0 / 14px 16px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 12px;
+}
+.share-head { display: grid; grid-template-columns: 40px 1fr 40px 40px; align-items: center; gap: 6px; }
+.share-head h3 { margin: 0; text-align: center; font-weight: 400; font-size: 20px; }
+.share-head button { height: 36px; border: 2px solid var(--ink); border-radius: var(--wob2); background: var(--card); font-size: 18px; line-height: 1; }
+.share-head button:disabled { opacity: .3; }
+.share-head .close { border: 0; background: none; font-size: 26px; color: var(--pencil); }
+.share-img { border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; background: var(--card); aspect-ratio: 3 / 4; max-height: 62vh; margin: 0 auto; max-width: 100%; }
+.share-img img { display: block; width: 100%; height: 100%; object-fit: contain; transition: opacity .2s; }
+.share-img img.loading { opacity: .3; }
+.share-go { border: 2px solid var(--ink); border-radius: var(--wob1); background: var(--money); color: #26354D; padding: 10px; font-size: 18px; box-shadow: 3px 3px 0 var(--ink); }
+.share-go:disabled { opacity: .5; }
+.share-hint { margin: 0; font-size: 13px; color: var(--pencil); text-align: center; }
+
 /* backup */
 .backup { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: var(--wob3); }
 .backup p { margin: 0; font-size: 14px; color: var(--pencil); }
@@ -567,6 +594,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
     </div>
     <div class="top-buys" id="topBuys"></div>
+    <button type="button" class="share-cta" id="shareOpen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
+      <span>生成我的月度加班账单<small>一张手绘风长图，可以直接发小红书</small></span>
+    </button>
 
     <div class="chart sketch" aria-label="最近 14 晚">
       <div class="legend">
@@ -694,6 +725,19 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 <div class="update-bar" id="updateBar" role="status" hidden>
   <span>有新版本了，你的记录不会受影响</span>
   <button type="button" id="updateBtn">点这里更新</button>
+</div>
+<div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareTitle" hidden>
+  <div class="share-sheet">
+    <div class="share-head">
+      <button type="button" id="sharePrev" aria-label="上个月">‹</button>
+      <h3 id="shareTitle">—</h3>
+      <button type="button" id="shareNext" aria-label="下个月">›</button>
+      <button type="button" class="close" id="shareClose" aria-label="关闭">×</button>
+    </div>
+    <div class="share-img"><img id="sharePreview" alt="月度加班账单预览"></div>
+    <button type="button" class="share-go" id="shareGo">分享 / 存到相册</button>
+    <p class="share-hint">iPhone：点上面的按钮 →「存储图像」就进相册了，也可以直接选小红书。</p>
+  </div>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -1331,6 +1375,191 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   };
   $("wishList").addEventListener("click", onWishClick);
   $("gotList").addEventListener("click", onWishClick);
+
+  // ---------- 月度加班账单分享图 ----------
+  // 用 Canvas 画一张 1080×1440（3:4，适合小红书）的手绘风账单。字体按需加载：先「空跑」一遍收集要画的字，加载好再正式画。
+  const SC = { paper: "#FAFAF4", grid: "#DCE6EF", ink: "#26354D", pencil: "#6E7889", card: "#FFFFFF",
+    money: "#F5C21B", moneyHi: "#FFEB7A", burn: "#D9483B", burnHi: "#FFD3CC", body: "#7550C8", bodyHi: "#E4D8FF" };
+  const SF = { title: '"Ma Shan Zheng", "Kaiti SC", KaiTi, serif', hand: '"ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif', num: '"Patrick Hand", "ZCOOL KuaiLe", sans-serif' };
+  let shareMonth = null, shareBlob = null;
+
+  function monthStats(month) {
+    const recs = Object.values(nights).filter(n => n.date.slice(0, 7) === month).sort((a, b) => a.date.localeCompare(b.date));
+    const spend = recs.reduce((a, n) => a + sum(n), 0);
+    const tally = new Map();
+    recs.forEach(n => n.items.forEach(it => { const k = it.name.trim(); if (!k) return; const t = tally.get(k) || { name: k, c: 0, s: 0 }; t.c++; t.s += Number(it.amount) || 0; tally.set(k, t); }));
+    const late = recs.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
+    return { recs, spend, burnout: recs.reduce((a, n) => a + (n.burnout || 0), 0), body: recs.reduce((a, n) => a + (n.body || 0), 0),
+      late: late ? late.end : "", top: [...tally.values()].sort((a, b) => b.s - a.s).slice(0, 3), max: Math.max(0, ...recs.map(sum)) };
+  }
+  // 固定种子的小抖动，让线条像手画的，但每次生成都一样
+  function rng(seed) { let x = seed >>> 0 || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  function wobblyRect(ctx, x, y, w, h, r, seed) {
+    const j = () => (r() - .5) * 6;
+    ctx.beginPath(); ctx.moveTo(x + j(), y + j());
+    ctx.quadraticCurveTo(x + w / 2, y + j(), x + w + j(), y + j());
+    ctx.quadraticCurveTo(x + w + j(), y + h / 2, x + w + j(), y + h + j());
+    ctx.quadraticCurveTo(x + w / 2, y + h + j(), x + j(), y + h + j());
+    ctx.quadraticCurveTo(x + j(), y + h / 2, x + j() * .5, y + j() * .5);
+    ctx.closePath();
+  }
+  function sketchBox(ctx, x, y, w, h, fill, seed, shadow = true) {
+    const r = rng(seed);
+    ctx.save();
+    if (shadow) { ctx.fillStyle = SC.ink; wobblyRect(ctx, x + 7, y + 8, w, h, rng(seed)); ctx.fill(); }
+    ctx.fillStyle = fill; wobblyRect(ctx, x, y, w, h, r); ctx.fill();
+    ctx.strokeStyle = SC.ink; ctx.lineWidth = 4; ctx.lineJoin = "round"; wobblyRect(ctx, x, y, w, h, rng(seed)); ctx.stroke();
+    ctx.restore();
+  }
+  function highlight(ctx, x, y, w, h, color) { ctx.save(); ctx.fillStyle = color; ctx.globalAlpha = .9; ctx.beginPath(); ctx.moveTo(x - 6, y + 4); ctx.lineTo(x + w + 6, y); ctx.lineTo(x + w + 4, y + h); ctx.lineTo(x - 4, y + h + 3); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  function drawTallies(ctx, count, x, y, size, color, maxW, maxH) {
+    // 次数多时缩小字号，放不下就画到能放下的个数为止
+    let groups = Math.ceil(count / 5), gap, perRow, rows;
+    for (;;) {
+      gap = size * .28; perRow = Math.max(1, Math.floor((maxW + gap) / (size + gap))); rows = Math.max(1, Math.floor((maxH + gap) / (size + gap)));
+      if (groups <= perRow * rows || size <= 30) break;
+      size -= 4;
+    }
+    groups = Math.min(groups, perRow * rows);
+    ctx.save(); ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (let g = 0; g < groups; g++) {
+      const gx = x + (g % perRow) * (size + gap), gy = y + Math.floor(g / perRow) * (size + gap);
+      ctx.save(); ctx.translate(gx + size / 2, gy + size / 2); ctx.rotate((((g * 37) % 7) - 3) * Math.PI / 180); ctx.translate(-size / 2, -size / 2); ctx.scale(size / 24, size / 24); ctx.lineWidth = 2.4;
+      for (let i = 0; i < Math.min(5, count - g * 5); i++) ctx.stroke(new Path2D(STROKES[i]));
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  function iconImage(name) {
+    const hit = DOODLES.find(([re]) => re.test(name));
+    if (!hit) return Promise.resolve(null);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="${SC.ink}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${hit[1].replace(/class="fill"/g, `fill="${SC.ink}" stroke="none"`)}</svg>`;
+    return new Promise(res => { const img = new Image(); img.onload = () => res(img); img.onerror = () => res(null); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
+  }
+
+  async function drawShareCard(month) {
+    const W = 1080, H = 1440, st = monthStats(month), [yy, mm] = month.split("-").map(Number);
+    const icons = await Promise.all(st.top.map(t => iconImage(t.name)));
+    const appUrl = (location.protocol.startsWith("http") ? location.host + location.pathname.replace(/index\.html$/, "") : "").replace(/\/$/, "");
+    const open = (typeof wishes !== "undefined" ? wishes : []).filter(w => !w.got && w.price > 0).sort((a, b) => a.price - b.price);
+    const affordable = open.filter(w => w.price <= st.spend).pop();
+    const wishLine = affordable ? `这个月加班花的钱，已经够买「${affordable.name}」了`
+      : open[0] ? `离「${open[0].name}」还差 ${money(open[0].price - st.spend)}` : `平均每晚花 ${money(st.recs.length ? st.spend / st.recs.length : 0)}`;
+
+    const paint = (ctx) => {
+      const T = (text, x, y, size, font, color = SC.ink, align = "left") => { ctx.font = `${size}px ${font}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = "alphabetic"; ctx.fillText(text, x, y); return ctx.measureText(text).width; };
+      // 方格纸
+      ctx.fillStyle = SC.paper; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = SC.grid; ctx.lineWidth = 2; ctx.beginPath();
+      for (let gx = 0; gx <= W; gx += 54) { ctx.moveTo(gx, 0); ctx.lineTo(gx, H); }
+      for (let gy = 0; gy <= H; gy += 54) { ctx.moveTo(0, gy); ctx.lineTo(W, gy); }
+      ctx.stroke();
+      // 抬头
+      T("加班夜记 · Overtime Night Log", 64, 104, 34, SF.hand, SC.pencil);
+      const t1 = `我的 ${mm} 月`;
+      const w1 = T(t1, 64, 210, 92, SF.hand);
+      ctx.font = `92px ${SF.hand}`; const w2 = ctx.measureText("加班账单").width;
+      highlight(ctx, 64 + w1 + 22, 172, w2, 44, SC.moneyHi);
+      T("加班账单", 64 + w1 + 22, 210, 92, SF.hand);
+      T(`${yy}`, W - 64, 104, 40, SF.num, SC.pencil, "right");
+      // 第一行三格
+      const row1 = [["加班", `${st.recs.length}`, "晚", SC.card], ["花了", money(st.spend), "", SC.moneyHi], ["最晚下班", st.late || "—", "", SC.card]];
+      row1.forEach(([k, v, unit, fill], i) => {
+        const x = 64 + i * 330, y = 262;
+        sketchBox(ctx, x, y, 300, 180, fill, 11 + i);
+        T(k, x + 28, y + 52, 34, SF.hand, SC.pencil);
+        const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num);
+        if (unit) T(unit, x + 36 + vw, y + 142, 36, SF.hand, SC.pencil);
+      });
+      // 第二行：正字
+      [["Burnout", st.burnout, SC.burn, SC.burnHi], ["身体不行", st.body, SC.body, SC.bodyHi]].forEach(([k, v, color, fill], i) => {
+        const x = 64 + i * 495, y = 488, w = 460, h = 236;
+        sketchBox(ctx, x, y, w, h, fill, 21 + i);
+        T(k, x + 28, y + 54, 36, SF.hand, color);
+        T(`${v} 次`, x + w - 28, y + 58, 52, SF.num, color, "right");
+        if (v) drawTallies(ctx, v, x + 28, y + 86, 58, color, w - 56, h - 106);
+        else T("这个月一次都没有，真好", x + 28, y + 140, 32, SF.hand, SC.pencil);
+      });
+      // 每晚花费日历
+      T("每晚花了多少", 64, 812, 36, SF.hand);
+      T("越黄 = 花得越多", W - 64, 812, 28, SF.hand, SC.pencil, "right");
+      const gx0 = 64, gy0 = 836, cw = 130, ch = 50, gap = 8;
+      ["一", "二", "三", "四", "五", "六", "日"].forEach((d, i) => T(d, gx0 + i * (cw + gap) + cw / 2, gy0 + 24, 24, SF.hand, i > 4 ? SC.burn : SC.pencil, "center"));
+      const lead = (new Date(yy, mm - 1, 1).getDay() + 6) % 7, days = new Date(yy, mm, 0).getDate();
+      for (let d = 1; d <= days; d++) {
+        const idx = lead + d - 1, cx = gx0 + (idx % 7) * (cw + gap), cy = gy0 + 38 + Math.floor(idx / 7) * (ch + gap);
+        const n = nights[`${month}-${pad(d)}`], v = n ? sum(n) : 0;
+        ctx.save(); const r = rng(500 + d);
+        ctx.fillStyle = v > 0 ? SC.money : SC.card; ctx.globalAlpha = v > 0 ? .25 + .75 * v / (st.max || 1) : 1;
+        wobblyRect(ctx, cx, cy, cw, ch, r); ctx.fill(); ctx.globalAlpha = 1;
+        ctx.strokeStyle = n ? SC.ink : SC.grid; ctx.lineWidth = n ? 2.5 : 2; wobblyRect(ctx, cx, cy, cw, ch, rng(500 + d)); ctx.stroke(); ctx.restore();
+        T(`${d}`, cx + 10, cy + 22, 20, SF.num, n ? SC.ink : SC.pencil);
+        if (n) T(`$${Math.round(v)}`, cx + cw - 10, cy + ch - 10, 26, SF.num, SC.ink, "right");
+        if (n && (n.burnout || n.body)) T("×".repeat(Math.min(3, n.burnout || 0)), cx + cw - 10, cy + 20, 18, SF.num, SC.burn, "right");
+      }
+      // 花得最多
+      const topY = 1210;
+      T("花得最多", 64, topY, 36, SF.hand);
+      st.top.forEach((t, i) => {
+        const x = 64 + i * 330, y = topY + 22;
+        sketchBox(ctx, x, y, 300, 100, SC.card, 41 + i, false);
+        ctx.save(); ctx.beginPath(); ctx.arc(x + 52, y + 50, 32, 0, Math.PI * 2); ctx.fillStyle = [SC.moneyHi, SC.bodyHi, SC.burnHi][hashOf(t.name) % 3]; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = SC.ink; ctx.stroke(); ctx.restore();
+        if (icons[i]) ctx.drawImage(icons[i], x + 30, y + 28, 44, 44);
+        else T([...t.name][0] || "?", x + 52, y + 63, 34, SF.title, SC.ink, "center");
+        const nm = t.name.length > 6 ? t.name.slice(0, 6) + "…" : t.name;
+        T(nm, x + 98, y + 44, 28, SF.hand);
+        T(`${money(t.s)} · ${t.c} 次`, x + 98, y + 82, 28, SF.num, SC.pencil);
+      });
+      if (!st.top.length) T("这个月没买东西，省钱冠军", 64, topY + 80, 32, SF.hand, SC.pencil);
+      // 愿望 + 页脚
+      T(wishLine, 64, 1378, 32, SF.hand, SC.body);
+      T(appUrl ? `加班夜记 · ${appUrl}` : "加班夜记", W - 64, 1418, 24, SF.hand, SC.pencil, "right");
+      T("数据只在我自己手机里", 64, 1418, 24, SF.hand, SC.pencil);
+    };
+    // 空跑一遍收集用到的字，按需加载字体子集，再正式画
+    const probe = document.createElement("canvas").getContext("2d"); let used = "";
+    const real = probe.fillText.bind(probe); probe.fillText = (t, ...a) => { used += t; return real(t, ...a); };
+    paint(probe);
+    try { await Promise.all([SF.title, SF.hand, SF.num].map(f => document.fonts.load(`40px ${f.split(",")[0]}`, used))); } catch (e) {}
+    const canvas = document.createElement("canvas"); canvas.width = W; canvas.height = H;
+    paint(canvas.getContext("2d"));
+    return canvas;
+  }
+
+  const monthsWithData = () => [...new Set(Object.keys(nights).map(d => d.slice(0, 7)))].sort();
+  async function openShare(month) {
+    const months = monthsWithData();
+    if (!months.length) { toast("先记几晚，再来生成账单吧"); return; }
+    shareMonth = month || (months.includes(nightOf().slice(0, 7)) ? nightOf().slice(0, 7) : months[months.length - 1]);
+    const [y, m] = shareMonth.split("-").map(Number);
+    $("shareTitle").textContent = `${y} 年 ${m} 月`;
+    $("sharePrev").disabled = shareMonth <= months[0];
+    $("shareNext").disabled = shareMonth >= months[months.length - 1];
+    $("shareModal").hidden = false; document.body.style.overflow = "hidden";
+    $("sharePreview").classList.add("loading"); $("shareGo").disabled = true;
+    const canvas = await drawShareCard(shareMonth);
+    shareBlob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    const old = $("sharePreview").src; $("sharePreview").src = URL.createObjectURL(shareBlob); if (old.startsWith("blob:")) URL.revokeObjectURL(old);
+    $("sharePreview").classList.remove("loading"); $("shareGo").disabled = false;
+  }
+  function closeShare() { $("shareModal").hidden = true; document.body.style.overflow = ""; }
+  const stepMonth = (k) => { const ms = monthsWithData(); const i = ms.indexOf(shareMonth) + k; if (ms[i]) openShare(ms[i]); };
+  $("shareOpen").onclick = () => openShare();
+  $("shareClose").onclick = closeShare;
+  $("shareModal").addEventListener("click", (e) => { if (e.target === $("shareModal")) closeShare(); });
+  $("sharePrev").onclick = () => stepMonth(-1);
+  $("shareNext").onclick = () => stepMonth(1);
+  $("shareGo").onclick = async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], `加班账单-${shareMonth}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(shareBlob); a.download = `overtime-bill-${shareMonth}.png`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast("图片已下载");
+  };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("shareModal").hidden) closeShare(); });
 
   // ---------- tabs ----------
   const TABS = ["tonight", "calendar", "stats", "wishes", "records"];
