@@ -1,7 +1,7 @@
 import WidgetKit
 import SwiftUI
 
-// 桌面小组件：显示本月加班几晚、花了多少、burnout 和身体不行的次数。
+// 桌面小组件：显示本月加班几晚、花了多少、几晚 burnout、几晚身体不行。
 // 数据由 App 写进 App Group 共享存储（见 WidgetBridgePlugin.swift），颜色跟着 App 当前主题。
 
 private let appGroup = "group.com.ssbabysong.overtimenightlog"
@@ -27,7 +27,7 @@ struct Summary: Codable {
     var emptyText = "打开 App 记第一晚"
     var colors = Palette()
 
-    static let sample = Summary(monthTitle: "9 月", nights: 15, spent: "$390", burnout: 20, body: 11, tonight: "$47.75")
+    static let sample = Summary(monthTitle: "9 月", nights: 15, spent: "$390", burnout: 6, body: 4, tonight: "$47.75")
 }
 
 // 宽松解析：缺了哪个字段就用默认值，以后加字段也不会让小组件出错

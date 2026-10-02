@@ -40,8 +40,8 @@
 「加班夜记」是一个手绘风的小本子，专门记录加班的夜晚：
 
 📝 今晚
-· 崩溃一次就点 +，用「正」字一笔一笔画下来
-· 身体不舒服（头疼、心慌、眼睛酸）也记一笔
+· 今晚崩溃了就点一下，打一个手绘的大叉
+· 身体不舒服（头疼、心慌、眼睛酸）也点一下
 · 买了什么、花了多少，10 秒记完，自动配手绘小图标
 
 📅 日历
@@ -53,7 +53,7 @@
 · 看看加班的零碎花销相当于几晚、够不够买它
 
 📊 统计和月度账单
-· 加班几晚、总花费、最晚几点下班、崩溃几次
+· 加班几晚、总花费、最晚几点下班、几晚崩溃
 · 一键生成「我的加班账单」分享图
 
 🔔 每晚提醒：到点提醒你记一笔
@@ -88,8 +88,8 @@ Working until 11 again. How much did tonight cost? How many times did you hit a 
 Overtime Night Log is a hand-drawn notebook for the nights you work late.
 
 📝 Tonight
-· Tap + each time you burn out, drawn as tally marks
-· Log when your body says no: headaches, racing heart, sore eyes
+· Burned out tonight? One tap marks it with a hand-drawn cross
+· Tap again when your body says no: headaches, racing heart, sore eyes
 · Add what you bought in 10 seconds, with a hand-drawn icon for each item
 
 📅 Calendar
@@ -101,7 +101,7 @@ Overtime Night Log is a hand-drawn notebook for the nights you work late.
 · See how many overtime nights of spending it's worth
 
 📊 Stats and a monthly bill
-· Nights, total spent, latest finish, burnouts
+· Nights, total spent, latest finish, burnout nights
 · Turn your month into a shareable image
 
 🔔 Nightly reminder to log your evening

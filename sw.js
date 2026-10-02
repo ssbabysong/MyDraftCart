@@ -1,7 +1,7 @@
 // 加班夜记 service worker：离线可用 + 安全更新。
 // 发布新版本时只需把 VERSION 加一：打开中的 App 会弹出「有新版本」提示，点一下就换上新界面。
 // 这里只缓存 App 本身的文件；你的记录存在 localStorage 里，更新和清理缓存都不会碰到它。
-const VERSION = "v19";
+const VERSION = "v20";
 const SHELL = `shell-${VERSION}`;
 const FONTS = "fonts";
 const ASSETS = ["./", "manifest.webmanifest", "icons/icon.svg", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
