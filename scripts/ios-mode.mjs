@@ -14,12 +14,17 @@ const MAP = [
   // [正式模式, 测试模式]
   [`PRODUCT_BUNDLE_IDENTIFIER = ${ID}.widget;`, `PRODUCT_BUNDLE_IDENTIFIER = ${ID}.dev.widget;`],
   [`PRODUCT_BUNDLE_IDENTIFIER = ${ID};`, `PRODUCT_BUNDLE_IDENTIFIER = ${ID}.dev;`],
-  ["CODE_SIGN_ENTITLEMENTS = App/App.entitlements;", "CODE_SIGN_ENTITLEMENTS = \"\"; /* free:App */"],
-  ["CODE_SIGN_ENTITLEMENTS = OvertimeWidget/OvertimeWidget.entitlements;", "CODE_SIGN_ENTITLEMENTS = \"\"; /* free:Widget */"],
 ];
+// 权限文件按 INFOPLIST_FILE 认出是 App 还是小组件（Xcode 改 Team 时会重写工程文件、删掉注释，不能靠注释做标记）
+const ENT = { "App/Info.plist": "App/App.entitlements", "OvertimeWidget/Info.plist": "OvertimeWidget/OvertimeWidget.entitlements" };
 
 let pbx = readFileSync(PBX, "utf8");
 for (const [paid, free] of MAP) pbx = mode === "free" ? pbx.split(paid).join(free) : pbx.split(free).join(paid);
+pbx = pbx.replace(/buildSettings = \{[\s\S]*?\n\t\t\t\};/g, (block) => {
+  const plist = (block.match(/\sINFOPLIST_FILE = ([^;]+);/) || [])[1];
+  if (!ENT[plist]) return block;
+  return block.replace(/CODE_SIGN_ENTITLEMENTS = .*/, `CODE_SIGN_ENTITLEMENTS = ${mode === "free" ? '""' : ENT[plist]};`);
+});
 writeFileSync(PBX, pbx);
 
 // Info.plist 里的标记让 App 知道自己处于测试模式（iCloud 同步显示为已关闭）
