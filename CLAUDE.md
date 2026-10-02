@@ -36,7 +36,8 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 ## 现状（交接时）
 
 - 网页版和 App 的 JS 逻辑都在模拟环境里测过。
-- iOS 工程已在 Mac（Xcode 27）上编译通过（模拟器，free 模式），记一笔、日历、统计、愿望清单、主题、iCloud 测试模式提示、小组件桥接都在模拟器里测过。每晚提醒只验证到弹出系统通知权限框，点「允许」之后的排程还需要人工确认。
+- iOS 工程已在 Mac（Xcode 27）上编译通过（模拟器，free 模式），记一笔、日历、统计、愿望清单、主题、iCloud 测试模式提示、小组件桥接都在模拟器里测过。每晚提醒已在真机（iPhone 17 Pro Max，iOS 27，免费 Personal Team）上确认能收到通知。
+- 真机连不上（Xcode 报 CoreDeviceError 4000 / `enablePersonalizedDDI`，`devicectl list devices` 显示 `connected (no DDI)`）时：iPhone「设置 → 通用 → 传输或还原 iPhone → 还原 → 还原位置与隐私」后重新插线信任即可。
 - 最低系统版本统一为 iOS 17（小组件需要 17；Capacitor 按工程里第一个 `IPHONEOS_DEPLOYMENT_TARGET` 生成 `CapApp-SPM`，各 target 不一致会有链接警告）。
 - Capacitor 8 的窗口是 `SceneDelegate.swift` 用代码建的，不走 storyboard：根控制器必须是 `MainViewController()`，否则自定义插件不会注册。
 - 开发者会员还在 Pending（付款 / 开通中），所以 Xcode 只有免费的 Personal Team，先用 `npm run ios:free` 测试。
