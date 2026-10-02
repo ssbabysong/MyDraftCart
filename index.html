@@ -964,7 +964,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
     [["burn", n.burnout], ["body", n.body]].forEach(([k, on]) => {
       $(k + "Toggle").setAttribute("aria-pressed", String(!!on));
-      $(k + "State").textContent = on ? L("今晚有（再点一下取消）", "Yes tonight (tap to undo)") : L("今晚没有，挺好", "Not tonight. Good.");
+      $(k + "State").textContent = on ? L("今晚有", "Yes tonight") : L("今晚没有，挺好", "Not tonight. Good.");
     });
     $("nightTotal").textContent = money(sum(n));
     const ul = $("items"); ul.textContent = "";
@@ -1636,7 +1636,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       T(tLabel, 64 + w1 + 22, 210, tSize, SF.hand);
       T(`${yy}`, W - 64, 104, 40, SF.num, SC.pencil, "right");
       // 第一行三格
-      const row1 = [[L("加班", "Overtime"), `${st.recs.length}`, L("晚", "nights"), SC.card], [L("花了", "Spent"), money(st.spend), "", SC.moneyHi], [L("最晚下班", "Latest finish"), st.late || "—", "", SC.card]];
+      const row1 = [[L("加班", "Overtime"), `${st.recs.length}`, L("晚", st.recs.length === 1 ? "night" : "nights"), SC.card], [L("花了", "Spent"), money(st.spend), "", SC.moneyHi], [L("最晚下班", "Latest finish"), st.late || "—", "", SC.card]];
       row1.forEach(([k, v, unit, fill], i) => {
         const x = 64 + i * 330, y = 262;
         sketchBox(ctx, x, y, 300, 180, fill, 11 + i);
@@ -1649,7 +1649,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const x = 64 + i * 495, y = 488, w = 460, h = 236;
         sketchBox(ctx, x, y, w, h, fill, 21 + i);
         T(k, x + 28, y + 54, 36, SF.hand, color);
-        T(L(`${v} 晚`, `${v} nights`), x + w - 28, y + 58, 52, SF.num, color, "right", 190);
+        T(L(`${v} 晚`, `${v} ${v === 1 ? "night" : "nights"}`), x + w - 28, y + 58, 52, SF.num, color, "right", 190);
         if (v) drawTallies(ctx, v, x + 28, y + 86, 58, color, w - 56, h - 106);
         else T(L("这个月一次都没有，真好", "None this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil);
       });
@@ -1688,7 +1688,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       // 愿望 + 页脚
       T(wishLine, 64, 1378, 32, SF.hand, SC.body, "left", W - 128);
       T(appUrl ? L(`加班夜记 · ${appUrl}`, `Overtime Night Log · ${appUrl}`) : L("加班夜记", "Overtime Night Log"), W - 64, 1418, 24, SF.hand, SC.pencil, "right");
-      T(L("数据只在我自己手机里", "My data stays on my phone"), 64, 1418, 24, SF.hand, SC.pencil);
     };
     // 空跑一遍收集用到的字，按需加载字体子集，再正式画
     const probe = document.createElement("canvas").getContext("2d"); let used = "";
@@ -2074,7 +2073,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const cs = getComputedStyle(document.documentElement), cv = (n) => cs.getPropertyValue(n).trim();
     const json = JSON.stringify({
       appName: L("加班夜记", "Overtime"), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
-      nights: st.recs.length, nightsLabel: L("晚", "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
+      nights: st.recs.length, nightsLabel: L("晚", st.recs.length === 1 ? "night" : "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
       burnout: st.burnout, body: st.body, burnoutLabel: "Burnout", bodyLabel: L("身体不行", "Unwell"),
       tonight: tn ? money(sum(tn)) : "", tonightLabel: L("今晚", "Tonight"), emptyText: L("打开 App 记第一晚", "Open the app to log tonight"),
       colors: { paper: cv("--paper"), ink: cv("--ink"), pencil: cv("--pencil"), card: cv("--card"), money: cv("--money"), moneyHi: cv("--money-hi"), burn: cv("--burn"), body: cv("--body") },
