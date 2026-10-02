@@ -36,7 +36,9 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 ## 现状（交接时）
 
 - 网页版和 App 的 JS 逻辑都在模拟环境里测过。
-- **iOS 工程从没在 Mac 上编译过**（是在 Linux 上用 xcodeproj gem 生成和修改的）。第一次编译可能有 Swift / 工程配置错误，需要修。
+- iOS 工程已在 Mac（Xcode 27）上编译通过（模拟器，free 模式），记一笔、日历、统计、愿望清单、主题、iCloud 测试模式提示、小组件桥接都在模拟器里测过。每晚提醒只验证到弹出系统通知权限框，点「允许」之后的排程还需要人工确认。
+- 最低系统版本统一为 iOS 17（小组件需要 17；Capacitor 按工程里第一个 `IPHONEOS_DEPLOYMENT_TARGET` 生成 `CapApp-SPM`，各 target 不一致会有链接警告）。
+- Capacitor 8 的窗口是 `SceneDelegate.swift` 用代码建的，不走 storyboard：根控制器必须是 `MainViewController()`，否则自定义插件不会注册。
 - 开发者会员还在 Pending（付款 / 开通中），所以 Xcode 只有免费的 Personal Team，先用 `npm run ios:free` 测试。
 - Bundle ID：`com.ssbabysong.overtimenightlog`，小组件 `….widget`，App Group `group.com.ssbabysong.overtimenightlog`。
 - 上架地区：除中国大陆外全部。
