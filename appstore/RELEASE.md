@@ -54,6 +54,26 @@ npm run ios
 
 **编译报错怎么办**：把 Xcode 左侧红色错误的截图发给我，我来改。
 
+## 会员还没开通？先用免费账号在手机上测试
+
+开发者会员开通前（developer.apple.com 显示 Pending），Xcode 里只有免费的「Personal Team」，它不支持 iCloud。可以先切到测试模式：
+
+```bash
+npm run ios:free
+```
+
+- Bundle ID 会变成 `com.ssbabysong.overtimenightlog.dev`，不占用正式 ID
+- iCloud 同步和小组件数据共享暂时关闭；提醒、震动、分享、主题等都能测
+- 两个 target 的 Team 都选 **Personal Team**
+- 免费账号装的 App 7 天后会失效，到时重新运行一次就行
+- 测试模式里记的数据不会带到正式版
+
+会员开通后切回正式模式，Team 改选付费账号：
+
+```bash
+npm run ios:paid
+```
+
 ## 4. 在 App Store Connect 创建 App
 
 1. 打开 https://appstoreconnect.apple.com →「App」→ 左上角「+」→「新建 App」

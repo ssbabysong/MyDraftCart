@@ -5,7 +5,9 @@
   "description": "加班夜记 · Overtime Night Log",
   "scripts": {
     "build": "node scripts/build-www.mjs",
-    "ios": "npm run build && npx cap sync ios && npx cap open ios"
+    "ios": "npm run build && npx cap sync ios && npx cap open ios",
+    "ios:free": "node scripts/ios-mode.mjs free && npm run ios",
+    "ios:paid": "node scripts/ios-mode.mjs paid && npm run ios"
   },
   "dependencies": {
     "@capacitor/core": "^8.5.2",

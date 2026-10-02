@@ -2004,6 +2004,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     icBusy = true;
     try {
       const st = await ic.status();
+      if (st && st.freeMode) {
+        icloud = { on: false, last: "", msg: L("测试模式：免费账号不支持 iCloud，记录只存在这台手机上。", "Test mode: free Apple accounts can't use iCloud, so records stay on this phone.") };
+        return;
+      }
       if (!st || !st.available) {
         icloud = { on: false, last: "", msg: L("没有登录 iCloud，记录只存在这台手机上。到「设置 → Apple 账户 → iCloud」里登录就能自动同步。", "Not signed in to iCloud, so records stay on this phone. Sign in under Settings → Apple Account → iCloud to sync.") };
         return;

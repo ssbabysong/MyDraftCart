@@ -39,6 +39,10 @@ public class ICloudSyncPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// 有没有登录 iCloud
     @objc func status(_ call: CAPPluginCall) {
+        // 免费账号测试模式（scripts/ios-mode.mjs free）没有 iCloud 权限，直接告诉网页
+        if Bundle.main.object(forInfoDictionaryKey: "OvertimeFreeMode") as? Bool == true {
+            return call.resolve(["available": false, "freeMode": true])
+        }
         call.resolve(["available": FileManager.default.ubiquityIdentityToken != nil])
     }
 
