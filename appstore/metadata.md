@@ -59,7 +59,7 @@
 🔔 每晚提醒：到点提醒你记一笔
 📱 桌面小组件：不用打开 App 也能看到本月数据
 ☁️ iCloud 自动同步：换手机不丢记录
-🎨 六种主题：手绘方格本、樱花、简约、收据、终端、波普
+🎨 六种主题：手绘方格本、樱花、和纸手账、收据、报纸、波普
 💱 支持多种货币，汇率可自己设置
 🌏 中文 / English
 
@@ -107,7 +107,7 @@ Overtime Night Log is a hand-drawn notebook for the nights you work late.
 🔔 Nightly reminder to log your evening
 📱 Home Screen widget with this month at a glance
 ☁️ iCloud sync so a new phone never loses your log
-🎨 Six themes: Grid paper, Sakura, Clean, Receipt, Terminal and Pop
+🎨 Six themes: Grid paper, Sakura, Washi, Receipt, Newsprint and Pop
 💱 Any currency, with your own exchange rate
 🌏 English / 中文
 

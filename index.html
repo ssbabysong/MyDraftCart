@@ -24,7 +24,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Patrick+Hand&family=Noto+Sans+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&family=ZCOOL+QingKe+HuangYou&family=Archivo+Black&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Patrick+Hand&family=Noto+Sans+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&family=ZCOOL+QingKe+HuangYou&family=Archivo+Black&family=Noto+Serif+SC:wght@400;700;900&family=Long+Cang&display=swap">
 <style>
 /* Layout: a hand-drawn notebook page — grid paper, ink-sketched boxes with wobbly edges, 正-tally counters, hatched bar chart */
 :root {
@@ -317,33 +317,40 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
 .wedit .save { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--body-hi); padding: 3px 16px; box-shadow: var(--sh-hard, 2px 2px 0 var(--ink)); }
 .wedit .cancel { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; }
 
-/* skins：四种额外主题，各自固定一套配色 */
+/* skins：五种额外主题，各自固定一套配色 */
 /* 樱花：手绘风，换一套粉色 */
 :root[data-skin="sakura"] {
   --paper: #FFF3F6; --grid: #F5D7E0; --ink: #4A2338; --pencil: #9A6F84; --card: #FFFFFF;
   --money: #F4A261; --money-hi: #FFDDC4; --burn: #D6336C; --burn-hi: #FFD0DD; --body: #7E57C2; --body-hi: #E9DDFB; color-scheme: light;
 }
-/* 其他风格：不只是换颜色，字体、圆角、阴影、倾斜一起换 */
-:root[data-skin="clean"] {
-  --paper: #F3F4F6; --grid: #E3E5EA; --ink: #1A2230; --pencil: #6A7282; --card: #FFFFFF;
-  --money: #F2A93B; --money-hi: #FCE7C3; --burn: #E5484D; --burn-hi: #FDE0E1; --body: #7C5CE0; --body-hi: #ECE6FD; --on-money: #1A2230;
-  --f-title: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; --f-hand: var(--f-title); --f-num: "Noto Sans SC", system-ui, sans-serif;
-  --tilt: 0; --rad: 16px; --round: 999px; --rad-top: 22px 22px 0 0; --rad-bar: 4px 4px 0 0; --bw: 1px; --bc: var(--grid);
-  --sh-hard: 0 1px 2px rgba(26,34,48,.06), 0 8px 24px rgba(26,34,48,.06); --paper-img: none; --tape: none; color-scheme: light;
+/* 和纸手账：手绘风，横线本 + 靛蓝墨水 + 朱红，胶带是斜条纹和纸胶带 */
+:root[data-skin="washi"] {
+  --paper: #F6F0E2; --grid: #E2D6BC; --ink: #2B3654; --pencil: #7D7563; --card: #FFFCF4;
+  --money: #E3A83B; --money-hi: #F6E3B8; --burn: #C8553D; --burn-hi: #F4D6CC; --body: #4F7A5E; --body-hi: #D9E8D9; color-scheme: light;
+  --f-title: "Long Cang", "Ma Shan Zheng", "Kaiti SC", cursive;
+  --paper-img: linear-gradient(transparent 23px, var(--grid) 23px);
 }
+:root[data-skin="washi"] .card::before { background: repeating-linear-gradient(-45deg, var(--burn-hi) 0 7px, var(--body-hi) 7px 14px); opacity: .95; }
+/* 其他风格：不只是换颜色，字体、圆角、阴影、倾斜一起换 */
+/* 报纸：宋体、黑色双线、直角、不倾斜 */
+:root[data-skin="news"] {
+  --paper: #EFEBE1; --grid: #D6CFBE; --ink: #1A1916; --pencil: #67625A; --card: #F8F5EE;
+  --money: #E2B33C; --money-hi: #F1E2B4; --burn: #B3261E; --burn-hi: #F0D2CD; --body: #23507A; --body-hi: #D3DFEA; --on-money: #1A1916;
+  --f-title: "Noto Serif SC", "Songti SC", "STSong", serif; --f-hand: var(--f-title); --f-num: var(--f-title);
+  --tilt: 0; --rad: 0; --round: 0; --rad-top: 0; --rad-bar: 0; --bw: 1px; --bc: var(--ink);
+  --sh-hard: none; --paper-img: none; --tape: none; color-scheme: light;
+}
+:root[data-skin="news"] h1 { font-weight: 900; letter-spacing: -.02em; }
+:root[data-skin="news"] h1 .hl { background: none; color: var(--burn); }
+:root[data-skin="news"] h2 { font-weight: 700; }
+:root[data-skin="news"] header { border-bottom: 3px double var(--ink); padding-bottom: 10px; }
+:root[data-skin="news"] .sketch, :root[data-skin="news"] .card, :root[data-skin="news"] .counter, :root[data-skin="news"] .tile { border: 3px double var(--ink); }
 :root[data-skin="receipt"] {
   --paper: #E8E5DE; --grid: #D5D0C5; --ink: #1B1B1B; --pencil: #75716A; --card: #FFFDF7;
   --money: #F1CB3B; --money-hi: #FAEA9C; --burn: #D2261E; --burn-hi: #F7D2CE; --body: #2D4FD6; --body-hi: #D7DEFA; --on-money: #1B1B1B;
   --f-title: "JetBrains Mono", "Noto Sans SC", ui-monospace, monospace; --f-hand: var(--f-title); --f-num: var(--f-title);
   --tilt: 0; --rad: 0; --round: 2px; --rad-top: 0; --rad-bar: 0; --bw: 1px; --bc: var(--ink);
   --sh-hard: 0 1px 0 rgba(0,0,0,.12); --paper-img: none; --tape: none; color-scheme: light;
-}
-:root[data-skin="terminal"] {
-  --paper: #0E0B07; --grid: #2A2215; --ink: #FFC766; --pencil: #A88B57; --card: #15110B;
-  --money: #FFB000; --money-hi: #3D2C07; --burn: #FF6B4A; --burn-hi: #3A170E; --body: #9EC5FF; --body-hi: #16253D; --on-money: #120D04;
-  --f-title: "JetBrains Mono", "Noto Sans SC", ui-monospace, monospace; --f-hand: var(--f-title); --f-num: var(--f-title);
-  --tilt: 0; --rad: 3px; --round: 3px; --rad-top: 6px 6px 0 0; --rad-bar: 0; --bw: 1px; --bc: color-mix(in srgb, var(--ink) 55%, transparent);
-  --sh-hard: none; --paper-img: repeating-linear-gradient(transparent 0 3px, rgba(255,199,102,.035) 3px 4px); --tape: none; color-scheme: dark;
 }
 :root[data-skin="pop"] {
   --paper: #FFF3D1; --grid: #F0DC9E; --ink: #111111; --pencil: #4A4A4A; --card: #FFFFFF;
@@ -352,12 +359,11 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
   --tilt: 0; --rad: 12px; --round: 999px; --rad-top: 16px 16px 0 0; --rad-bar: 3px 3px 0 0; --bw: 3px; --bc: #111111;
   --sh-hard: 4px 4px 0 #111111; --paper-img: radial-gradient(rgba(17,17,17,.13) 1.3px, transparent 1.6px); --tape: none; color-scheme: light;
 }
-:root[data-skin="clean"] h1, :root[data-skin="receipt"] h1, :root[data-skin="terminal"] h1 { font-weight: 700; letter-spacing: -.01em; }
-:root[data-skin="clean"] h2, :root[data-skin="receipt"] h2, :root[data-skin="terminal"] h2 { font-weight: 700; }
-:root[data-skin="receipt"] h1, :root[data-skin="terminal"] h1 { font-size: clamp(30px, 8vw, 42px); }
-:root[data-skin="receipt"] h1 .hl, :root[data-skin="terminal"] h1 .hl { background: none; }
+:root[data-skin="receipt"] h1 { font-weight: 700; letter-spacing: -.01em; }
+:root[data-skin="receipt"] h2 { font-weight: 700; }
+:root[data-skin="receipt"] h1 { font-size: clamp(30px, 8vw, 42px); }
+:root[data-skin="receipt"] h1 .hl { background: none; }
 :root[data-skin="receipt"] .card { border-style: dashed; }
-:root[data-skin="terminal"] h1 { text-shadow: 0 0 12px color-mix(in srgb, var(--ink) 45%, transparent); }
 :root[data-skin="pop"] h1 { font-size: clamp(42px, 11vw, 60px); }
 :root[data-skin="pop"] .tabbar { border-top-width: 3px; }
 .cur-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
@@ -648,10 +654,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
     </div>
     <div class="top-buys" id="topBuys"></div>
-    <button type="button" class="share-cta" id="shareOpen">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
-      <span>生成我的月度加班账单<small>一张手绘风长图，可以直接发小红书</small></span>
-    </button>
 
     <div class="chart sketch" aria-label="最近 14 晚">
       <div class="legend">
@@ -662,6 +664,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="plot" id="plot"></div>
       <div class="marks" id="marks"></div>
     </div>
+    <button type="button" class="share-cta" id="shareOpen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
+      <span>生成我的月度加班账单<small>一张手绘风长图，可以直接发小红书</small></span>
+    </button>
   </section>
   </main>
 
@@ -865,9 +871,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     document.title = L("加班夜记", "Overtime Night Log");
     $("brandEyebrow").textContent = L("Overtime Night Log", "late-night spending log");
   }
-  // 「正」字计数；英文用 |||| 加一道斜线
-  const STROKES_EN = ["M5 3.5 Q5.6 12 5 20.5", "M9.5 3 Q10 12 9.5 20.8", "M14 3.5 Q14.5 12 14 20.5", "M18.5 3 Q19 12 18.5 20.8", "M2 17.5 Q12 11.5 22 6"];
-  const tallyStrokes = () => L(STROKES, STROKES_EN);
   const LS_KEY = "overtime-nights-v1";
   const chipList = () => L([["咖啡", 5.5], ["外卖", 16], ["能量饮料", 3.5], ["零食", 4], ["打车回家", 22], ["奶茶", 6.5]],
     [["Coffee", 5.5], ["Takeout", 16], ["Energy drink", 3.5], ["Snacks", 4], ["Ride home", 22], ["Boba", 6.5]]);
@@ -980,8 +983,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
   }
 
-  // 分享图里的正字：每 5 晚一个"正"，按笔顺一笔一笔画
-  const STROKES = ["M3 4.5 Q12 3.2 21 4.2", "M12 4.5 Q12.6 13 12 21.5", "M12.5 12.5 Q16 11.8 19 12.4", "M5.5 11.5 Q6 16 5.8 21.5", "M2 21.8 Q12 20.6 22 21.4"];
 
   // 今晚已添加的商品：点名称或金额就地修改
   let editingItem = null;   // {date, i}
@@ -1518,7 +1519,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 固定种子的小抖动，让线条像手画的，但每次生成都一样
   function rng(seed) { let x = seed >>> 0 || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); }
   // 分享图跟随风格：手绘风线条抖一抖，其他风格画规整的圆角矩形
-  const LOOKS = { grid: { hand: 1 }, sakura: { hand: 1 }, clean: { r: 22, lw: 2, soft: 1 }, receipt: { r: 0, lw: 2, dashed: 1 }, terminal: { r: 6, lw: 2 }, pop: { r: 16, lw: 5, shadow: 1, dots: 1 } };
+  const LOOKS = { grid: { hand: 1 }, sakura: { hand: 1 }, washi: { hand: 1, ruled: 1 }, receipt: { r: 0, lw: 2, dashed: 1 }, news: { r: 0, lw: 3 }, pop: { r: 16, lw: 5, shadow: 1, dots: 1 } };
   const look = () => LOOKS[skin] || LOOKS.grid;
   function wobblyRect(ctx, x, y, w, h, r, seed) {
     if (!look().hand) { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, look().r); else ctx.rect(x, y, w, h); return; }
@@ -1544,24 +1545,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     ctx.restore();
   }
   function highlight(ctx, x, y, w, h, color) { ctx.save(); ctx.fillStyle = color; ctx.globalAlpha = .9; ctx.beginPath(); ctx.moveTo(x - 6, y + 4); ctx.lineTo(x + w + 6, y); ctx.lineTo(x + w + 4, y + h); ctx.lineTo(x - 4, y + h + 3); ctx.closePath(); ctx.fill(); ctx.restore(); }
-  function drawTallies(ctx, count, x, y, size, color, maxW, maxH) {
-    // 次数多时缩小字号，放不下就画到能放下的个数为止
-    let groups = Math.ceil(count / 5), gap, perRow, rows;
-    for (;;) {
-      gap = size * .28; perRow = Math.max(1, Math.floor((maxW + gap) / (size + gap))); rows = Math.max(1, Math.floor((maxH + gap) / (size + gap)));
-      if (groups <= perRow * rows || size <= 30) break;
-      size -= 4;
-    }
-    groups = Math.min(groups, perRow * rows);
-    ctx.save(); ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    for (let g = 0; g < groups; g++) {
-      const gx = x + (g % perRow) * (size + gap), gy = y + Math.floor(g / perRow) * (size + gap);
-      ctx.save(); ctx.translate(gx + size / 2, gy + size / 2); ctx.rotate((look().hand ? (((g * 37) % 7) - 3) : 0) * Math.PI / 180); ctx.translate(-size / 2, -size / 2); ctx.scale(size / 24, size / 24); ctx.lineWidth = 2.4;
-      for (let i = 0; i < Math.min(5, count - g * 5); i++) ctx.stroke(new Path2D(tallyStrokes()[i]));
-      ctx.restore();
-    }
-    ctx.restore();
-  }
   function iconImage(name) {
     const hit = DOODLES.find(([re]) => re.test(name));
     if (!hit) return Promise.resolve(null);
@@ -1573,7 +1556,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     // 分享图跟随当前主题的配色
     const cs = getComputedStyle(document.documentElement), cv = (n, f) => (cs.getPropertyValue(n).trim() || f);
     const SF0 = { title: '"Ma Shan Zheng", "Kaiti SC", KaiTi, serif', hand: '"ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif', num: '"Patrick Hand", "ZCOOL KuaiLe", sans-serif' };
-    Object.assign(SF, look().hand ? SF0 : { title: cv("--f-title", SF0.title), hand: cv("--f-hand", SF0.hand), num: cv("--f-num", SF0.num) });
+    Object.assign(SF, look().hand ? { ...SF0, title: cv("--f-title", SF0.title) } : { title: cv("--f-title", SF0.title), hand: cv("--f-hand", SF0.hand), num: cv("--f-num", SF0.num) });
     Object.assign(SC, { paper: cv("--paper", SC.paper), grid: cv("--grid", SC.grid), ink: cv("--ink", SC.ink), pencil: cv("--pencil", SC.pencil), card: cv("--card", SC.card),
       money: cv("--money", SC.money), moneyHi: cv("--money-hi", SC.moneyHi), burn: cv("--burn", SC.burn), burnHi: cv("--burn-hi", SC.burnHi), body: cv("--body", SC.body), bodyHi: cv("--body-hi", SC.bodyHi) });
     SC.onMoney = cv("--on-money", SC.ink);
@@ -1592,7 +1575,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       ctx.fillStyle = SC.paper; ctx.fillRect(0, 0, W, H);
       if (look().hand) {
         ctx.strokeStyle = SC.grid; ctx.lineWidth = 2; ctx.beginPath();
-        for (let gx = 0; gx <= W; gx += 54) { ctx.moveTo(gx, 0); ctx.lineTo(gx, H); }
+        if (!look().ruled) for (let gx = 0; gx <= W; gx += 54) { ctx.moveTo(gx, 0); ctx.lineTo(gx, H); }
         for (let gy = 0; gy <= H; gy += 54) { ctx.moveTo(0, gy); ctx.lineTo(W, gy); }
         ctx.stroke();
       } else if (look().dots) {
@@ -1617,14 +1600,16 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num, SC.ink, "left", unit ? 160 : 248);
         if (unit) T(unit, x + 36 + vw, y + 142, 36, SF.hand, SC.pencil);
       });
-      // 第二行：正字
-      [["Burnout", st.burnout, SC.burn, SC.burnHi], [L("身体不行", "Unwell"), st.body, SC.body, SC.bodyHi]].forEach(([k, v, color, fill], i) => {
+      // 第二行：几晚 burnout / 身体不行，下面列出是哪几晚
+      [["Burnout", "burnout", st.burnout, SC.burn, SC.burnHi], [L("身体不行", "Unwell"), "body", st.body, SC.body, SC.bodyHi]].forEach(([k, key, v, color, fill], i) => {
         const x = 64 + i * 495, y = 488, w = 460, h = 236;
         sketchBox(ctx, x, y, w, h, fill, 21 + i);
         T(k, x + 28, y + 54, 36, SF.hand, color);
-        T(L(`${v} 晚`, `${v} ${v === 1 ? "night" : "nights"}`), x + w - 28, y + 58, 52, SF.num, color, "right", 190);
-        if (v) drawTallies(ctx, v, x + 28, y + 86, 58, color, w - 56, h - 106);
-        else T(L("这个月一次都没有，真好", "None this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil);
+        if (!v) { T(L("这个月一晚都没有，真好", "Not one night this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56); return; }
+        const vw = T(`${v}`, x + 28, y + 150, 84, SF.num, color);
+        T(L("晚", v === 1 ? "night" : "nights"), x + 40 + vw, y + 150, 36, SF.hand, color);
+        const days = st.recs.filter(n => n[key]).map(n => `${Number(n.date.slice(5, 7))}/${Number(n.date.slice(8))}`).sort((a, b) => parseInt(a.split("/")[1]) - parseInt(b.split("/")[1]));
+        T(days.join(L("、", ", ")), x + 28, y + 202, 26, SF.num, SC.pencil, "left", w - 56);
       });
       // 每晚花费日历
       T(L("每晚花了多少", "Spent each night"), 64, 812, 36, SF.hand);
@@ -1713,13 +1698,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const SKINS = [
     { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "手绘 · 跟随深浅色", noteEn: "Hand-drawn · auto dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
     { id: "sakura", zh: "樱花", en: "Sakura", noteZh: "手绘", noteEn: "Hand-drawn", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
-    { id: "clean", zh: "简约", en: "Clean", noteZh: "干净利落", noteEn: "Calm and tidy", c: ["#F3F4F6", "#E3E5EA", "#1A2230", "#F2A93B", "#E5484D"], font: '"Noto Sans SC", sans-serif', r: "10px" },
+    { id: "washi", zh: "和纸手账", en: "Washi", noteZh: "横线本 · 纸胶带", noteEn: "Ruled notebook, washi tape", c: ["#F6F0E2", "#E2D6BC", "#2B3654", "#E3A83B", "#C8553D"], font: '"Long Cang", "Ma Shan Zheng", cursive', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "ruled" },
     { id: "receipt", zh: "收据", en: "Receipt", noteZh: "小票等宽字", noteEn: "Till-roll mono", c: ["#FFFDF7", "#D5D0C5", "#1B1B1B", "#F1CB3B", "#D2261E"], font: '"JetBrains Mono", monospace', r: "0" },
-    { id: "terminal", zh: "终端", en: "Terminal", noteZh: "琥珀色屏幕", noteEn: "Amber screen", c: ["#0E0B07", "#2A2215", "#FFC766", "#FFB000", "#FF6B4A"], font: '"JetBrains Mono", monospace', r: "3px" },
+    { id: "news", zh: "报纸", en: "Newsprint", noteZh: "宋体 · 双线框", noteEn: "Serif, double rules", c: ["#EFEBE1", "#D6CFBE", "#1A1916", "#E2B33C", "#B3261E"], font: '"Noto Serif SC", serif', r: "0" },
     { id: "pop", zh: "波普", en: "Pop", noteZh: "粗边撞色", noteEn: "Bold and bright", c: ["#FFF3D1", "#F0DC9E", "#111111", "#FFCF24", "#4361EE"], font: '"ZCOOL QingKe HuangYou", sans-serif', r: "8px", lines: "dots" },
   ];
   let skin = "grid"; try { skin = localStorage.getItem(SKIN_KEY) || "grid"; } catch (e) {}
-  if (!SKINS.some(k => k.id === skin)) { skin = "grid"; try { localStorage.setItem(SKIN_KEY, "grid"); } catch (e) {} }   // 旧版本的牛皮纸 / 深夜 / 薄荷已下线
+  if (!SKINS.some(k => k.id === skin)) { skin = "grid"; try { localStorage.setItem(SKIN_KEY, "grid"); } catch (e) {} }   // 旧版本的牛皮纸 / 深夜 / 薄荷 / 简约 / 终端已下线
   function applySkin() {
     if (skin === "grid") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", skin);
     syncStatusBar();
@@ -1757,7 +1742,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const b = document.createElement("button"); b.type = "button"; b.className = "skin"; b.dataset.skin = k.id; b.setAttribute("aria-pressed", String(k.id === skin));
       const sw = document.createElement("span"); sw.className = "sw";
       sw.style.background = k.lines === "grid" ? `linear-gradient(${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, linear-gradient(90deg, ${k.c[1]} 1px, transparent 1px) 0 0 / 10px 10px, ${k.c[0]}`
-        : k.lines === "dots" ? `radial-gradient(${k.c[1]} 1.2px, transparent 1.5px) 0 0 / 8px 8px, ${k.c[0]}` : k.c[0];
+        : k.lines === "dots" ? `radial-gradient(${k.c[1]} 1.2px, transparent 1.5px) 0 0 / 8px 8px, ${k.c[0]}`
+        : k.lines === "ruled" ? `linear-gradient(transparent 9px, ${k.c[1]} 9px) 0 0 / 10px 10px, ${k.c[0]}` : k.c[0];
       sw.style.borderRadius = k.r;
       const sample = document.createElement("em"); sample.textContent = L("加班 $12", "Aa $12");
       sample.style.cssText = `font-family:${k.font};color:${k.c[2]};border-radius:${k.r}`;
