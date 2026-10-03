@@ -306,8 +306,6 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
 .wmeta { font-size: 13px; color: var(--pencil); }
 .wprice { font-family: var(--f-num); font-size: 22px; line-height: 1.1; text-align: right; white-space: nowrap; }
 .wprice small { display: block; }
-.wbar { height: 8px; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--rad, 6px 8px 7px 5px); overflow: hidden; background: var(--paper); }
-.wbar i { display: block; height: 100%; background: repeating-linear-gradient(-45deg, var(--body) 0 3px, transparent 3px 6px); }
 .wish-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .got-head { font-size: 14px; color: var(--pencil); }
 .wname, .wprice { cursor: pointer; }
@@ -1400,13 +1398,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const saveWishes = () => { try { localStorage.setItem(WISH_KEY, JSON.stringify(wishes)); } catch (e) {} };
   const CHECK = '<svg viewBox="0 0 24 24"><path d="M4 13 Q8 16 10 19 Q14 10 21 4"/></svg>';
 
-  // 最近 30 晚平均每晚夜宵钱，用来换算"要少买几晚"
-  function nightlyAvg() {
-    const from = shift(nightOf(), -29);
-    const recent = Object.values(nights).filter(n => n.date >= from);
-    const spend = recent.reduce((a, n) => a + sum(n), 0);
-    return recent.length ? spend / recent.length : 0;
-  }
   let editingWish = null;
   function wishEditRow(w) {
     const li = document.createElement("li"); li.dataset.id = w.id;
@@ -1430,7 +1421,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     setTimeout(() => { n.focus(); n.select(); });
     return li;
   }
-  function wishRow(w, avg, monthSpend) {
+  function wishRow(w) {
     if (editingWish === w.id) return wishEditRow(w);
     const li = document.createElement("li"); li.dataset.id = w.id; if (w.got) li.className = "got";
     const box = document.createElement("button"); box.type = "button"; box.className = "wbox"; box.dataset.act = "got";
@@ -1444,15 +1435,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const d = w.gotAt ? parse(w.gotAt) : null;
       meta.textContent = d ? L(`${fmtMD(d)} 买到了`, `Bought ${fmtMD(d)}`) : L("买到了", "Bought");
       body.append(meta);
-    } else {
-      const pct = w.price > 0 ? Math.min(100, (monthSpend / w.price) * 100) : 0;
-      const nightsNeeded = avg > 0 && w.price > 0 ? Math.ceil(w.price / avg) : 0;
-      meta.textContent = nightsNeeded ? L(`≈ ${nightsNeeded} 晚的加班花销`, `≈ ${nightsNeeded} nights of overtime spending`) : L("记几晚加班花销，就能算出要省几晚", "Log a few nights to see how many it's worth");
+    } else if (w.created) {
+      const d = new Date(w.created);
+      meta.textContent = L(`${fmtMD(d)} 写下`, `Added ${fmtMD(d)}`);
       body.append(meta);
-      if (monthSpend > 0 && w.price > 0) {
-        const bar = document.createElement("div"); bar.className = "wbar"; bar.title = L(`这个月加班花的钱，够买它的 ${Math.round(pct)}%`, `This month's overtime spending covers ${Math.round(pct)}% of it`);
-        const i = document.createElement("i"); i.style.width = pct + "%"; bar.append(i); body.append(bar);
-      }
     }
     const side = document.createElement("div"); side.className = "wish-actions";
     const pr = document.createElement("span"); pr.className = "wprice"; pr.textContent = money(w.price || 0); pr.dataset.act = "edit"; pr.title = L("点一下修改", "Tap to edit");
@@ -1465,24 +1451,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const open = wishes.filter(w => !w.got).sort((a, b) => (a.price || 0) - (b.price || 0));
     const got = wishes.filter(w => w.got).sort((a, b) => (b.gotAt || "").localeCompare(a.gotAt || ""));
     const total = open.reduce((a, w) => a + (Number(w.price) || 0), 0);
-    const month = nightOf().slice(0, 7);
-    const monthSpend = Object.values(nights).filter(n => n.date.slice(0, 7) === month).reduce((a, n) => a + sum(n), 0);
-    const avg = nightlyAvg();
     $("wishTotal").textContent = money(total);
-    const cmp = $("wishCompare"); cmp.textContent = "";
-    if (open.length && monthSpend > 0) {
-      const b1 = document.createElement("b"); b1.textContent = money(monthSpend);
-      const b2 = document.createElement("b"); b2.textContent = Math.round((monthSpend / total) * 100) + "%";
-      if (lang === "en") cmp.append("Overtime spending this month: ", b1, ", or ", b2, " of your wishlist. "); else cmp.append("这个月加班已经花掉 ", b1, "，相当于愿望清单的 ", b2, "。");
-      const cheapest = open.find(w => w.price > 0);
-      if (cheapest && monthSpend >= cheapest.price) cmp.append(L(`这些钱已经够买「${cheapest.name}」了。`, `That's already enough for "${cheapest.name}".`));
-    } else if (open.length) cmp.textContent = L(`${open.length} 个愿望。每条下面会算出它相当于几晚的加班花销。`, `${open.length} wishes. Each shows how many nights of overtime spending it's worth.`);
-    else cmp.textContent = L("把想买的东西和价格写下来，看看加班的零碎花销能换成什么。", "Write down what you want and its price, and see what all those late-night buys add up to.");
+    $("wishCompare").textContent = open.length ? L(`${open.length} 样想买的东西。买到了就勾掉。`, `${open.length} ${open.length === 1 ? "thing" : "things"} I want. Tick them off when you get them.`)
+      : L("把自己想买的东西和价格写下来。", "Write down the things you want and what they cost.");
 
     const ul = $("wishList"); ul.textContent = "";
-    open.forEach(w => ul.append(wishRow(w, avg, monthSpend)));
+    open.forEach(w => ul.append(wishRow(w)));
     const g = $("gotList"); g.textContent = "";
-    got.forEach(w => g.append(wishRow(w, avg, monthSpend)));
+    got.forEach(w => g.append(wishRow(w)));
     $("gotHead").hidden = !got.length;
     $("gotHead").textContent = got.length ? L(`已经买到 ${got.length} 个，一共 ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))}`, `Got ${got.length}, ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))} in total`) : "";
 
@@ -1604,10 +1580,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const W = 1080, H = 1440, st = monthStats(month), [yy, mm] = month.split("-").map(Number);
     const icons = await Promise.all(st.top.map(t => iconImage(t.name)));
     const appUrl = (location.protocol.startsWith("http") ? location.host + location.pathname.replace(/index\.html$/, "") : "").replace(/\/$/, "");
-    const open = (typeof wishes !== "undefined" ? wishes : []).filter(w => !w.got && w.price > 0).sort((a, b) => a.price - b.price);
-    const affordable = open.filter(w => w.price <= st.spend).pop();
-    const wishLine = affordable ? L(`这个月加班花的钱，已经够买「${affordable.name}」了`, `This month's overtime spending could already buy "${affordable.name}"`)
-      : open[0] ? L(`离「${open[0].name}」还差 ${money(open[0].price - st.spend)}`, `${money(open[0].price - st.spend)} to go for "${open[0].name}"`) : L(`平均每晚花 ${money(st.recs.length ? st.spend / st.recs.length : 0)}`, `About ${money(st.recs.length ? st.spend / st.recs.length : 0)} a night`);
+    const avgLine = L(`平均每晚花 ${money(st.recs.length ? st.spend / st.recs.length : 0)}`, `About ${money(st.recs.length ? st.spend / st.recs.length : 0)} a night`);
 
     const paint = (ctx) => {
       const T = (text, x, y, size, font, color = SC.ink, align = "left", maxW = 0) => {
@@ -1685,8 +1658,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         T(L(`${money(t.s)} · ${t.c} 次`, `${money(t.s)} · ${t.c}×`), x + 98, y + 82, 28, SF.num, SC.pencil);
       });
       if (!st.top.length) T(L("这个月没买东西，省钱冠军", "Bought nothing this month. Savings champion."), 64, topY + 80, 32, SF.hand, SC.pencil);
-      // 愿望 + 页脚
-      T(wishLine, 64, 1378, 32, SF.hand, SC.body, "left", W - 128);
+      // 平均 + 页脚
+      T(avgLine, 64, 1378, 32, SF.hand, SC.body, "left", W - 128);
       T(appUrl ? L(`加班夜记 · ${appUrl}`, `Overtime Night Log · ${appUrl}`) : L("加班夜记", "Overtime Night Log"), W - 64, 1418, 24, SF.hand, SC.pencil, "right");
     };
     // 空跑一遍收集用到的字，按需加载字体子集，再正式画

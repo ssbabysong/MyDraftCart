@@ -49,8 +49,8 @@
 · 切到「商品」，整个月买了什么一眼看完
 
 ⭐ 愿望清单
-· 写下想买的东西和价格
-· 看看加班的零碎花销相当于几晚、够不够买它
+· 写下自己想买的东西和价格
+· 买到了就勾掉，留着看看都买过什么
 
 📊 统计和月度账单
 · 加班几晚、总花费、最晚几点下班、几晚崩溃
@@ -97,8 +97,8 @@ Overtime Night Log is a hand-drawn notebook for the nights you work late.
 · Switch to Items to see everything you bought this month
 
 ⭐ Wishlist
-· Add what you want and its price
-· See how many overtime nights of spending it's worth
+· Keep a list of the things you want, with prices
+· Tick them off when you get them, and look back at what you bought
 
 📊 Stats and a monthly bill
 · Nights, total spent, latest finish, burnout nights
