@@ -57,7 +57,7 @@
 · 一键生成「我的加班账单」分享图
 
 🔔 每晚提醒：到点提醒你记一笔
-📱 桌面小组件：不用打开 App 也能看到本月数据
+📱 桌面小组件：本月数据、最近 14 晚花费趋势，还有一张加班日历（越晚下班颜色越深）
 ☁️ iCloud 自动同步：换手机不丢记录
 🎨 六种主题：手绘方格本、樱花、和纸手账、收据、报纸、波普
 💱 支持多种货币，汇率可自己设置
@@ -105,7 +105,7 @@ Overtime Night Log is a hand-drawn notebook for the nights you work late.
 · Turn your month into a shareable image
 
 🔔 Nightly reminder to log your evening
-📱 Home Screen widget with this month at a glance
+📱 Home Screen widgets: this month, a 14-night spending trend, and an overtime calendar where later nights look darker
 ☁️ iCloud sync so a new phone never loses your log
 🎨 Six themes: Grid paper, Sakura, Washi, Receipt, Newsprint and Pop
 💱 Any currency, with your own exchange rate
@@ -138,4 +138,4 @@ First release! Log the cost and the toll of late nights, with a nightly reminder
 
 ## 给审核员的备注（App Review Information → Notes）
 
-No account or login is required. All data is stored locally and in the user's own iCloud (NSUbiquitousKeyValueStore). To try it quickly: open the Log tab and tap "Load sample data", then explore the Calendar, Stats (tap "Make my monthly overtime bill") and Wishes tabs. The nightly reminder can be turned on under Log → Settings. A Home Screen widget is included (small and medium).
+No account or login is required. All data is stored locally and in the user's own iCloud (NSUbiquitousKeyValueStore). To try it quickly: open the Log tab and tap "Load sample data", then explore the Calendar, Stats (tap "Make my monthly overtime bill") and Wishes tabs. The nightly reminder can be turned on under Log → Settings. Two Home Screen widgets are included: an overview (small, medium, large) and an overtime calendar (small, medium).

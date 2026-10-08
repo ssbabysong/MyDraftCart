@@ -884,8 +884,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
-  // 加班的"今晚"：凌晨 6 点前仍算前一天
-  const nightOf = (d = new Date()) => { const x = new Date(d); if (x.getHours() < 6) x.setDate(x.getDate() - 1); return ymd(x); };
+  // 加班的"今晚"：凌晨 4 点前仍算前一天（加班到第二天凌晨，还记在前一晚）。小组件里的 dayStartHour 跟这里一致
+  const DAY_START_HOUR = 4;
+  const nightOf = (d = new Date()) => { const x = new Date(d); if (x.getHours() < DAY_START_HOUR) x.setDate(x.getDate() - 1); return ymd(x); };
   // ---------- 货币与汇率 ----------
   // 记录一律按美元保存；显示和输入用你选的货币，按你填的汇率换算。换货币、改汇率都不会改动已存的数据。
   const CUR_KEY = "overtime-currency";
@@ -2026,15 +2027,30 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   // 桌面小组件：把本月汇总交给原生端，内容没变就不重复刷新
   let widgetLast = "";
+  // 下班越晚颜色越深：21 点前 1，23 点前 2，凌晨 1 点前 3，再晚 4；记了这晚但没填下班时间算 1
+  const lateLevel = (n) => { if (!n) return 0; const k = lateKey(n.end); return k < 0 || k < 21 * 60 ? 1 : k < 23 * 60 ? 2 : k < 25 * 60 ? 3 : 4; };
   function pushWidget(force) {
     const wb = plug("WidgetBridge"); if (!wb || !loaded) return;
     const month = nightOf().slice(0, 7), st = monthStats(month), m = Number(month.slice(5)), tn = nights[nightOf()];
     const cs = getComputedStyle(document.documentElement), cv = (n) => cs.getPropertyValue(n).trim();
+    const end = nightOf(), trend = [];
+    for (let i = 13; i >= 0; i--) { const d = shift(end, -i), n = nights[d]; trend.push([d, n ? sum(n) : 0, n]); }
+    const tMax = niceMax(Math.max(0, ...trend.map(x => x[1])));
+    const dim = new Date(Number(month.slice(0, 4)), m, 0).getDate();
     const json = JSON.stringify({
       appName: L("加班夜记", "Overtime"), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
       nights: st.recs.length, nightsLabel: L("晚", st.recs.length === 1 ? "night" : "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
       burnout: st.burnout, body: st.body, burnoutLabel: "Burnout", bodyLabel: L("身体不行", "Unwell"),
       tonight: tn ? money(sum(tn)) : "", tonightLabel: L("今晚", "Tonight"), emptyText: L("打开 App 记第一晚", "Open the app to log tonight"),
+      dayStartHour: DAY_START_HOUR,
+      // 最近 14 晚的花费趋势：h 是相对最高刻度的高度（0–1），t 标出今晚
+      trendTitle: L("最近 14 晚花费", "Last 14 nights"), trendMax: money(tMax),
+      trend: trend.map(([d, v, n]) => ({ d: parse(d).getDate(), h: Math.round(v / tMax * 1000) / 1000, t: d === end, b: !!n?.burnout })),
+      // 加班日历：每天一个深浅等级，0 没加班，1–4 越大下班越晚
+      calTitle: L("加班日历", "Overtime calendar"), month, lead: (parse(month + "-01").getDay() + 6) % 7,
+      levels: Array.from({ length: dim }, (_, i) => lateLevel(nights[`${month}-${pad(i + 1)}`])),
+      weekdays: L(["一", "二", "三", "四", "五", "六", "日"], ["M", "T", "W", "T", "F", "S", "S"]),
+      legend: L("越深下班越晚", "Darker = later"), lateLabel: L("最晚下班", "Latest finish"), late: st.late || "—",
       colors: { paper: cv("--paper"), ink: cv("--ink"), pencil: cv("--pencil"), card: cv("--card"), money: cv("--money"), moneyHi: cv("--money-hi"), burn: cv("--burn"), body: cv("--body") },
     });
     if (json === widgetLast && !force) return;
