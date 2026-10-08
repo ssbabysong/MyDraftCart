@@ -125,7 +125,7 @@ First release! Log the cost and the toll of late nights, with a nightly reminder
 
 ## 截图
 
-`appstore/screenshots/` 里是 6.9 英寸 iPhone 截图（1320×2868），App Store Connect 用这一种尺寸就够了，其他尺寸会自动缩放。
+`appstore/screenshots/` 里是 6.9 英寸 iPhone 截图（1320×2868）；`appstore/screenshots/6.3-inch/` 是同一套图缩成的 1206×2622，给 App Store Connect 的「iPhone with Dynamic Island (medium display)」槽位用（那里只收 1206×2622 或 1179×2556）。只传一种尺寸就够了，其他尺寸会自动缩放。App 只支持 iPhone，不需要 iPad 截图。
 
 | 顺序 | 中文 | 英文 |
 | --- | --- | --- |
