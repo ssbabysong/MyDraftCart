@@ -41,31 +41,31 @@
 
 「加班夜记」是一个手绘风的小本子，专门记录加班的夜晚：
 
-📝 今晚
+今晚
 · 今晚崩溃了就点一下，打一个手绘的大叉
 · 身体不舒服（头疼、心慌、眼睛酸）也点一下
 · 买了什么、花了多少，10 秒记完，自动配手绘小图标
 
-📅 日历
+日历
 · 颜色越深的格子，那晚花得越多
 · 切到「商品」，整个月买了什么一眼看完
 
-⭐ 愿望清单
+愿望清单
 · 写下自己想买的东西和价格
 · 买到了就勾掉，留着看看都买过什么
 
-📊 统计和月度账单
+统计和月度账单
 · 加班几晚、总花费、最晚几点下班、几晚崩溃、几晚身体不行
 · 一键生成「我的加班账单」分享图
 
-🔔 每晚提醒：到点提醒你记一笔
-📱 桌面小组件：本月数据、最近 14 晚花费趋势，还有一张加班日历（黄色越深那晚花得越多）
-☁️ iCloud 自动同步：换手机不丢记录
-🎨 六种主题：手绘方格本、樱花、和纸手账、收据、报纸、波普
-💱 支持多种货币，汇率可自己设置
-🌏 中文 / English
+每晚提醒：到点提醒你记一笔
+桌面小组件：本月数据、最近 14 晚花费趋势，还有一张加班日历（黄色越深那晚花得越多）
+iCloud 自动同步：换手机不丢记录
+六种主题：手绘方格本、樱花、和纸手账、收据、报纸、波普
+支持多种货币，汇率可自己设置
+中文 / English
 
-🔒 不用注册，没有广告。你的记录只存在你自己的手机和 iCloud 里，开发者看不到。
+不用注册，没有广告。你的记录只存在你自己的手机和 iCloud 里，开发者看不到。
 
 **关键词**（100 字符以内，逗号分隔，不加空格）：
 加班,记账,打工人,夜宵,外卖,花销,burnout,情绪,日记,愿望清单,手账,月账单
@@ -89,31 +89,31 @@ Working until 11 again. How much did tonight cost? How many times did you hit a 
 
 Overtime Night Log is a hand-drawn notebook for the nights you work late.
 
-📝 Tonight
+Tonight
 · Burned out tonight? One tap marks it with a hand-drawn cross
 · Tap again when your body says no: headaches, racing heart, sore eyes
 · Add what you bought in 10 seconds, with a hand-drawn icon for each item
 
-📅 Calendar
+Calendar
 · Darker days mean you spent more
 · Switch to Items to see everything you bought this month
 
-⭐ Wishlist
+Wishlist
 · Keep a list of the things you want, with prices
 · Tick them off when you get them, and look back at what you bought
 
-📊 Stats and a monthly bill
+Stats and a monthly bill
 · Nights, total spent, latest finish, burnout and unwell nights
 · Turn your month into a shareable image
 
-🔔 Nightly reminder to log your evening
-📱 Home Screen widgets: this month, a 14-night spending trend, and an overtime calendar where darker squares mean you spent more
-☁️ iCloud sync so a new phone never loses your log
-🎨 Six themes: Grid paper, Sakura, Washi, Receipt, Newsprint and Pop
-💱 Any currency, with your own exchange rate
-🌏 English / 中文
+Nightly reminder to log your evening
+Home Screen widgets: this month, a 14-night spending trend, and an overtime calendar where darker squares mean you spent more
+iCloud sync so a new phone never loses your log
+Six themes: Grid paper, Sakura, Washi, Receipt, Newsprint and Pop
+Any currency, with your own exchange rate
+English / 中文
 
-🔒 No sign-up, no ads. Your records stay on your phone and in your own iCloud. The developer can't see them.
+No sign-up, no ads. Your records stay on your phone and in your own iCloud. The developer can't see them.
 
 **Keywords**:
 overtime,expense,tracker,burnout,journal,spending,wishlist,late night,work,budget,habit
