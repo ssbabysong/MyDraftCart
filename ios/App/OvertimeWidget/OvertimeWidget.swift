@@ -2,8 +2,8 @@ import WidgetKit
 import SwiftUI
 
 // 桌面小组件，两种：
-//   「本月概览」小号：加班几晚、花了多少；中号再加最近 14 晚花费趋势；大号再加加班日历
-//   「加班日历」小号 / 中号：本月每天下班多晚，颜色越深越晚
+//   「加班夜记」小号：本月加班几晚、花了多少；中号再加最近 14 晚花费趋势
+//   「加班日历」小号 / 中号：GitHub 那种小方块，一列一周，黄色越深那晚花得越多
 // 数据由 App 写进 App Group 共享存储（见 WidgetBridgePlugin.swift），颜色跟着 App 当前主题。
 
 private let appGroup = "group.com.ssbabysong.overtimenightlog"
@@ -28,25 +28,19 @@ struct Summary: Codable {
     var tonightLabel = "今晚"
     var emptyText = "打开 App 记第一晚"
     var dayStartHour = 4
-    var trendTitle = "最近 14 晚花费"
-    var trendMax = "$50"
+    var trendTitle = "近 14 晚"
     var trend: [TrendPoint] = []
-    var calTitle = "加班日历"
-    var month = ""
-    var lead = 0
-    var levels: [Int] = []
-    var weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-    var legend = "越深下班越晚"
-    var lateLabel = "最晚下班"
-    var late = "—"
+    var heatStart = ""          // heat[0] 对应的日期（周一），yyyy-MM-dd
+    var heat: [Int] = []        // 每天一个等级：0 没花钱，1–4 越大花得越多
+    var monthShort = (1...12).map { "\($0)月" }
     var colors = Palette()
 
     static let sample: Summary = {
         var s = Summary(monthTitle: "10 月", nights: 14, spent: "$356.25", burnout: 6, body: 4, tonight: "$47.75")
         let h: [Double] = [0, 0.84, 0.12, 0.2, 0, 0, 0.54, 0.84, 0.47, 0.8, 0, 0, 0, 0.37]
         s.trend = h.enumerated().map { TrendPoint(d: 9 + $0.offset, h: $0.element, t: $0.offset == 13, b: $0.element > 0.7) }
-        s.trendMax = "$50"; s.late = "01:10"; s.month = "2026-10"; s.lead = 3
-        s.levels = [2, 1, 0, 0, 4, 2, 4, 0, 1, 0, 0, 2, 3, 2, 3, 0, 0, 0, 2, 1, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        s.heatStart = "2026-05-25"
+        s.heat = (0..<151).map { i in i % 7 >= 5 ? 0 : [0, 1, 2, 0, 3, 4, 1, 2, 0, 3][(i * 7 + i / 5) % 10] }
         return s
     }()
 }
@@ -93,16 +87,10 @@ extension Summary {
         emptyText = try c.decodeIfPresent(String.self, forKey: .emptyText) ?? emptyText
         dayStartHour = try c.decodeIfPresent(Int.self, forKey: .dayStartHour) ?? dayStartHour
         trendTitle = try c.decodeIfPresent(String.self, forKey: .trendTitle) ?? trendTitle
-        trendMax = try c.decodeIfPresent(String.self, forKey: .trendMax) ?? trendMax
         trend = (try? c.decodeIfPresent([TrendPoint].self, forKey: .trend)) ?? trend
-        calTitle = try c.decodeIfPresent(String.self, forKey: .calTitle) ?? calTitle
-        month = try c.decodeIfPresent(String.self, forKey: .month) ?? month
-        lead = try c.decodeIfPresent(Int.self, forKey: .lead) ?? lead
-        levels = (try? c.decodeIfPresent([Int].self, forKey: .levels)) ?? levels
-        weekdays = (try? c.decodeIfPresent([String].self, forKey: .weekdays)) ?? weekdays
-        legend = try c.decodeIfPresent(String.self, forKey: .legend) ?? legend
-        lateLabel = try c.decodeIfPresent(String.self, forKey: .lateLabel) ?? lateLabel
-        late = try c.decodeIfPresent(String.self, forKey: .late) ?? late
+        heatStart = try c.decodeIfPresent(String.self, forKey: .heatStart) ?? heatStart
+        heat = (try? c.decodeIfPresent([Int].self, forKey: .heat)) ?? heat
+        monthShort = (try? c.decodeIfPresent([String].self, forKey: .monthShort)) ?? monthShort
         colors = try c.decodeIfPresent(Palette.self, forKey: .colors) ?? colors
     }
 }
@@ -143,10 +131,10 @@ extension Color {
 }
 
 /// 加班的「今晚」：凌晨 dayStartHour 点前还算前一天，和 App 里的 nightOf 一致
-func nightDay(_ date: Date, dayStartHour: Int) -> DateComponents {
+func nightDay(_ date: Date, dayStartHour: Int) -> Date {
     let cal = Calendar.current
     let d = cal.component(.hour, from: date) < dayStartHour ? cal.date(byAdding: .day, value: -1, to: date)! : date
-    return cal.dateComponents([.year, .month, .day], from: d)
+    return cal.startOfDay(for: d)
 }
 
 struct WidgetView: View {
@@ -157,11 +145,7 @@ struct WidgetView: View {
         let s = entry.summary ?? Summary()
         let c = s.colors
         Group {
-            switch family {
-            case .systemLarge: large(s, c)
-            case .systemMedium: medium(s, c)
-            default: small(s, c)
-            }
+            if family == .systemMedium { medium(s, c) } else { small(s, c) }
         }
         .foregroundColor(Color(hex: c.ink))
         .widgetBackground(Color(hex: c.paper))
@@ -206,26 +190,6 @@ struct WidgetView: View {
             if entry.summary != nil { TrendView(s: s, c: c) }
         }
     }
-
-    private func large(_ s: Summary, _ c: Palette) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if entry.summary == nil {
-                small(s, c)
-            } else {
-                HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Text(s.monthTitle).font(.system(size: 15, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil)).lineLimit(1)
-                    Text("\(s.nights) \(s.nightsLabel)").font(.system(size: 20, weight: .bold, design: .rounded)).lineLimit(1).fixedSize()
-                    Text(s.spent).font(.system(size: 20, weight: .bold, design: .rounded)).lineLimit(1).minimumScaleFactor(0.6)
-                        .padding(.horizontal, 4).background(Color(hex: c.moneyHi).cornerRadius(4))
-                    Spacer(minLength: 0)
-                    flags(s, c).fixedSize().layoutPriority(1)
-                }
-                TrendView(s: s, c: c).frame(height: 120)
-                CalendarView(s: s, c: c, now: entry.date, showHeader: true)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
 }
 
 /// 最近 14 晚的花费柱状图，今晚的柱子用实色
@@ -242,107 +206,101 @@ struct TrendView: View {
                     Text("\(s.tonightLabel) \(s.tonight)").font(.system(size: 12, weight: .bold, design: .rounded)).lineLimit(1).minimumScaleFactor(0.7)
                 }
             }
-            ZStack(alignment: .topTrailing) {
-                GeometryReader { g in
-                    let n = max(s.trend.count, 1)
-                    let gap: CGFloat = 3
-                    let w = max((g.size.width - gap * CGFloat(n - 1)) / CGFloat(n), 2)
-                    HStack(alignment: .bottom, spacing: gap) {
-                        ForEach(Array(s.trend.enumerated()), id: \.offset) { _, p in
-                            VStack(spacing: 2) {
-                                Spacer(minLength: 0)
-                                if p.b == true { Circle().fill(Color(hex: c.burn)).frame(width: 4, height: 4) }
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color(hex: c.money).opacity(p.t == true ? 1 : 0.55))
-                                    .overlay(RoundedRectangle(cornerRadius: 2).stroke(Color(hex: c.ink), lineWidth: p.t == true ? 1.2 : 0))
-                                    .frame(width: w, height: max(CGFloat(min(p.h, 1)) * (g.size.height - 8), p.h > 0 ? 3 : 1))
-                            }
+            GeometryReader { g in
+                let n = max(s.trend.count, 1)
+                let gap: CGFloat = 3
+                let w = max((g.size.width - gap * CGFloat(n - 1)) / CGFloat(n), 2)
+                HStack(alignment: .bottom, spacing: gap) {
+                    ForEach(Array(s.trend.enumerated()), id: \.offset) { _, p in
+                        VStack(spacing: 2) {
+                            Spacer(minLength: 0)
+                            if p.b == true { Circle().fill(Color(hex: c.burn)).frame(width: 4, height: 4) }
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color(hex: c.money).opacity(p.t == true ? 1 : 0.55))
+                                .overlay(RoundedRectangle(cornerRadius: 2).stroke(Color(hex: c.ink), lineWidth: p.t == true ? 1.2 : 0))
+                                .frame(width: w, height: max(CGFloat(min(p.h, 1)) * (g.size.height - 8), p.h > 0 ? 3 : 1))
                         }
                     }
-                    .frame(maxHeight: .infinity, alignment: .bottom)
                 }
-                .overlay(Rectangle().fill(Color(hex: c.pencil).opacity(0.5)).frame(height: 1), alignment: .bottom)
-                Text(s.trendMax).font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil))
+                .frame(maxHeight: .infinity, alignment: .bottom)
             }
-            HStack {
-                Text(s.trend.first.map { "\($0.d)" } ?? "")
-                Spacer()
-                Text(s.trend.last.map { "\($0.d)" } ?? "")
-            }
-            .font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil))
+            .overlay(Rectangle().fill(Color(hex: c.pencil).opacity(0.5)).frame(height: 1), alignment: .bottom)
         }
     }
 }
 
-/// 本月加班日历：每天一个格子，下班越晚颜色越深；今天描边
-struct CalendarView: View {
+/// GitHub 那种小方块：一列一周（周一在上），黄色越深那晚花得越多，今天描边。放得下几周就显示几周，最右一列是本周
+struct HeatmapView: View {
     let s: Summary
     let c: Palette
     let now: Date
-    var showHeader = false
+    var monthLabels = true
 
-    private func shade(_ level: Int) -> Color {
-        let o: [Double] = [0, 0.18, 0.4, 0.65, 0.92]
-        return level <= 0 ? Color(hex: c.pencil).opacity(0.08) : Color(hex: c.ink).opacity(o[min(level, 4)])
+    func shade(_ level: Int) -> Color {
+        let o: [Double] = [0, 0.3, 0.55, 0.8, 1]
+        return level <= 0 ? Color(hex: c.pencil).opacity(0.12) : Color(hex: c.money).opacity(o[min(level, 4)])
+    }
+
+    /// heat[0] 那天（周一）
+    var start: Date? {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: s.heatStart).map { Calendar.current.startOfDay(for: $0) }
     }
 
     var body: some View {
+        let cal = Calendar.current
         let today = nightDay(now, dayStartHour: s.dayStartHour)
-        let todayIndex = String(format: "%04d-%02d", today.year ?? 0, today.month ?? 0) == s.month ? (today.day ?? 0) : 0
-        let cells = Array(repeating: -1, count: s.lead) + s.levels
-        let rows = Int((Double(cells.count) / 7).rounded(.up))
-        VStack(alignment: .leading, spacing: 4) {
-            if showHeader {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(s.calTitle).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                    Spacer()
-                    legendView
-                }
-            }
-            // 表头和格子用同一个边长，保证星期和日期对齐
-            GeometryReader { g in
-                let gap: CGFloat = 3, head: CGFloat = 13
-                let side = max(min((g.size.width - gap * 6) / 7, (g.size.height - head - gap * CGFloat(rows)) / CGFloat(max(rows, 1))), 4)
-                VStack(alignment: .leading, spacing: gap) {
-                    HStack(spacing: gap) {
-                        ForEach(Array(s.weekdays.enumerated()), id: \.offset) { _, w in
-                            Text(w).font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil)).frame(width: side, height: head)
-                        }
-                    }
-                    ForEach(0..<rows, id: \.self) { r in
-                        HStack(spacing: gap) {
-                            ForEach(0..<7, id: \.self) { k in
-                                let i = r * 7 + k
-                                let level = i < cells.count ? cells[i] : -1
-                                let day = i - s.lead + 1
-                                RoundedRectangle(cornerRadius: max(side * 0.22, 2))
-                                    .fill(level < 0 ? Color.clear : shade(level))
-                                    .overlay(RoundedRectangle(cornerRadius: max(side * 0.22, 2)).stroke(Color(hex: c.burn), lineWidth: day == todayIndex && level >= 0 ? 1.5 : 0))
-                                    .overlay {
-                                        if level >= 0 && side >= 24 {
-                                            Text("\(day)").font(.system(size: side * 0.32, weight: .semibold, design: .rounded))
-                                                .foregroundColor(level >= 3 ? Color(hex: c.paper) : Color(hex: c.pencil))
+        GeometryReader { g in
+            let gap: CGFloat = 3, head: CGFloat = monthLabels ? 12 : 0
+            let side = max((g.size.height - head - gap * 6) / 7, 4)
+            let fit = max(Int((g.size.width + gap) / (side + gap)), 1)
+            if let start, let todayIdx = cal.dateComponents([.day], from: start, to: today).day, todayIdx >= 0 {
+                let weeks = min(fit, todayIdx / 7 + 1)
+                let first = todayIdx / 7 - weeks + 1
+                HStack(alignment: .top, spacing: gap) {
+                    ForEach(0..<weeks, id: \.self) { k in
+                        let w = first + k
+                        VStack(spacing: gap) {
+                            if monthLabels {
+                                // 这一周里有某月 1 号（或者是第一列）就标上月份
+                                let label: String = {
+                                    for d in 0..<7 {
+                                        guard let day = cal.date(byAdding: .day, value: w * 7 + d, to: start) else { continue }
+                                        if cal.component(.day, from: day) == 1 || (k == 0 && d == 0 && cal.component(.day, from: day) < 22) {
+                                            let m = cal.component(.month, from: day)
+                                            return s.monthShort.indices.contains(m - 1) ? s.monthShort[m - 1] : "\(m)"
                                         }
                                     }
+                                    return ""
+                                }()
+                                Text(label).font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil))
+                                    .fixedSize().frame(width: side, height: head, alignment: .leading)
+                            }
+                            ForEach(0..<7, id: \.self) { d in
+                                let i = w * 7 + d
+                                RoundedRectangle(cornerRadius: max(side * 0.25, 1.5))
+                                    .fill(i > todayIdx ? Color.clear : shade(i < s.heat.count ? s.heat[i] : 0))
+                                    .overlay(RoundedRectangle(cornerRadius: max(side * 0.25, 1.5)).stroke(Color(hex: c.ink), lineWidth: i == todayIdx ? 1.2 : 0))
                                     .frame(width: side, height: side)
                             }
                         }
                     }
                 }
-                .frame(width: g.size.width, height: g.size.height, alignment: .top)
+                .frame(width: g.size.width, height: g.size.height, alignment: .trailing)
             }
         }
     }
 
-    var legendView: some View {
+    /// 「少 ▢▢▢▢ 多」图例，不带文字
+    var legend: some View {
         HStack(spacing: 2) {
-            Text(s.legend).font(.system(size: 9, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil)).padding(.trailing, 2)
-            ForEach(1...4, id: \.self) { l in RoundedRectangle(cornerRadius: 2).fill(shade(l)).frame(width: 8, height: 8) }
+            ForEach(0...4, id: \.self) { l in RoundedRectangle(cornerRadius: 2).fill(shade(l)).frame(width: 8, height: 8) }
         }
     }
 }
 
-/// 「加班日历」小组件：小号只有日历，中号旁边加加班几晚和最晚下班
+/// 「加班日历」小组件：小号只有方块；中号上面一行本月花费 + 图例
 struct CalendarWidgetView: View {
     @Environment(\.widgetFamily) var family
     let entry: Entry
@@ -350,38 +308,23 @@ struct CalendarWidgetView: View {
     var body: some View {
         let s = entry.summary ?? Summary()
         let c = s.colors
+        let map = HeatmapView(s: s, c: c, now: entry.date)
         Group {
             if entry.summary == nil {
-                VStack(alignment: .leading) {
-                    Text(s.calTitle).font(.system(size: 13, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                    Spacer()
-                    Text(s.emptyText).font(.system(size: 14, weight: .medium, design: .rounded))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                Text(s.emptyText).font(.system(size: 14, weight: .medium, design: .rounded))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             } else if family == .systemMedium {
-                HStack(spacing: 14) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(s.monthTitle).font(.system(size: 13, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                        HStack(alignment: .firstTextBaseline, spacing: 3) {
-                            Text("\(s.nights)").font(.system(size: 34, weight: .bold, design: .rounded))
-                            Text(s.nightsLabel).font(.system(size: 13, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                        }
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(s.lateLabel).font(.system(size: 11, weight: .medium, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                            Text(s.late).font(.system(size: 20, weight: .bold, design: .rounded))
-                        }
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(s.monthTitle).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil))
+                        Text(s.spent).font(.system(size: 15, weight: .bold, design: .rounded)).lineLimit(1)
                         Spacer(minLength: 0)
-                        CalendarView(s: s, c: c, now: entry.date).legendView
+                        map.legend
                     }
-                    .frame(width: 112, alignment: .leading)
-                    CalendarView(s: s, c: c, now: entry.date)
+                    map
                 }
             } else {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(s.monthTitle).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundColor(Color(hex: c.pencil))
-                    CalendarView(s: s, c: c, now: entry.date)
-                }
+                map
             }
         }
         .foregroundColor(Color(hex: c.ink))
@@ -408,7 +351,7 @@ struct OvertimeWidget: Widget {
         }
         .configurationDisplayName("加班夜记")
         .description("本月加班几晚、花了多少、最近花费趋势 · This month's overtime and spending trend")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
@@ -419,7 +362,7 @@ struct OvertimeCalendarWidget: Widget {
             CalendarWidgetView(entry: entry)
         }
         .configurationDisplayName("加班日历")
-        .description("本月每天下班多晚，颜色越深越晚 · Darker days mean you left later")
+        .description("每晚花了多少，黄色越深花得越多 · Darker squares mean you spent more")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

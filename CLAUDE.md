@@ -17,7 +17,7 @@
 | `ios/App/App/Plugins/ICloudSyncPlugin.swift` | iCloud 键值存储插件（JS 名 `ICloudSync`） |
 | `ios/App/App/Plugins/WidgetBridgePlugin.swift` | 把本月汇总写进 App Group，刷新小组件（JS 名 `WidgetBridge`） |
 | `ios/App/App/MainViewController.swift` | 注册上面两个插件；`Main.storyboard` 指向它 |
-| `ios/App/OvertimeWidget/` | WidgetKit 小组件扩展，iOS 17+：「加班夜记」概览（小号；中号加 14 晚花费趋势；大号再加加班日历）和「加班日历」（小号、中号，越晚下班越深） |
+| `ios/App/OvertimeWidget/` | WidgetKit 小组件扩展，iOS 17+：「加班夜记」概览（小号；中号加 14 晚花费趋势）和「加班日历」（小号、中号，GitHub 式一列一周的黄色小方块，越深那晚花得越多） |
 | `appstore/` | 上架步骤 `RELEASE.md`、文案 `metadata.md`、截图 |
 | `privacy.html`、`support.html` | 隐私政策和技术支持页（App Store 要求） |
 
@@ -42,7 +42,7 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - Capacitor 8 的窗口是 `SceneDelegate.swift` 用代码建的，不走 storyboard：根控制器必须是 `MainViewController()`，否则自定义插件不会注册。
 - 开发者会员已开通（个人账号），工程已切回 `npm run ios:paid` 正式模式，App 和 OvertimeWidget 两个 target 都选付费 Team。命令行 `xcodebuild -allowProvisioningUpdates` 真机构建已通过，签名里带 iCloud 键值存储和 App Group。`ios:free` 只在需要用免费账号时才用。
 - App Store 截图（`appstore/screenshots/`）是 iPhone 17 Pro Max 模拟器截的，1320×2868，中英文各 6 张：今晚、日历、统计、月度账单、愿望清单、主题。功能界面有明显变化时要重拍。
-- 「今晚」凌晨 4 点才换天（`index.html` 的 `DAY_START_HOUR`），加班到第二天凌晨还记在前一晚；小组件用 App 传过去的 `dayStartHour` 判断今天，凌晨 4 点也会自动刷新。
+- 「今晚」凌晨 4 点才换天（`index.html` 的 `DAY_START_HOUR`），加班到第二天凌晨还记在前一晚；小组件用 App 传过去的 `dayStartHour` 判断今天（日历方块的「今天」描边），凌晨 4 点也会自动刷新。
 - Bundle ID：`com.ssbabysong.overtimenightlog`，小组件 `….widget`，App Group `group.com.ssbabysong.overtimenightlog`。
 - 上架地区：除中国大陆外全部。
 
