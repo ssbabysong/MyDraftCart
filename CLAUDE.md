@@ -44,7 +44,8 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - App Store 截图（`appstore/screenshots/`）是 iPhone 17 Pro Max 模拟器截的，1320×2868，中英文各 6 张：今晚、日历、统计、月度账单、愿望清单、主题。功能界面有明显变化时要重拍。
 - 「今晚」凌晨 4 点才换天（`index.html` 的 `DAY_START_HOUR`），加班到第二天凌晨还记在前一晚；小组件用 App 传过去的 `dayStartHour` 判断今天（日历方块的「今天」描边），凌晨 4 点也会自动刷新。
 - Bundle ID：`com.ssbabysong.overtimenightlog`，小组件 `….widget`，App Group `group.com.ssbabysong.overtimenightlog`。
-- 上架地区：除中国大陆外全部。
+- 上架地区：除中国大陆外全部，主要市场是美国。App Store Connect 主要语言是英文（美国），另加简体中文。
+- 桌面图标名跟着系统语言（`ios/App/App/*.lproj/InfoPlist.strings`）：英文 Overtime Log，简体 加班夜记，繁体 加班夜記；基础值 `CFBundleDisplayName` 是英文。小组件的名称和没数据时的文字在 `OvertimeWidget.swift` 里按 `Locale.preferredLanguages` 选中英文。
 
 ## 约定
 

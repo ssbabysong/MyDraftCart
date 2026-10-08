@@ -14,29 +14,29 @@ struct Palette: Codable {
 }
 
 struct Summary: Codable {
-    var appName = "加班夜记"
-    var monthTitle = "9 月"
+    var appName = T("加班夜记", "Overtime")
+    var monthTitle = T("10 月", "October")
     var nights = 0
-    var nightsLabel = "晚"
+    var nightsLabel = T("晚", "nights")
     var spent = "$0"
-    var spentLabel = "花了"
+    var spentLabel = T("花了", "spent")
     var burnout = 0
     var body = 0
     var burnoutLabel = "Burnout"
-    var bodyLabel = "身体不行"
+    var bodyLabel = T("身体不行", "Unwell")
     var tonight = ""
-    var tonightLabel = "今晚"
-    var emptyText = "打开 App 记第一晚"
+    var tonightLabel = T("今晚", "Tonight")
+    var emptyText = T("打开 App 记第一晚", "Open the app to log tonight")
     var dayStartHour = 4
-    var trendTitle = "近 14 晚"
+    var trendTitle = T("近 14 晚", "Last 14 nights")
     var trend: [TrendPoint] = []
     var heatStart = ""          // heat[0] 对应的日期（周一），yyyy-MM-dd
     var heat: [Int] = []        // 每天一个等级：0 没花钱，1–4 越大花得越多
-    var monthShort = (1...12).map { "\($0)月" }
+    var monthShort = zh ? (1...12).map { "\($0)月" } : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     var colors = Palette()
 
     static let sample: Summary = {
-        var s = Summary(monthTitle: "10 月", nights: 14, spent: "$356.25", burnout: 6, body: 4, tonight: "$47.75")
+        var s = Summary(nights: 14, spent: "$356.25", burnout: 6, body: 4, tonight: "$47.75")
         let h: [Double] = [0, 0.84, 0.12, 0.2, 0, 0, 0.54, 0.84, 0.47, 0.8, 0, 0, 0, 0.37]
         s.trend = h.enumerated().map { TrendPoint(d: 9 + $0.offset, h: $0.element, t: $0.offset == 13, b: $0.element > 0.7) }
         s.heatStart = "2026-05-25"
@@ -343,14 +343,18 @@ extension View {
     }
 }
 
+/// 添加小组件时显示的名字跟着手机语言：中文手机用中文，其他都用英文
+private let zh = Locale.preferredLanguages.first?.hasPrefix("zh") == true
+private func T(_ zhText: String, _ en: String) -> String { zh ? zhText : en }
+
 struct OvertimeWidget: Widget {
     let kind = "OvertimeWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WidgetView(entry: entry)
         }
-        .configurationDisplayName("加班夜记")
-        .description("本月加班几晚、花了多少、最近花费趋势 · This month's overtime and spending trend")
+        .configurationDisplayName(T("加班夜记", "Overtime"))
+        .description(T("本月加班几晚、花了多少、最近 14 晚花费趋势", "This month's overtime nights, spending and a 14-night trend"))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
@@ -361,8 +365,8 @@ struct OvertimeCalendarWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             CalendarWidgetView(entry: entry)
         }
-        .configurationDisplayName("加班日历")
-        .description("每晚花了多少，黄色越深花得越多 · Darker squares mean you spent more")
+        .configurationDisplayName(T("加班日历", "Overtime Calendar"))
+        .description(T("每晚花了多少，黄色越深花得越多", "Each night's spending. Darker squares mean you spent more."))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

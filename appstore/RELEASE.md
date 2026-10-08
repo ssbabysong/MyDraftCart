@@ -77,9 +77,9 @@ npm run ios:paid
 ## 4. 在 App Store Connect 创建 App
 
 1. 打开 https://appstoreconnect.apple.com →「App」→ 左上角「+」→「新建 App」
-2. 平台：iOS；名称：**加班夜记**（如果被占用，可以用「加班夜记 Overtime」）；主要语言：简体中文；套装 ID：选 `com.ssbabysong.overtimenightlog`；SKU：`overtime-night-log`
-3. 按 `appstore/metadata.md` 填写：副标题、描述、关键词、类别、隐私政策网址、技术支持网址
-4. 再点右上角语言菜单，添加「英文（美国）」，填英文那一份
+2. 平台：iOS；名称：**Overtime Night Log**；主要语言：**English (U.S.)**；套装 ID：选 `com.ssbabysong.overtimenightlog`；SKU：`overtime-night-log`
+3. 按 `appstore/metadata.md` 的英文那一份填写：副标题、描述、关键词、类别、隐私政策网址、技术支持网址
+4. 再点右上角语言菜单，添加「简体中文」，名称填「加班夜记」（如果被占用，可以用「加班夜记 Overtime」），填中文那一份
 5. **App 隐私**：选择「不收集数据」
 6. **价格与销售范围**：免费；地区全选，然后取消「中国大陆」
 7. 截图：上传 `appstore/screenshots/` 里对应语言的 6 张图到「6.9 英寸显示屏」
