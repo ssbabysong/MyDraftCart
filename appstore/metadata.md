@@ -53,7 +53,7 @@
 · 买到了就勾掉，留着看看都买过什么
 
 📊 统计和月度账单
-· 加班几晚、总花费、最晚几点下班、几晚崩溃
+· 加班几晚、总花费、最晚几点下班、几晚崩溃、几晚身体不行
 · 一键生成「我的加班账单」分享图
 
 🔔 每晚提醒：到点提醒你记一笔
@@ -101,7 +101,7 @@ Overtime Night Log is a hand-drawn notebook for the nights you work late.
 · Tick them off when you get them, and look back at what you bought
 
 📊 Stats and a monthly bill
-· Nights, total spent, latest finish, burnout nights
+· Nights, total spent, latest finish, burnout and unwell nights
 · Turn your month into a shareable image
 
 🔔 Nightly reminder to log your evening
@@ -129,12 +129,12 @@ First release! Log the cost and the toll of late nights, with a nightly reminder
 | --- | --- | --- |
 | 1 | zh-1-tonight.png | en-1-tonight.png |
 | 2 | zh-2-calendar.png | en-2-calendar.png |
-| 3 | zh-3-items.png | en-3-items.png |
-| 4 | zh-4-wishes.png | en-4-wishes.png |
-| 5 | zh-5-bill.png | en-5-bill.png |
+| 3 | zh-3-stats.png | en-3-stats.png |
+| 4 | zh-4-bill.png | en-4-bill.png |
+| 5 | zh-5-wishes.png | en-5-wishes.png |
 | 6 | zh-6-themes.png | en-6-themes.png |
 
-截图里的数据是示例数据。
+截图里的数据是示例数据。用 iPhone 17 Pro Max 模拟器截的，内容依次是：今晚、日历、统计、月度账单、愿望清单、主题设置（和纸手账主题）。
 
 ## 给审核员的备注（App Review Information → Notes）
 

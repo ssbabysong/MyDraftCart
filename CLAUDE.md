@@ -40,7 +40,8 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 真机连不上（Xcode 报 CoreDeviceError 4000 / `enablePersonalizedDDI`，`devicectl list devices` 显示 `connected (no DDI)`）时：iPhone「设置 → 通用 → 传输或还原 iPhone → 还原 → 还原位置与隐私」后重新插线信任即可。
 - 最低系统版本统一为 iOS 17（小组件需要 17；Capacitor 按工程里第一个 `IPHONEOS_DEPLOYMENT_TARGET` 生成 `CapApp-SPM`，各 target 不一致会有链接警告）。
 - Capacitor 8 的窗口是 `SceneDelegate.swift` 用代码建的，不走 storyboard：根控制器必须是 `MainViewController()`，否则自定义插件不会注册。
-- 开发者会员还在 Pending（付款 / 开通中），所以 Xcode 只有免费的 Personal Team，先用 `npm run ios:free` 测试。
+- 开发者会员已开通（个人账号），工程已切回 `npm run ios:paid` 正式模式，App 和 OvertimeWidget 两个 target 都选付费 Team。命令行 `xcodebuild -allowProvisioningUpdates` 真机构建已通过，签名里带 iCloud 键值存储和 App Group。`ios:free` 只在需要用免费账号时才用。
+- App Store 截图（`appstore/screenshots/`）是 iPhone 17 Pro Max 模拟器截的，1320×2868，中英文各 6 张：今晚、日历、统计、月度账单、愿望清单、主题。功能界面有明显变化时要重拍。
 - Bundle ID：`com.ssbabysong.overtimenightlog`，小组件 `….widget`，App Group `group.com.ssbabysong.overtimenightlog`。
 - 上架地区：除中国大陆外全部。
 

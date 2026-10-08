@@ -103,7 +103,6 @@
 				D3AEF4F6FC9929F3264C489A /* ICloudSyncPlugin.swift */,
 				59D32F10FD3B0C6570164D71 /* WidgetBridgePlugin.swift */,
 			);
-			name = Plugins;
 			path = Plugins;
 			sourceTree = "<group>";
 		};
@@ -114,7 +113,6 @@
 				64F9DC0281010578A32CD280 /* Info.plist */,
 				981BD5BF08B80CBD90F8886D /* OvertimeWidget.entitlements */,
 			);
-			name = OvertimeWidget;
 			path = OvertimeWidget;
 			sourceTree = "<group>";
 		};
@@ -338,6 +336,7 @@
 				CODE_SIGN_ENTITLEMENTS = OvertimeWidget/OvertimeWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BN3CG5FXJ2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OvertimeWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -474,6 +473,7 @@
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BN3CG5FXJ2;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "加班夜记";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
@@ -499,6 +499,7 @@
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BN3CG5FXJ2;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "加班夜记";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
@@ -524,6 +525,7 @@
 				CODE_SIGN_ENTITLEMENTS = OvertimeWidget/OvertimeWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BN3CG5FXJ2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OvertimeWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
