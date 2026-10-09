@@ -45,6 +45,7 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 「今晚」凌晨 4 点才换天（`index.html` 的 `DAY_START_HOUR`），加班到第二天凌晨还记在前一晚；小组件用 App 传过去的 `dayStartHour` 判断今天（日历方块的「今天」描边），凌晨 4 点也会自动刷新。
 - Bundle ID：`com.ssbabysong.overtimenightlog`，小组件 `….widget`，App Group `group.com.ssbabysong.overtimenightlog`。
 - 2026-10-08 已用 `xcodebuild -exportArchive`（method app-store-connect，destination upload）把 1.0（build 1）上传到 App Store Connect。再上传必须把两个 target 的 `CURRENT_PROJECT_VERSION` 加 1（同一版本号下 build 不能重复）。之后加了 App 和小组件的 `PrivacyInfo.xcprivacy`（UserDefaults：CA92.1、1C8F.1，防 ITMS-91053），build 号升到 2。
+- 2026-10-08 已在 App Store Connect 提交审核（1.0）。截图要传到「iPhone with Dynamic Island (medium display)」槽位（`appstore/screenshots/6.3-inch/`，1206×2622）；描述里不能有 emoji，App Store Connect 会报 invalid characters。Header / 搜索结果宣传图在 `appstore/promo/out/`，用 `node appstore/promo/make.mjs` 生成。
 - 上架地区：除中国大陆外全部，主要市场是美国。App Store Connect 主要语言是英文（美国），另加简体中文。
 - 桌面图标名跟着系统语言（`ios/App/App/*.lproj/InfoPlist.strings`）：英文 Overtime Log，简体 加班夜记，繁体 加班夜記；基础值 `CFBundleDisplayName` 是英文。小组件的名称和没数据时的文字在 `OvertimeWidget.swift` 里按 `Locale.preferredLanguages` 选中英文。
 
