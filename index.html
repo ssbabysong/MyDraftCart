@@ -395,6 +395,7 @@ ol.f-log svg { width: 22px; height: 22px; overflow: visible; }
 .wbox.locked svg { width: 16px; height: 16px; stroke-width: 2.4; }
 .wish-hint { margin: -6px 0 0; font-size: 13px; color: var(--pencil); }
 
+.f-rule { margin: -10px 0 0; font-size: 13px; color: var(--burn); text-align: center; }
 /* 全屏专注页 */
 html.staged, html.staged body { overflow: hidden; }
 html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
@@ -419,6 +420,16 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 .fs-dots .tom:not(.full) .tl { fill: transparent; }
 .fs-close { border: var(--bw, 2px) solid var(--bc, var(--ink)); background: var(--card); border-radius: var(--rad, var(--wob2)); padding: 2px 14px; font-size: 15px; display: inline-flex; align-items: center; gap: 4px; }
 .fs-close::after { content: "⌄"; font-size: 18px; line-height: 0; margin-top: -6px; }
+.fs-stay { font-size: 14px; color: var(--burn); border: var(--bw, 1.5px) dashed var(--burn); border-radius: var(--rad, var(--wob2)); padding: 1px 10px; }
+.focus-stage.broken::before { background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--grid) 90%, transparent) 0, transparent 58%); animation: none; }
+.focus-stage.broken .fs-ring .arc { stroke: var(--pencil); opacity: .45 !important; }
+.focus-stage.broken .fs-ring .mk { opacity: 0; }
+.focus-stage.broken .fs-phase { background: linear-gradient(transparent 55%, var(--grid) 55%, var(--grid) 92%, transparent 92%); }
+.fs-time svg.rot { width: 1.7em; height: 1.25em; overflow: visible; display: block; }
+.tom.rot .tb { fill: color-mix(in srgb, var(--burn-hi) 55%, var(--pencil)); }
+.tom.rot .tl { fill: color-mix(in srgb, var(--leaf) 50%, var(--pencil)); }
+.tom.rot .crack { fill: none; stroke: var(--bc, var(--ink)); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.tom.rot .drip { fill: color-mix(in srgb, var(--burn-hi) 55%, var(--pencil)); stroke: var(--bc, var(--ink)); stroke-width: 1.6; }
 .fs-ring { position: relative; width: min(84vw, 46vh, 350px); aspect-ratio: 1; flex: none; margin-top: 4px; }
 .fs-ring svg { width: 100%; height: 100%; overflow: visible; display: block; }
 .fs-ring .tk { stroke: var(--pencil); stroke-width: 1.6; stroke-linecap: round; opacity: .55; }
@@ -861,6 +872,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <label class="f-for"><span>为了哪个愿望</span><select id="fWish"></select></label>
       <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
       <p class="f-tip" id="fTip"></p>
+      <p class="f-rule">专注时不能离开：切出 App 超过 10 秒，番茄就会坏掉，要重新开始。</p>
     </div>
     <div class="f-running sketch" id="fRunning" hidden>
       <svg viewBox="0 0 100 100" class="tom" id="fRunTom"></svg>
@@ -996,6 +1008,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <div class="fs-top">
     <span class="fs-cycle" id="fsCycle"></span>
     <button type="button" class="fs-close" id="fsClose">收起</button>
+    <span class="fs-stay" id="fsStay" hidden>别离开这一页</span>
   </div>
   <div class="fs-ring" id="fsRing">
     <div id="fsSvg"></div>
@@ -1082,6 +1095,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "今天专注": "Today", "今天的番茄": "Sessions today", "本周专注": "This week", "愿望进度": "Wish progress", "最近的番茄": "Recent sessions", "收起": "Minimize",
     "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
+    "专注时不能离开：切出 App 超过 10 秒，番茄就会坏掉，要重新开始。": "No leaving: switch away for more than 10 seconds and the tomato goes bad, so you start over.", "别离开这一页": "Stay on this page",
     "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
@@ -1782,7 +1796,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const savePref = () => { try { localStorage.setItem(FPREF_KEY, JSON.stringify(fpref)); } catch (e) {} };
   let frun = null;
   try { frun = JSON.parse(localStorage.getItem(FRUN_KEY) || "null"); } catch (e) {}
-  if (frun && (!frun.phase || ((frun.phase === "done" || frun.phase === "breakdone") && Date.now() - (frun.doneAt || 0) > 2 * 3600000))) frun = null;
+  if (frun && (!frun.phase || ((frun.phase === "done" || frun.phase === "breakdone" || frun.phase === "broken") && Date.now() - (frun.doneAt || 0) > 2 * 3600000))) frun = null;
+  if (frun && frun.phase === "focus") frun.open = true;   // 专注中不能收起（旧版本可能存了收起状态）
   const saveFrun = () => { try { frun ? localStorage.setItem(FRUN_KEY, JSON.stringify(frun)) : localStorage.removeItem(FRUN_KEY); } catch (e) {} };
 
   const focusFor = (id) => focusLog.reduce((a, s) => a + (s.wishId === id ? s.min : 0), 0);
@@ -1824,7 +1839,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const ln = plug("LocalNotifications"); if (!ln) return;
     try {
       await ln.cancel({ notifications: [{ id: FNOTE }] });
-      if (!fActive() || frun.pausedAt) return;
+      if (!fActive() || frun.pausedAt || frun.phase === "focus") return;
       let perm = await ln.checkPermissions();
       if (perm.display !== "granted") perm = await ln.requestPermissions();
       if (perm.display !== "granted" || !fActive() || frun.pausedAt) return;
@@ -1836,9 +1851,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       await ln.schedule({ notifications: [{ id: FNOTE, title, body, schedule: { at: new Date(Date.now() + fLeft()), allowWhileIdle: true } }] });
     } catch (e) {}
   }
-  // 专注时不让屏幕自动熄灭（支持的浏览器 / 系统才有效）
-  let wake = null;
+  // 专注时不让屏幕自动熄灭：App 里用原生开关（锁屏也算离开，会让番茄坏掉），网页用 Wake Lock（支持的浏览器才有效）
+  let wake = null, awakeNative = null;
   async function keepAwake(on) {
+    const ka = plug("KeepAwake");
+    if (ka && awakeNative !== on) { awakeNative = on; try { await ka.set({ on }); } catch (e) {} }
     try {
       if (on && !wake && navigator.wakeLock && document.visibilityState === "visible") { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => (wake = null)); }
       else if (!on && wake) { const w = wake; wake = null; await w.release(); }
@@ -1847,7 +1864,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   function startFocus() {
     const f = clampInt(fpref.f, 1, 180, 25), w = fWishObj(fpref.wish);
-    const cycle = frun && (frun.phase === "done" || frun.phase === "breakdone" || frun.phase === "break") ? frun.cycle || 0 : 0;
+    const cycle = frun && ["done", "breakdone", "break", "broken"].includes(frun.phase) ? frun.cycle || 0 : 0;
     frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", cycle, open: true };
     unlockAudio(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
@@ -1876,11 +1893,45 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function endBreak() { frun = { ...frun, phase: "breakdone", pausedAt: 0, doneAt: Date.now() }; saveFrun(); chime(); buzz("success"); renderStage(true); }
   function closeStage() {
     if (!frun) return;
-    if (frun.phase === "done" || frun.phase === "breakdone") frun = null; else frun.open = false;
+    if (frun.phase === "focus") return;
+    if (frun.phase === "done" || frun.phase === "breakdone" || frun.phase === "broken") frun = null; else frun.open = false;
     saveFrun(); renderFocusAll();
   }
+  // 专注时离开（切出 App、锁屏、关掉 App）超过 GRACE 毫秒，这个番茄就坏掉了，不计入、要重新开始
+  const GRACE = 10000, FWARN = 901;
+  function breakTomato(at) {
+    frun = { ...frun, phase: "broken", pausedAt: frun.pausedAt || at, doneAt: Date.now(), open: true };
+    saveFrun(); scheduleFocusNote(); buzz("medium"); renderFocusAll();
+  }
+  // 回到页面时判断：离开多久了？离开期间本来就到点了的，照样算完成
+  function checkLeft(leftAt) {
+    if (!frun || frun.phase !== "focus" || !leftAt) return false;
+    const away = Date.now() - leftAt, endAt = frun.start + frun.paused + frun.dur;
+    if (away <= GRACE) return false;
+    if (!frun.pausedAt && endAt <= leftAt + GRACE) { finishFocus(endAt); return true; }
+    breakTomato(leftAt); return true;
+  }
+  async function leaveWarn(on) {
+    const ln = plug("LocalNotifications"); if (!ln) return;
+    try {
+      await ln.cancel({ notifications: [{ id: FWARN }] });
+      if (on) await ln.schedule({ notifications: [{ id: FWARN, title: L("番茄要坏掉了！", "Your tomato is going bad!"), body: L("10 秒内回来，继续专注。", "Come back within 10 seconds to keep focusing."), schedule: { at: new Date(Date.now() + 1500) } }] });
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!frun || frun.phase !== "focus") return;
+    if (document.visibilityState === "hidden") { frun.leftAt = Date.now(); saveFrun(); leaveWarn(true); return; }
+    leaveWarn(false);
+    const left = frun.leftAt; delete frun.leftAt; saveFrun();
+    if (!checkLeft(left) && left && Date.now() - left > 1500) toast(L("好险！再久一点番茄就坏了", "Close call! A bit longer and the tomato would've gone bad."));
+  });
   function fTick() {
     if (!frun) return;
+    if (frun.phase === "focus" && document.visibilityState === "visible") {
+      const now = Date.now();
+      if (frun.seen && now - frun.seen > GRACE + 2000 && checkLeft(frun.seen)) return;   // 计时器被系统挂起很久（比如锁屏）也算离开
+      if (!frun.seen || now - frun.seen > 2000) { frun.seen = now; saveFrun(); }
+    }
     if (fActive() && !frun.pausedAt && fLeft() <= 0) {
       const endAt = frun.start + frun.paused + frun.dur;
       if (frun.phase === "focus") finishFocus(endAt); else endBreak();
@@ -1889,7 +1940,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     renderStageTime();
   }
   setInterval(fTick, 500);
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { fTick(); if (frun && frun.open) keepAwake(fActive() && !frun.pausedAt); } });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { fTick(); if (frun && frun.open) keepAwake(fActive() && (!frun.pausedAt || frun.phase === "focus")); } });
 
   // 表盘：60 个刻度 + 手绘的外圈 + 进度弧 + 跟着走的小番茄
   const RR = 112, RC = 2 * Math.PI * RR;
@@ -1917,19 +1968,22 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       ["慢一点也没关系", "Slow is fine"], ["这一段时间只属于你", "This time is yours"], ["喝口水，肩膀放松", "Sip some water, drop your shoulders"]],
     brk: [["站起来走走，看看远处", "Stand up and look far away"], ["闭上眼睛，深呼吸三次", "Close your eyes, three deep breaths"], ["伸个懒腰，转转脖子", "Stretch, roll your neck"]],
     done: [["做得好，对自己好一点", "Well done. Be kind to yourself"], ["又往愿望走近了一步", "One step closer"]],
+    broken: [["没关系，重新种一个", "That's okay. Grow a new one"], ["下次把手机扣在桌上", "Next time, put the phone face down"]],
   };
   const quote = (k, n) => { const q = QUOTES[k][n % QUOTES[k].length]; return L(q[0], q[1]); };
   function ctrlBtn(cls, label, fn) { const b = document.createElement("button"); b.type = "button"; b.className = cls; b.innerHTML = label; b.onclick = fn; return b; }
+  const ROTTEN = '<svg viewBox="0 0 100 100" class="tom rot" aria-hidden="true"><path class="tb" d="M12 72 C10 58 30 51 50 52 C72 51 92 58 88 72 C86 82 68 86 50 86 C30 86 13 82 12 72Z"/><path class="crack" d="M38 53 L45 62 L39 69 L47 78"/><path class="crack" d="M66 56 L61 64 L67 70"/><path class="tl" d="M54 53 L45 47 L52 47 L50 39 L57 46 L65 41 L61 50Z"/><circle class="drip" cx="22" cy="90" r="3.4"/><circle class="drip" cx="80" cy="92" r="2.6"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M7 5 Q8.5 4.6 10 5 L10 19 Q8.5 19.4 7 19Z"/><path d="M14 5 Q15.5 4.6 17 5 L17 19 Q15.5 19.4 14 19Z"/></svg>';
   const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 4.5 Q19 11 19.5 12 Q19 13 8 19.5 Q7.4 12 8 4.5Z"/></svg>';
   function renderStage(full) {
     const st = $("fStage"), show = !!(frun && frun.open);
     st.hidden = !show; document.documentElement.classList.toggle("staged", show);
-    keepAwake(show && fActive() && !frun.pausedAt);
+    keepAwake(show && fActive() && (!frun.pausedAt || frun.phase === "focus"));
     if (!show) { renderPill(); return; }
     if (full) {
       const ph = frun.phase, brk = ph === "break" || ph === "breakdone", done = ph === "done" || ph === "breakdone";
-      st.className = "focus-stage" + (brk ? " brk" : "") + (frun.pausedAt ? " paused" : "") + (ph === "done" ? " done" : "");
+      st.className = "focus-stage" + (brk ? " brk" : "") + (frun.pausedAt && ph !== "broken" ? " paused" : "") + (ph === "done" ? " done" : "") + (ph === "broken" ? " broken" : "");
+      $("fsClose").hidden = ph === "focus"; $("fsStay").hidden = ph !== "focus";
       $("fsSvg").innerHTML = ringSVG();
       const cyc = $("fsCycle"); cyc.textContent = "";
       const dots = document.createElement("span"); dots.className = "fs-dots";
@@ -1941,7 +1995,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       $("fsPhase").textContent = ph === "focus" ? (frun.pausedAt ? L("暂停中", "Paused") : L("专注中", "Focusing"))
         : ph === "break" ? (frun.pausedAt ? L("暂停中", "Paused") : frun.long ? L("长休息", "Long break") : L("休息一下", "Break"))
         : ph === "done" ? L("番茄完成", "Session done") : L("休息好了", "Break's over");
-      const ctrl = $("fsCtrl"); ctrl.textContent = ""; ctrl.className = "fs-ctrl" + (done ? " col" : "");
+      if (ph === "broken") $("fsPhase").textContent = L("番茄坏掉了", "The tomato went bad");
+      const ctrl = $("fsCtrl"); ctrl.textContent = ""; ctrl.className = "fs-ctrl" + (done || ph === "broken" ? " col" : "");
       if (ph === "focus") {
         const ab = ctrlBtn("fs-side warn", L("放弃", "Give up"), () => twoStep(ab, L("放弃", "Give up"), () => { frun = null; saveFrun(); scheduleFocusNote(); renderFocusAll(); toast(L("这个番茄没有记下，没关系", "Not saved. That's okay.")); }));
         ctrl.append(ab,
@@ -1953,6 +2008,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
           ctrlBtn("fs-main", frun.pausedAt ? ICON_PLAY : ICON_PAUSE, togglePause),
           ctrlBtn("fs-side", L("多休 5 分钟", "+5 min"), () => { frun.dur += 5 * 60000; saveFrun(); scheduleFocusNote(); renderStageTime(); }));
         ctrl.children[1].setAttribute("aria-label", frun.pausedAt ? L("继续", "Resume") : L("暂停", "Pause"));
+      } else if (ph === "broken") {
+        ctrl.append(ctrlBtn("fs-btn", L("重新开始这个番茄", "Start this one over"), startFocus), ctrlBtn("fs-side", L("先到这里", "Done for now"), closeStage));
       } else if (ph === "done") {
         const long = frun.cycle % 4 === 0, bm = long ? frun.b * 3 : frun.b;
         if (bm > 0) ctrl.append(ctrlBtn("fs-btn", long ? L(`长休息 ${bm} 分钟`, `Long break · ${bm} min`) : L(`休息 ${bm} 分钟`, `Take a ${bm}-min break`), startBreak),
@@ -1970,16 +2027,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     renderPill();
     if (!frun || !frun.open) return;
     const ph = frun.phase, act = fActive(), el = fElapsed();
-    const p = act ? Math.min(1, el / frun.dur) : 1;
+    const p = act || ph === "broken" ? Math.min(1, el / frun.dur) : 1;
     const arc = $("fsArc"), mk = $("fsMark");
     if (arc) { arc.style.strokeDashoffset = (RC * (1 - p)).toFixed(1); arc.style.opacity = p > 0.003 ? 1 : 0; }
     if (mk) { const a = -Math.PI / 2 + p * 2 * Math.PI; mk.setAttribute("transform", `translate(${(160 + RR * Math.cos(a)).toFixed(1)} ${(160 + RR * Math.sin(a)).toFixed(1)})`); }
     const t = act ? mmss(fLeft()) : ph === "done" ? `+${frun.gained}` : "0:00";
-    $("fsTime").innerHTML = t.split("").map(c => c === ":" ? '<span class="cl">:</span>' : `<i>${c}</i>`).join("");
+    $("fsTime").innerHTML = ph === "broken" ? ROTTEN : t.split("").map(c => c === ":" ? '<span class="cl">:</span>' : `<i>${c}</i>`).join("");
     $("fsTime").setAttribute("aria-label", act ? L(`还剩 ${t}`, `${t} left`) : "");
     $("fsSub").textContent = act ? (frun.pausedAt ? L("点下面的按钮继续", "Tap below to resume") : L(`${hhmm(Date.now() + fLeft())} 结束`, `Ends at ${hhmm(Date.now() + fLeft())}`))
-      : ph === "done" ? L("分钟，已经记下", "minutes saved") : L("准备好就开始下一个", "Start the next one when ready");
-    $("fsQuote").textContent = ph === "focus" ? quote("focus", Math.floor(el / 120000)) : ph === "break" ? quote("brk", Math.floor(el / 60000)) : ph === "done" ? quote("done", frun.cycle || 0) : quote("brk", 0);
+      : ph === "done" ? L("分钟，已经记下", "minutes saved") : ph === "broken" ? L(`离开太久，这 ${Math.floor(el / 60000)} 分钟没有记下`, `You left too long. ${Math.floor(el / 60000)} min not saved`)
+      : L("准备好就开始下一个", "Start the next one when ready");
+    $("fsQuote").textContent = ph === "focus" ? quote("focus", Math.floor(el / 120000)) : ph === "break" ? quote("brk", Math.floor(el / 60000)) : ph === "done" ? quote("done", frun.cycle || 0) : ph === "broken" ? quote("broken", frun.cycle || 0) : quote("brk", 0);
     // 绑定的愿望：已攒的 + 这个番茄正在攒的
     const w = fWishObj(frun.wishId), box = $("fsWish");
     box.hidden = !w || !(w.focusGoal > 0);
@@ -2013,7 +2071,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("fPill").onclick = $("fRunOpen").onclick = () => { if (!frun) return; frun.open = true; saveFrun(); renderFocusAll(); };
   document.addEventListener("keydown", (e) => {
     if (!frun || !frun.open || e.target.closest?.("input, textarea, select")) return;
-    if (e.key === "Escape") closeStage();
+    if (e.key === "Escape" && frun.phase !== "focus") closeStage();
     else if (e.key === " " && fActive()) { e.preventDefault(); togglePause(); }
   });
 
@@ -2703,6 +2761,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device");
   showLastBackup();
   renderAll(); renderStage(true);
+  // 刷新 / 关掉 App 再打开时还在专注：按最后一次在页面上的时间算，离开太久番茄就坏了
+  if (frun && frun.phase === "focus") checkLeft(frun.leftAt || frun.seen || frun.start);
   if (NATIVE) {
     renderReminder(); renderICloud(); syncStatusBar();
     icLastLocal = JSON.stringify([nights, wishes, focusLog]); icloudSync();
