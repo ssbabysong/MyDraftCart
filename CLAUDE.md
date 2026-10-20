@@ -55,4 +55,5 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 只有用户能做的事（登录 Apple ID、在 Xcode 里选 Team、信任开发者、App Store Connect 里点提交）要写清楚步骤让用户操作。
 - 不要把任何密钥、Token、Apple 账号信息写进仓库。
 - 改了 `index.html` 后：`sw.js` 的 `VERSION` 加一，并运行 `npm run build && npx cap sync ios`。
-- 番茄专注（底部第 4 个 tab「专注」）：专注记录存 `overtime-focus-v1`（`{id, start, end, min, wishId?}`），和每晚记录、愿望一样进备份和 iCloud 三方合并；进行中的番茄 `overtime-focus-run` 只存在本机，按时间戳算剩余时间。愿望可设 `focusGoal`（分钟），绑定它的专注攒够了才解锁。App 里番茄结束用本地通知 id 900 提醒（暂停 / 放弃 / 完成时取消）。还没在真机上测过。
+- 底部菜单 4 个：今晚 / 日历（标题处切换日历、统计）/ 专注（标题处切换番茄专注、愿望清单）/ 记录。分组在 `GROUPS`，再点底部按钮回到上次看的子页（`overtime-sub-<组>`）。
+- 番茄专注：专注记录存 `overtime-focus-v1`（`{id, start, end, min, wishId?}`），和每晚记录、愿望一样进备份和 iCloud 三方合并；进行中的番茄 `overtime-focus-run` 只存在本机，按时间戳算剩余时间。愿望可设 `focusGoal`（分钟），绑定它的专注攒够了才解锁。App 里番茄结束用本地通知 id 900 提醒（暂停 / 放弃 / 完成时取消）。还没在真机上测过。

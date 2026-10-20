@@ -90,6 +90,10 @@ h1 .hl { background: linear-gradient(transparent 60%, var(--burn-hi) 60%, var(--
 .clock b { display: block; font-family: var(--f-num); font-weight: 400; font-size: 34px; line-height: 1; }
 .clock span { font-size: 14px; color: var(--pencil); }
 h2 { font-family: var(--f-hand); font-weight: 400; font-size: 24px; margin: 0; text-wrap: balance; }
+.pg-switch { display: flex; align-items: baseline; gap: 4px 18px; flex-wrap: wrap; }
+.pg-switch button { border: 0; background: none; padding: 0 0 2px; font-family: var(--f-hand); font-size: 19px; color: var(--pencil); line-height: 1.3; }
+.pg-switch button[aria-current="page"] { font-size: 24px; color: var(--ink); background: linear-gradient(var(--ink), var(--ink)) no-repeat 0 100% / 100% 2px; cursor: default; }
+:root[data-skin="news"] .pg-switch button[aria-current="page"], :root[data-skin="receipt"] .pg-switch button[aria-current="page"] { font-weight: 700; }
 h2.underlined { display: inline-block; background: linear-gradient(var(--ink), var(--ink)) no-repeat 0 100% / 100% 2px; padding-bottom: 2px; align-self: flex-start; }
 
 /* tonight card */
@@ -214,7 +218,7 @@ textarea#note {
 body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(6, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
   background: var(--paper); border-top: var(--bw, 2px) solid var(--bc, var(--ink));
   border-radius: var(--rad-top, 18px 22px 0 0 / 10px 12px 0 0);
@@ -224,13 +228,11 @@ body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   border: 0; background: transparent; color: var(--pencil); padding: 4px 0 2px;
   display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 13px; position: relative;
 }
-.tabbar svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
+.tabbar svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
 .tabbar button[aria-current="page"] { color: var(--ink); }
-html[lang="en"] .tabbar button { font-size: 12px; letter-spacing: -.02em; white-space: nowrap; }
 .tabbar button[aria-current="page"] svg { transform: rotate(calc(-6deg * var(--tilt, 1))) scale(1.08); }
 .tabbar button[aria-current="page"] span { background: linear-gradient(transparent 55%, var(--money-hi) 55%, var(--money-hi) 92%, transparent 92%); padding: 0 4px; }
 .tabbar button[data-go="tonight"][aria-current="page"] svg { fill: var(--money); }
-.tabbar button[data-go="wishes"][aria-current="page"] svg { fill: var(--body-hi); }
 .tabbar button:active svg { transform: scale(.9); }
 @media (min-width: 700px) { .tabbar { left: 50%; right: auto; width: 520px; transform: translateX(-50%); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-bottom: 0; } }
 @media (prefers-reduced-motion: reduce) { .tab { animation: none; } }
@@ -773,7 +775,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <main class="tab" id="tab-calendar" data-tab="calendar" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="calTitle">
     <div class="stats-head">
-      <h2 class="underlined" id="calTitle">日历</h2>
+      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="calendar" aria-current="page" id="calTitle">日历</button><button type="button" data-go="stats">统计</button></nav>
       <div class="seg" role="group" id="calViewSeg" aria-label="日历视图">
         <button type="button" data-v="month" aria-pressed="true">月历</button>
         <button type="button" data-v="items" aria-pressed="false">商品</button>
@@ -810,7 +812,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <main class="tab" id="tab-stats" data-tab="stats" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="statsTitle">
     <div class="stats-head">
-      <h2 class="underlined" id="statsTitle">统计</h2>
+      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="calendar">日历</button><button type="button" data-go="stats" aria-current="page" id="statsTitle">统计</button></nav>
       <div class="seg" role="group" id="statsSeg" aria-label="统计范围">
         <button type="button" data-p="week" aria-pressed="false">本周</button>
         <button type="button" data-p="month" aria-pressed="true">本月</button>
@@ -845,7 +847,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   <main class="tab" id="tab-focus" data-tab="focus" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="focusTitle">
-    <h2 class="underlined" id="focusTitle">番茄专注</h2>
+    <nav class="pg-switch" aria-label="页面"><button type="button" data-go="focus" aria-current="page" id="focusTitle">番茄专注</button><button type="button" data-go="wishes">愿望清单</button></nav>
     <div class="card sketch f-setup" id="fSetup">
       <div class="f-dial" aria-hidden="true">
         <svg viewBox="0 0 100 100" class="tom" id="fDialTom"></svg>
@@ -882,7 +884,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   <main class="tab" id="tab-wishes" data-tab="wishes" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="wishTitle">
-    <h2 class="underlined" id="wishTitle">愿望清单</h2>
+    <nav class="pg-switch" aria-label="页面"><button type="button" data-go="focus">番茄专注</button><button type="button" data-go="wishes" aria-current="page" id="wishTitle">愿望清单</button></nav>
     <div class="wish-sum sketch">
       <span class="eyebrow">还想买的，一共</span>
       <div class="big-total"><span id="wishTotal">$0</span></div>
@@ -981,17 +983,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8 Q16 7 27 8.5 Q27.5 18 26.5 27 Q16 27.8 5.5 26.8 Q4.5 18 5 8Z"/><path d="M5.2 13.5 Q16 12.8 27 13.8"/><path d="M11 4.5 L11 10"/><path d="M21 4.5 L21 10"/><path d="M10 19 L10.5 19M16 19 L16.5 19M22 19 L22.5 19M10 23 L10.5 23M16 23 L16.5 23"/></svg>
     <span>日历</span>
   </button>
-  <button type="button" data-go="stats">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27.5 Q16 26.8 28 27.6"/><path d="M8 26 L8 17 L12.5 17 L12.5 26"/><path d="M14.5 26 L14.5 9 L19 9 L19 26"/><path d="M21 26 L21 14 L25.5 14 L25.5 26"/></svg>
-    <span>统计</span>
-  </button>
   <button type="button" data-go="focus">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 9.5 C8.5 9.3 4.6 14.2 5 19.6 C5.5 25.4 10.4 28.2 16 28.2 C21.7 28.2 26.6 25.3 27 19.6 C27.4 14 23.4 9.4 16 9.5Z"/><path d="M16 10 L12 7.4 M16 10 L20 7.4 M16 10 L16 6.5 Q16.4 4.2 19 3.6"/></svg>
     <span>专注</span>
-  </button>
-  <button type="button" data-go="wishes">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 L19.6 11.2 L28 12.2 L21.8 17.9 L23.4 26.3 L16 22.2 L8.6 26.4 L10.2 17.9 L4 12.3 L12.4 11.1Z"/></svg>
-    <span>愿望</span>
   </button>
   <button type="button" data-go="records">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 4.5 Q17 4 25 5 Q25.8 16 25 27.5 Q16 28 8 27.2 Q7.3 16 8 4.5Z"/><path d="M5 9 L10 9M5 16 L10 16M5 23 L10 23"/><path d="M13 11 Q17 10.6 21 11.2M13 16 Q17 15.6 21 16.2M13 21 Q15.5 20.7 18 21.1"/></svg>
@@ -1086,9 +1080,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "关闭": "Close", "前一天": "Previous day", "后一天": "Next day", "常买": "Frequent buys", "想买什么": "What do you want", "想买的东西": "Wish item",
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "回到专注": "Back to focus",
     "今天专注": "Today", "今天的番茄": "Sessions today", "本周专注": "This week", "愿望进度": "Wish progress", "最近的番茄": "Recent sessions", "收起": "Minimize",
-    "专注时长": "Focus length", "专注分钟": "Focus minutes", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
+    "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
-    "日历视图": "Calendar view", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1651,7 +1645,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const f = document.createElement("form"); f.className = "wedit"; f.autocomplete = "off";
     const n = document.createElement("input"); n.type = "text"; n.id = "wedit-name"; n.maxLength = 40; n.value = w.name; n.setAttribute("aria-label", L("名称", "Name"));
     const p = document.createElement("input"); p.type = "number"; p.id = "wedit-price"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = dispRound(toDisp(w.price)); p.setAttribute("aria-label", L("价格 ", "Price ") + curSym());
-    const g = document.createElement("input"); g.type = "number"; g.id = "wedit-goal"; g.min = "0"; g.step = "1"; g.inputMode = "numeric"; g.value = w.focusGoal || ""; g.placeholder = L("专注分钟", "Focus minutes"); g.setAttribute("aria-label", L("专注多少分钟后解锁", "Focus minutes to unlock"));
+    const g = document.createElement("input"); g.type = "number"; g.id = "wedit-goal"; g.min = "0"; g.step = "1"; g.inputMode = "numeric"; g.value = w.focusGoal || ""; g.placeholder = L("专注分钟", "Focus min"); g.setAttribute("aria-label", L("专注多少分钟后解锁", "Focus minutes to unlock"));
     const btns = document.createElement("div"); btns.className = "btns";
     const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = L("取消", "Cancel");
     const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = L("保存", "Save");
@@ -2396,11 +2390,25 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function showTab(name, save = true) {
     if (!TABS.includes(name)) name = "tonight";
     document.querySelectorAll(".tab").forEach(t => (t.hidden = t.dataset.tab !== name));
-    document.querySelectorAll(".tabbar button").forEach(b => b.dataset.go === name ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+    const g = groupOf(name);
+    document.querySelectorAll(".tabbar button").forEach(b => b.dataset.go === g ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
     window.scrollTo(0, 0);
-    if (save) { try { localStorage.setItem("overtime-tab", name); } catch (e) {} if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name); }
+    if (save) {
+      try { localStorage.setItem("overtime-tab", name); if (GROUPS[g]) localStorage.setItem("overtime-sub-" + g, name); } catch (e) {}
+      if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+    }
   }
-  document.querySelector(".tabbar").addEventListener("click", (e) => { const b = e.target.closest("button[data-go]"); if (b) showTab(b.dataset.go); });
+  // 底部菜单 4 个按钮：「日历」里含日历 / 统计，「专注」里含番茄专注 / 愿望清单，在页面标题处切换；再点底部按钮回到上次看的那一页
+  const GROUPS = { calendar: ["calendar", "stats"], focus: ["focus", "wishes"] };
+  function groupOf(name) { for (const [g, list] of Object.entries(GROUPS)) if (list.includes(name)) return g; return name; }
+  document.querySelector(".tabbar").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-go]"); if (!b) return;
+    const g = b.dataset.go; let t = g;
+    if (GROUPS[g]) { try { t = localStorage.getItem("overtime-sub-" + g) || g; } catch (err) {} if (!GROUPS[g].includes(t)) t = g; }
+    showTab(t);
+  });
+  window.addEventListener("hashchange", () => { const t = location.hash.slice(1); if (TABS.includes(t)) showTab(t); });
+  document.addEventListener("click", (e) => { const b = e.target.closest(".pg-switch button[data-go]"); if (b && b.getAttribute("aria-current") !== "page") showTab(b.dataset.go); });
   { let t = location.hash.slice(1); if (!TABS.includes(t)) { try { t = localStorage.getItem("overtime-tab") || "tonight"; } catch (e) { t = "tonight"; } } showTab(t, false); }
 
   // ---------- backup ----------
