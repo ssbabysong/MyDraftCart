@@ -178,7 +178,6 @@ struct WidgetView: View {
     private func flags(_ s: Summary, _ c: Palette) -> some View {
         HStack(spacing: 8) {
             Label("\(s.burnout)", systemImage: "flame.fill").foregroundColor(Color(hex: c.burn))
-            Label("\(s.body)", systemImage: "heart.fill").foregroundColor(Color(hex: c.body))
         }
         .font(.system(size: 13, weight: .semibold, design: .rounded))
         .labelStyle(.titleAndIcon)

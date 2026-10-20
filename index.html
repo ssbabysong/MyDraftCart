@@ -112,7 +112,7 @@ h2.underlined { display: inline-block; background: linear-gradient(var(--ink), v
 }
 .field-inline { display: flex; align-items: center; gap: 10px; font-size: 16px; }
 
-.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.counters { display: grid; grid-template-columns: 1fr; gap: 14px; }
 .counter { border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .counter.burn { border-radius: var(--rad, var(--wob2)); background: var(--burn-hi); }
 .counter.body { border-radius: var(--rad, var(--wob3)); background: var(--body-hi); transform: rotate(calc(.6deg * var(--tilt, 1))); }
@@ -168,6 +168,11 @@ form.buy .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(-
 .chips button:nth-child(odd) { transform: rotate(calc(-1.5deg * var(--tilt, 1))); }
 .chips button:nth-child(even) { transform: rotate(calc(1.2deg * var(--tilt, 1))); }
 .chips button:hover { background: var(--money-hi); }
+.wish-pick { display: flex; flex-direction: column; gap: 6px; }
+#wishChips button { border-style: solid; background: var(--body-hi); display: inline-flex; align-items: center; gap: 5px; }
+#wishChips button.locked { background: transparent; border-style: dashed; color: var(--pencil); }
+#wishChips svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+ul.items .wtag { font-size: 12px; color: var(--body); margin-left: 6px; white-space: nowrap; }
 textarea#note {
   width: 100%; min-height: 80px; resize: vertical; border: 0; padding: 4px 6px; color: var(--ink); line-height: 28px;
   background: repeating-linear-gradient(transparent 0 27px, var(--grid) 27px 28px); background-color: transparent;
@@ -760,12 +765,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <button type="button" class="counter burn" id="burnToggle" aria-pressed="false">
         <span class="row"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg><span class="label">Burnout</span></span>
         <span class="state" id="burnState"></span>
-        <span class="hint">崩溃、想摆烂、脑子转不动</span>
-      </button>
-      <button type="button" class="counter body" id="bodyToggle" aria-pressed="false">
-        <span class="row"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg><span class="label">身体不行</span></span>
-        <span class="state" id="bodyState"></span>
-        <span class="hint">头疼、心慌、胃不舒服、眼睛酸</span>
+        <span class="hint">崩溃、想摆烂、脑子转不动、身体不舒服</span>
       </button>
     </div>
 
@@ -778,6 +778,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <button type="submit" class="add">记一笔</button>
       </form>
       <div class="chips" id="chips" aria-label="常买"></div>
+      <div class="wish-pick" id="wishPick" hidden>
+        <span class="eyebrow">从愿望清单里买</span>
+        <div class="chips" id="wishChips"></div>
+      </div>
     </div>
 
     <div>
@@ -812,7 +816,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-key">
         <span>花得越多颜色越深<span class="ramp"><i style="background:var(--card)"></i><i style="background:color-mix(in srgb, var(--money) 30%, var(--card))"></i><i style="background:color-mix(in srgb, var(--money) 60%, var(--card))"></i><i style="background:var(--money)"></i></span></span>
-        <span><span style="color:var(--burn)">×</span> burnout　<span style="color:var(--body)">×</span> 身体不行</span>
+        <span><span style="color:var(--burn)">×</span> burnout</span>
         <span><svg viewBox="0 0 100 100" class="tom full" id="calKeyTom" aria-hidden="true"></svg> 一个番茄</span>
       </div>
       </div>
@@ -842,7 +846,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="tile money"><span class="v" id="sSpend">$0</span><span class="k">总花费</span></div>
       <div class="tile money"><span class="v" id="sAvg">$0</span><span class="k">平均每晚</span></div>
       <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 晚数</span></div>
-      <div class="tile body"><span class="v" id="sBody">0</span><span class="k">身体不行晚数</span></div>
+      <div class="tile focus"><span class="v" id="sFocus">0</span><span class="k">专注番茄</span></div>
       <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
     </div>
     <div class="top-buys" id="topBuys"></div>
@@ -851,7 +855,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="legend">
         <span><i style="background:var(--money)"></i>每晚花费</span>
         <span><i style="background:var(--burn-hi);border-color:var(--burn)"></i>Burnout ×</span>
-        <span><i style="background:var(--body-hi);border-color:var(--body)"></i>身体不行 ×</span>
       </div>
       <div class="plot" id="plot"></div>
       <div class="marks" id="marks"></div>
@@ -1072,12 +1075,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const weekHead = () => L(["一", "二", "三", "四", "五", "六", "日"], ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]);
   const EN_TEXT = {
     "加班": "Overtime ", "夜记": "Night Log", "今晚": "Tonight", "下班时间": "Left work at", "身体不行": "Unwell",
-    "崩溃、想摆烂、脑子转不动": "Melting down, want to quit, brain fried", "头疼、心慌、胃不舒服、眼睛酸": "Headache, racing heart, upset stomach, sore eyes",
-    "今晚买了": "Bought tonight", "记一笔": "Add", "备注": "Note", "删除这一晚": "Delete this night",
+    "崩溃、想摆烂、脑子转不动、身体不舒服": "Melting down, brain fried, or feeling unwell",
+    "今晚买了": "Bought tonight", "从愿望清单里买": "From my wishlist", "记一笔": "Add", "备注": "Note", "删除这一晚": "Delete this night",
     "日历": "Calendar", "月历": "Month", "商品": "Items", "本月": "This month", "本周": "This week", "全部": "All time",
-    "花得越多颜色越深": "Darker = spent more", "身体不行 ×": "Unwell ×", "这个月买过的东西": "Bought this month", "每晚买了什么": "What I bought each night",
+    "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每晚买了什么": "What I bought each night",
     "统计": "Stats", "加班晚数": "Overtime nights", "总花费": "Total spent", "平均每晚": "Per night", "Burnout 晚数": "Burnout nights",
-    "身体不行晚数": "Unwell nights", "最晚下班": "Latest finish", "每晚花费": "Spent per night",
+    "专注番茄": "Focus sessions", "最晚下班": "Latest finish", "每晚花费": "Spent per night",
     "生成我的月度加班账单": "Make my monthly overtime bill", "一张手绘风长图，可以直接发小红书": "A hand-drawn image, ready to post",
     "愿望": "Wishes", "愿望清单": "Wishlist", "还想买的，一共": "Still on my list", "许个愿": "Make a wish",
     "每晚提醒": "Nightly reminder", "提醒时间": "Reminder time", "提醒日期": "Reminder days", "工作日": "Weekdays", "每天": "Every day",
@@ -1128,7 +1131,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const chipList = () => L([["咖啡", 5.5], ["外卖", 16], ["能量饮料", 3.5], ["零食", 4], ["打车回家", 22], ["奶茶", 6.5]],
     [["Coffee", 5.5], ["Takeout", 16], ["Energy drink", 3.5], ["Snacks", 4], ["Ride home", 22], ["Boba", 6.5]]);
 
-  let nights = {};            // date -> {date, items:[{name, amount}], burnout, body, end, note, sample?}
+  let nights = {};            // date -> {date, items:[{name, amount, wishId?}], burnout, end, note, sample?}
   let store = null, loaded = false;
   let period = "month";
   try { period = localStorage.getItem("overtime-period") || "month"; } catch (e) {}
@@ -1180,18 +1183,19 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
   tick(); setInterval(tick, 30000);
 
-  const blank = (date) => ({ date, items: [], burnout: 0, body: 0, end: "", note: "" });
+  const blank = (date) => ({ date, items: [], burnout: 0, end: "", note: "" });
   const get = (date) => nights[date] || blank(date);
-  // burnout / 身体不行每晚只记有没有（1 / 0）。旧版本是计数，读进来时把大于 0 的都当作「有」
+  // burnout 每晚只记有没有（1 / 0）。旧版本是计数，读进来时把大于 0 的都当作「有」；
+  // 旧版本还单独记过「身体不行」（body），现在并进 burnout：有其一就算这晚 burnout
   function normFlags(all) {
-    for (const n of Object.values(all || {})) if (n && typeof n === "object") { n.burnout = n.burnout > 0 ? 1 : 0; n.body = n.body > 0 ? 1 : 0; }
+    for (const n of Object.values(all || {})) if (n && typeof n === "object") { n.burnout = n.burnout > 0 || n.body > 0 ? 1 : 0; delete n.body; }
     return all;
   }
 
   // ---------- persistence (one write at a time per night) ----------
   const queue = {};
   function persist(n) {
-    const empty = !n.items.length && !n.burnout && !n.body && !n.end && !n.note;
+    const empty = !n.items.length && !n.burnout && !n.end && !n.note;
     if (empty) delete nights[n.date]; else nights[n.date] = n;
     if (!store) { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {} showSaved(); return; }
     const run = async () => {
@@ -1217,7 +1221,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("nextDay").disabled = current >= nightOf();
     if (document.activeElement !== $("endTime")) $("endTime").value = n.end || "";
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
-    [["burn", n.burnout], ["body", n.body]].forEach(([k, on]) => {
+    [["burn", n.burnout]].forEach(([k, on]) => {
       $(k + "Toggle").setAttribute("aria-pressed", String(!!on));
       $(k + "State").textContent = on ? L("今晚有", "Yes tonight") : L("今晚没有，挺好", "Not tonight. Good.");
     });
@@ -1229,10 +1233,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const li = document.createElement("li");
       if (editingItem && editingItem.i === i) { li.className = "editing"; li.append(itemEditForm(it, i)); ul.append(li); return; }
       const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name; nm.dataset.edit = i; nm.title = L("点一下修改", "Tap to edit");
+      if (it.wishId) { const t = document.createElement("span"); t.className = "wtag"; t.textContent = L("★ 愿望", "★ wish"); nm.append(t); }
       const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0); am.dataset.edit = i; am.title = L("点一下修改", "Tap to edit");
       const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.i = i; x.setAttribute("aria-label", L("删除 ", "Delete ") + it.name);
       li.append(logoFor(it.name, true), nm, am, x); ul.append(li);
     });
+    renderWishPick();
     $("deleteNight").hidden = !nights[current];
     $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
   }
@@ -1256,7 +1262,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (!name) { n.focus(); return; }
       if (!(amt >= 0)) { p.focus(); toast(L("请填一个金额，比如 5.5", "Enter an amount, like 5.5")); return; }
       editingItem = null;
-      update(night => { if (night.items[i]) night.items[i] = { name, amount: toBase(amt) }; });
+      update(night => { if (night.items[i]) night.items[i] = { name, amount: toBase(amt), ...(night.items[i].wishId ? { wishId: night.items[i].wishId } : {}) }; });
       toast(L("已保存", "Saved"));
     };
     setTimeout(() => { n.focus(); n.select(); });
@@ -1279,7 +1285,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("sSpend").textContent = money(spend);
     $("sAvg").textContent = money(list.length ? spend / list.length : 0);
     $("sBurn").textContent = list.filter(n => n.burnout).length;
-    $("sBody").textContent = list.filter(n => n.body).length;
+    $("sFocus").textContent = focusLog.filter(f => inPeriod(nightOf(new Date(f.start)))).length;
     const late = list.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
     $("sLate").textContent = late ? late.end : "—";
     const tally = {};
@@ -1311,10 +1317,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const col = document.createElement("div");
       const b = document.createElement("div"); b.className = "dots b";
       b.textContent = n?.burnout ? "×" : "";
-      const p = document.createElement("div"); p.className = "dots p";
-      p.textContent = n?.body ? "×" : "";
       const x = document.createElement("span"); x.className = "xlab"; x.textContent = parse(d).getDate();
-      col.append(b, p, x); marks.append(col);
+      col.append(b, x); marks.append(col);
     });
   }
 
@@ -1335,7 +1339,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const r = document.createElement("span"); r.className = "h-right";
       const pm = document.createElement("span"); pm.className = "pill m"; pm.textContent = money(sum(n)); r.append(pm);
       if (n.burnout) { const x = document.createElement("span"); x.className = "pill b"; x.textContent = "burnout"; r.append(x); }
-      if (n.body) { const x = document.createElement("span"); x.className = "pill p"; x.textContent = L("身体不行", "unwell"); r.append(x); }
       b.append(dt, mid, r); li.append(b); ul.append(li);
     });
     const e = $("empty");
@@ -1389,10 +1392,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${heat}%, var(--card))`;
       if (v > 0 && heat >= 60) b.classList.add("hot");   // 颜色深的格子换成对比色文字
       const dn = document.createElement("span"); dn.className = "d"; dn.textContent = d; b.append(dn);
-      if (n && (n.burnout || n.body)) {
+      if (n && n.burnout) {
         const f = document.createElement("span"); f.className = "flags";
         if (n.burnout) { const x = document.createElement("span"); x.className = "b"; x.textContent = "×"; f.append(x); }
-        if (n.body) { const x = document.createElement("span"); x.className = "p"; x.textContent = "×"; f.append(x); }
         b.append(f);
       }
       const tf = fd[date];
@@ -1404,7 +1406,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? moneyShort(v) : "";
       b.append(a);
       let label = fmtMD(new Date(y, m - 1, d));
-      if (n) label += L(`，花了 ${money(v)}` + (n.burnout ? "，burnout" : "") + (n.body ? "，身体不行" : ""), `, spent ${money(v)}` + (n.burnout ? ", burnout" : "") + (n.body ? ", unwell" : ""));
+      if (n) label += L(`，花了 ${money(v)}` + (n.burnout ? "，burnout" : ""), `, spent ${money(v)}` + (n.burnout ? ", burnout" : ""));
       if (tf) label += L(`，专注 ${tf.n} 个番茄`, `, ${tf.n} focus ${tf.n === 1 ? "session" : "sessions"}`);
       b.setAttribute("aria-label", label); b.title = label;
       g.append(b);
@@ -1497,10 +1499,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         chip.append(logoFor(it.name, true), nm, p); box.append(chip);
       });
       else { const e = document.createElement("span"); e.className = "nl-none"; e.textContent = L("没买东西", "Bought nothing"); box.append(e); }
-      if (n.burnout || n.body) {
+      if (n.burnout) {
         const f = document.createElement("span"); f.className = "nl-flags";
         if (n.burnout) { const x = document.createElement("span"); x.className = "b"; x.textContent = "burnout × "; f.append(x); }
-        if (n.body) { const x = document.createElement("span"); x.className = "p2"; x.textContent = L("身体不行 ×", "unwell ×"); f.append(x); }
         box.append(f);
       }
       li.append(db, box); ol.append(li);
@@ -1533,7 +1534,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const meta = el("div", "dd-meta");
       if (n.end) meta.append(el("span", null, L(`${n.end} 下班`, `left at ${n.end}`)));
       if (n.burnout) meta.append(el("span", "pill b", "burnout"));
-      if (n.body) meta.append(el("span", "pill p", L("身体不行", "unwell")));
       if (n.sample) meta.append(el("span", "sample-tag", L("示例", "sample")));
       if (meta.childNodes.length) box.append(meta);
       if (n.items.length) {
@@ -1579,7 +1579,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     for (const [back, items, bo, bd, end] of plan) {
       const date = shift(base, -back);
       if (nights[date]) continue;
-      const n = { date, items: items.map(([name, amount]) => ({ name, amount })), burnout: bo ? 1 : 0, body: bd ? 1 : 0, end, note: L("示例数据", "Sample data"), sample: true };
+      const n = { date, items: items.map(([name, amount]) => ({ name, amount })), burnout: bo || bd ? 1 : 0, end, note: L("示例数据", "Sample data"), sample: true };
       nights[date] = n;
       persistRaw(n);
     }
@@ -1592,7 +1592,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   // ---------- events ----------
   $("burnToggle").onclick = () => update(n => n.burnout = n.burnout ? 0 : 1);
-  $("bodyToggle").onclick = () => update(n => n.body = n.body ? 0 : 1);
 
   $("buyForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -1612,11 +1611,41 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     });
   }
   renderChips();
+  // 从愿望清单里买：点一下就记成今晚的一笔，同时把这个愿望勾成「买到了」。还没攒够专注的愿望要再点一下确认
+  let pickArmed = null;
+  function renderWishPick() {
+    const open = wishes.filter(w => !w.got).sort((a, b) => (a.price || 0) - (b.price || 0));
+    $("wishPick").hidden = !open.length;
+    const box = $("wishChips"); box.textContent = "";
+    open.forEach(w => {
+      const b = document.createElement("button"); b.type = "button"; b.dataset.wish = w.id;
+      const locked = isLocked(w); if (locked) b.className = "locked";
+      b.innerHTML = locked ? LOCK : '<svg viewBox="0 0 24 24"><path d="M12 3.5 L14.4 8.6 L20 9.3 L15.9 13.1 L17 18.7 L12 16 L7 18.7 L8.1 13.1 L4 9.3 L9.6 8.6Z"/></svg>';
+      b.append(`${w.name} ${money(w.price || 0)}`);
+      b.setAttribute("aria-label", L(`买了愿望「${w.name}」${money(w.price || 0)}`, `Bought wish "${w.name}" ${money(w.price || 0)}`) + (locked ? L("（还没解锁）", " (still locked)") : ""));
+      box.append(b);
+    });
+  }
+  $("wishChips").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-wish]"); if (!b) return;
+    const w = wishes.find(v => v.id === b.dataset.wish); if (!w || w.got) return;
+    if (isLocked(w) && pickArmed !== w.id) {
+      pickArmed = w.id; clearTimeout(renderWishPick.t); renderWishPick.t = setTimeout(() => (pickArmed = null), 3000);
+      toast(L(`「${w.name}」还差 ${fmtMin(goalLeft(w))} 专注才解锁。真要买？再点一下`, `"${w.name}" needs ${fmtMin(goalLeft(w))} more focus. Buy anyway? Tap again.`)); return;
+    }
+    pickArmed = null;
+    w.got = true; w.gotAt = current; delete w.sample; saveWishes();
+    update(n => n.items.push({ name: w.name, amount: w.price || 0, wishId: w.id }));
+    buzz("success");
+    toast(L(`买到愿望「${w.name}」啦，已经从清单里勾掉`, `Got your wish "${w.name}"! Ticked off your list.`));
+  });
   $("items").addEventListener("click", (e) => {
     const ed = e.target.closest("[data-edit]");
     if (ed) { editingItem = { date: current, i: Number(ed.dataset.edit) }; renderNight(); return; }
     const x = e.target.closest(".x"); if (!x) return;
     editingItem = null;
+    const it = get(current).items[Number(x.dataset.i)], w = it && it.wishId && wishes.find(v => v.id === it.wishId);
+    if (w && w.got) { w.got = false; w.gotAt = ""; saveWishes(); toast(L(`「${w.name}」放回愿望清单了`, `"${w.name}" is back on your wishlist`)); }
     update(n => n.items.splice(Number(x.dataset.i), 1));
   });
 
@@ -1759,7 +1788,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const g = $("gotList"); g.textContent = "";
     got.forEach(w => g.append(wishRow(w)));
     $("gotHead").hidden = !got.length;
-    renderFocus();
+    renderFocus(); renderWishPick();
     $("gotHead").textContent = got.length ? L(`已经买到 ${got.length} 个，一共 ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))}`, `Got ${got.length}, ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))} in total`) : "";
 
     const e = $("wishEmpty"); e.hidden = wishes.length > 0; e.textContent = "";
@@ -2224,7 +2253,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const tally = new Map();
     recs.forEach(n => n.items.forEach(it => { const k = it.name.trim(); if (!k) return; const t = tally.get(k) || { name: k, c: 0, s: 0 }; t.c++; t.s += Number(it.amount) || 0; tally.set(k, t); }));
     const late = recs.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
-    return { recs, spend, burnout: recs.filter(n => n.burnout).length, body: recs.filter(n => n.body).length,
+    return { recs, spend, burnout: recs.filter(n => n.burnout).length,
       late: late ? late.end : "", top: [...tally.values()].sort((a, b) => b.s - a.s).slice(0, 3), max: Math.max(0, ...recs.map(sum)) };
   }
   // 固定种子的小抖动，让线条像手画的，但每次生成都一样
@@ -2311,17 +2340,31 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num, SC.ink, "left", unit ? 160 : 248);
         if (unit) T(unit, x + 36 + vw, y + 142, 36, SF.hand, SC.pencil);
       });
-      // 第二行：几晚 burnout / 身体不行，下面列出是哪几晚
-      [["Burnout", "burnout", st.burnout, SC.burn, SC.burnHi], [L("身体不行", "Unwell"), "body", st.body, SC.body, SC.bodyHi]].forEach(([k, key, v, color, fill], i) => {
-        const x = 64 + i * 495, y = 488, w = 460, h = 236;
-        sketchBox(ctx, x, y, w, h, fill, 21 + i);
-        T(k, x + 28, y + 54, 36, SF.hand, color);
-        if (!v) { T(L("这个月一晚都没有，真好", "Not one night this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56); return; }
-        const vw = T(`${v}`, x + 28, y + 150, 84, SF.num, color);
-        T(L("晚", v === 1 ? "night" : "nights"), x + 40 + vw, y + 150, 36, SF.hand, color);
-        const days = st.recs.filter(n => n[key]).map(n => `${Number(n.date.slice(5, 7))}/${Number(n.date.slice(8))}`).sort((a, b) => parseInt(a.split("/")[1]) - parseInt(b.split("/")[1]));
-        T(days.join(L("、", ", ")), x + 28, y + 202, 26, SF.num, SC.pencil, "left", w - 56);
-      });
+      // 第二行：几晚 burnout（下面列出是哪几晚）、专注了几个番茄
+      {
+        const x = 64, y = 488, w = 460, h = 236, v = st.burnout;
+        sketchBox(ctx, x, y, w, h, SC.burnHi, 21);
+        T("Burnout", x + 28, y + 54, 36, SF.hand, SC.burn);
+        if (!v) T(L("这个月一晚都没有，真好", "Not one night this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
+        else {
+          const vw = T(`${v}`, x + 28, y + 150, 84, SF.num, SC.burn);
+          T(L("晚", v === 1 ? "night" : "nights"), x + 40 + vw, y + 150, 36, SF.hand, SC.burn);
+          const days = st.recs.filter(n => n.burnout).map(n => `${Number(n.date.slice(5, 7))}/${Number(n.date.slice(8))}`).sort((a, b) => parseInt(a.split("/")[1]) - parseInt(b.split("/")[1]));
+          T(days.join(L("、", ", ")), x + 28, y + 202, 26, SF.num, SC.pencil, "left", w - 56);
+        }
+      }
+      {
+        const x = 559, y = 488, w = 460, h = 236, fs = focusLog.filter(f => nightOf(new Date(f.start)).slice(0, 7) === month);
+        const fm = fs.reduce((a, f) => a + f.min, 0);
+        sketchBox(ctx, x, y, w, h, SC.card, 22);
+        T(L("专注", "Focus"), x + 28, y + 54, 36, SF.hand, SC.burn);
+        if (!fs.length) T(L("这个月还没有番茄", "No focus sessions yet"), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
+        else {
+          const vw = T(`${fs.length}`, x + 28, y + 150, 84, SF.num, SC.ink);
+          T(L("个番茄", fs.length === 1 ? "session" : "sessions"), x + 40 + vw, y + 150, 36, SF.hand, SC.ink);
+          T(fmtMin(fm), x + 28, y + 202, 28, SF.num, SC.pencil, "left", w - 56);
+        }
+      }
       // 每晚花费日历
       T(L("每晚花了多少", "Spent each night"), 64, 812, 36, SF.hand);
       T(L("颜色越深 = 花得越多", "Darker = spent more"), W - 64, 812, 28, SF.hand, SC.pencil, "right");
@@ -2338,7 +2381,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const hot = v > 0 && .25 + .75 * v / (st.max || 1) >= .6, cellInk = hot ? SC.onMoney : SC.ink;
         T(`${d}`, cx + 10, cy + 22, 20, SF.num, n ? cellInk : SC.pencil);
         if (n) T(moneyShort(v), cx + cw - 10, cy + ch - 10, 26, SF.num, cellInk, "right", cw - 34);
-        if (n && (n.burnout || n.body)) T(n.burnout ? "×" : "", cx + cw - 10, cy + 20, 18, SF.num, SC.burn, "right");
+        if (n && n.burnout) T("×", cx + cw - 10, cy + 20, 18, SF.num, SC.burn, "right");
       }
       // 花得最多
       const topY = 1210;
@@ -2580,8 +2623,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       let added = 0;
       for (const [date, v] of Object.entries(src)) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !v || typeof v !== "object") continue;
-        const items = Array.isArray(v.items) ? v.items.filter(i => i && typeof i.name === "string").map(i => ({ name: i.name.slice(0, 40), amount: Math.max(0, Number(i.amount) || 0) })) : [];
-        nights[date] = { date, items, burnout: parseInt(v.burnout) > 0 ? 1 : 0, body: parseInt(v.body) > 0 ? 1 : 0,
+        const items = Array.isArray(v.items) ? v.items.filter(i => i && typeof i.name === "string").map(i => ({ name: i.name.slice(0, 40), amount: Math.max(0, Number(i.amount) || 0), ...(typeof i.wishId === "string" ? { wishId: i.wishId.slice(0, 40) } : {}) })) : [];
+        nights[date] = { date, items, burnout: parseInt(v.burnout) > 0 || parseInt(v.body) > 0 ? 1 : 0,
           end: typeof v.end === "string" ? v.end.slice(0, 5) : "", note: typeof v.note === "string" ? v.note.slice(0, 500) : "", ...(v.sample ? { sample: true } : {}) };
         added++;
       }
@@ -2773,7 +2816,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const json = JSON.stringify({
       appName: L("加班夜记", "Overtime"), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
       nights: st.recs.length, nightsLabel: L("晚", st.recs.length === 1 ? "night" : "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
-      burnout: st.burnout, body: st.body, burnoutLabel: "Burnout", bodyLabel: L("身体不行", "Unwell"),
+      burnout: st.burnout, burnoutLabel: "Burnout",
       tonight: tn ? money(sum(tn)) : "", tonightLabel: L("今晚", "Tonight"), emptyText: L("打开 App 记第一晚", "Open the app to log tonight"),
       dayStartHour: DAY_START_HOUR,
       // 最近 14 晚的花费趋势：h 是相对最高刻度的高度（0–1），t 标出今晚
