@@ -86,12 +86,13 @@ button { cursor: pointer; }
 header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 h1 { font-family: var(--f-title); font-weight: 400; font-size: clamp(40px, 10vw, 58px); line-height: 1; margin: 4px 0 0; transform: rotate(calc(-2deg * var(--tilt, 1))); transform-origin: left bottom; }
 h1 .hl { background: linear-gradient(transparent 60%, var(--burn-hi) 60%, var(--burn-hi) 90%, transparent 90%); }
-.head-r { display: flex; align-items: flex-end; gap: 12px; }
-.gear { width: 42px; height: 42px; flex: none; padding: 0; display: grid; place-items: center; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); color: var(--ink); box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); margin-bottom: 2px; }
-.gear svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; transition: transform .3s; }
-.gear[aria-current="page"] { background: var(--money-hi); }
+.head-r { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+/* 设置入口：时钟上方一个小齿轮，不占菜单 */
+.gear { position: relative; width: 34px; height: 34px; padding: 0; margin-right: -4px; display: grid; place-items: center; border: 0; background: none; color: var(--pencil); border-radius: 50%; }
+.gear svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; transition: transform .3s; }
+.gear:hover, .gear[aria-current="page"] { color: var(--ink); }
 .gear[aria-current="page"] svg { transform: rotate(45deg); }
-.gear:active { transform: translate(2px, 2px); box-shadow: var(--sh-hard, 0 1px 0 var(--ink)); }
+.gear.dot::after { content: ""; position: absolute; top: 4px; right: 3px; width: 9px; height: 9px; border-radius: 50%; background: var(--burn); border: 2px solid var(--paper); }
 .clock { text-align: right; transform: rotate(calc(1.5deg * var(--tilt, 1))); }
 .clock b { display: block; font-family: var(--f-num); font-weight: 400; font-size: 34px; line-height: 1; }
 .clock span { font-size: 14px; color: var(--pencil); }
@@ -388,32 +389,10 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
 }
 .f-start:active { transform: translate(2px, 2px); box-shadow: var(--sh-hard, 1px 1px 0 var(--ink)); }
 .f-start svg { width: 30px; height: 30px; overflow: visible; }
-.f-tip { margin: -4px 0 0; font-size: 14px; color: var(--pencil); text-align: center; }
 .f-running { padding: 18px; border-radius: var(--rad, var(--wob2)); display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center; background: var(--burn-hi); }
 .f-running svg { width: 46px; height: 46px; grid-row: span 2; overflow: visible; }
 .f-running .f-run-time { font-family: var(--f-num); font-weight: 400; font-size: 36px; line-height: 1; }
 .f-running .btn-ghost { grid-row: span 2; background: var(--card); }
-.tiles.f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.f-toms { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 0; font-family: var(--f-num); color: var(--pencil); }
-.f-toms svg { width: 26px; height: 26px; overflow: visible; }
-.f-toms svg:nth-child(odd) { transform: rotate(calc(-8deg * var(--tilt, 1))); }
-.f-toms svg:nth-child(even) { transform: rotate(calc(6deg * var(--tilt, 1))); }
-.f-h { margin: 6px 0 0; font-weight: 400; font-size: 19px; }
-ul.f-goals { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-ul.f-goals button { width: 100%; text-align: left; background: var(--card); border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; border-radius: var(--rad, var(--wob1)); }
-ul.f-goals li:nth-child(even) button { border-radius: var(--rad, var(--wob2)); }
-ul.f-goals button[aria-pressed="true"] { box-shadow: var(--sh-hard, 3px 3px 0 var(--ink)); background: var(--burn-hi); }
-.fg-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.fg-top span:first-child { min-width: 0; overflow-wrap: anywhere; }
-.fg-top span:last-child { font-family: var(--f-num); font-size: 16px; white-space: nowrap; color: var(--pencil); }
-.f-empty { font-size: 14px; color: var(--pencil); border: 2px dashed var(--pencil); border-radius: var(--rad, var(--wob2)); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-ol.f-log { list-style: none; margin: 0; padding: 0; }
-ol.f-log li { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; padding: 7px 2px; border-bottom: 2px dashed var(--grid); }
-ol.f-log svg { width: 22px; height: 22px; overflow: visible; }
-.fl-mid { min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
-.fl-mid span { overflow-wrap: anywhere; }
-.fl-mid small { font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
-.fl-min { font-family: var(--f-num); font-size: 19px; white-space: nowrap; }
 /* 进度条：已攒的分钟 + 这个番茄正在攒的（斜线） */
 .pbar { position: relative; height: 14px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); background: var(--card); overflow: hidden; display: flex; }
 .pbar i { display: block; height: 100%; background: var(--money); transition: width .4s; }
@@ -429,7 +408,6 @@ ol.f-log svg { width: 22px; height: 22px; overflow: visible; }
 .wbox.locked svg { width: 16px; height: 16px; stroke-width: 2.4; }
 .wish-hint { margin: -6px 0 0; font-size: 13px; color: var(--pencil); }
 
-.f-rule { margin: -10px 0 0; font-size: 13px; color: var(--burn); text-align: center; }
 /* 全屏专注页 */
 html.staged, html.staged body { overflow: hidden; }
 html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
@@ -501,7 +479,6 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 .fs-wish p { margin: 0; font-size: 13px; color: var(--pencil); }
 .fs-wish.unlocked { background: var(--money-hi); }
 .fs-wish.unlocked p { color: var(--ink); }
-.fs-quote { margin: 0; font-family: var(--f-title); font-size: 21px; line-height: 1.3; text-align: center; color: var(--ink); opacity: .8; max-width: 22em; transform: rotate(calc(-1.2deg * var(--tilt, 1))); min-height: 1.3em; }
 .fs-ctrl { width: min(420px, 100%); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; min-height: 92px; }
 .fs-main {
   width: 88px; height: 88px; border: var(--bw, 2.5px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%);
@@ -529,12 +506,8 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 .tabbar button[data-go="focus"][aria-current="page"] svg { fill: var(--burn-hi); }
 .tabbar button[data-go="wishes"][aria-current="page"] svg { fill: var(--body-hi); }
 @media (max-width: 480px) {
-  .tiles.f-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .f-tiles .tile { padding: 10px; }
-  .f-tiles .tile .v { font-size: 26px; }
-  .f-tiles .tile .k { font-size: 12px; }
 }
-@media (max-height: 640px) { .fs-quote { display: none; } .fs-ring { width: min(84vw, 42vh, 350px); } }
+@media (max-height: 640px) { .fs-ring { width: min(84vw, 42vh, 350px); } }
 @media (prefers-reduced-motion: reduce) { .focus-stage, .focus-stage::before, .focus-stage.paused .fs-time, .fs-ring.pop .fs-sparks i { animation: none !important; } }
 
 /* skins：五种额外主题，各自固定一套配色 */
@@ -764,20 +737,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <h1>加班<span class="hl">夜记</span></h1>
     </div>
     <div class="head-r">
-      <div class="clock"><b id="clock">--:--</b><span id="clockSub"></span></div>
       <button type="button" class="gear" data-go="records" aria-label="设置和记录">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13.6 4.5 L18.4 4.4 L19.2 8.1 Q20.6 8.7 21.7 9.6 L25.3 8.4 L27.6 12.6 L24.8 15.1 Q25 16.6 24.7 18 L27.5 20.4 L25.2 24.6 L21.6 23.4 Q20.5 24.3 19.1 24.9 L18.3 28.6 L13.5 28.5 L12.8 24.8 Q11.4 24.2 10.3 23.3 L6.7 24.5 L4.4 20.3 L7.2 17.8 Q7 16.4 7.3 15 L4.5 12.5 L6.8 8.4 L10.4 9.6 Q11.5 8.7 12.9 8.1Z"/><circle cx="16" cy="16.5" r="3.6"/></svg>
       </button>
+      <div class="clock"><b id="clock">--:--</b><span id="clockSub"></span></div>
     </div>
   </header>
 
-  <div class="bk-remind" id="bkRemind" role="status" hidden>
-    <span id="bkRemindText">已经 7 天没备份了</span>
-    <span class="acts">
-      <button type="button" class="go" id="bkRemindGo">备份到 iCloud</button>
-      <button type="button" class="later" id="bkRemindLater">明天再说</button>
-    </span>
-  </div>
 
   <main class="tab" id="tab-tonight" data-tab="tonight">
   <section class="card sketch" aria-labelledby="nightTitle">
@@ -914,10 +880,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <label>专注 <input type="number" id="fCustF" min="1" max="180" step="1" inputmode="numeric" aria-label="专注分钟"> 分钟</label>
         <label>休息 <input type="number" id="fCustB" min="0" max="60" step="1" inputmode="numeric" aria-label="休息分钟"> 分钟</label>
       </div>
-      <label class="f-for"><span>为了哪个愿望</span><select id="fWish"></select></label>
+      <label class="f-for" id="fFor"><span>为了哪个愿望</span><select id="fWish"></select></label>
       <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
-      <p class="f-tip" id="fTip"></p>
-      <p class="f-rule">专注时不能离开：切出 App 超过 10 秒，番茄就会坏掉，要重新开始。</p>
     </div>
     <div class="f-running sketch" id="fRunning" hidden>
       <svg viewBox="0 0 100 100" class="tom" id="fRunTom"></svg>
@@ -925,17 +889,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <button type="button" class="btn-ghost" id="fRunOpen">回到专注</button>
       <b class="f-run-time" id="fRunTime"></b>
     </div>
-    <div class="tiles f-tiles">
-      <div class="tile"><span class="v" id="fToday">0</span><span class="k">今天专注</span></div>
-      <div class="tile money"><span class="v" id="fCount">0</span><span class="k">今天的番茄</span></div>
-      <div class="tile"><span class="v" id="fWeek">0</span><span class="k">本周专注</span></div>
-    </div>
-    <div class="f-toms" id="fToms" aria-hidden="true"></div>
-    <h3 class="f-h">愿望进度</h3>
-    <ul class="f-goals" id="fGoals"></ul>
-    <div class="f-empty" id="fGoalEmpty" hidden></div>
-    <h3 class="f-h" id="fLogHead">最近的番茄</h3>
-    <ol class="f-log" id="fLog"></ol>
   </section>
   </main>
 
@@ -963,6 +916,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   <main class="tab" id="tab-records" data-tab="records" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="setTitle">
+    <div class="bk-remind" id="bkRemind" role="status" hidden>
+      <span id="bkRemindText">已经 7 天没备份了</span>
+      <span class="acts">
+        <button type="button" class="go" id="bkRemindGo">备份到 iCloud</button>
+        <button type="button" class="later" id="bkRemindLater">明天再说</button>
+      </span>
+    </div>
     <h2 class="underlined" id="setTitle">设置</h2>
     <div class="backup sketch settings">
       <div class="set-row">
@@ -1065,7 +1025,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <div class="fs-sparks" aria-hidden="true"><i style="--a:0deg">✦</i><i style="--a:45deg">✦</i><i style="--a:90deg">✦</i><i style="--a:135deg">✦</i><i style="--a:180deg">✦</i><i style="--a:225deg">✦</i><i style="--a:270deg">✦</i><i style="--a:315deg">✦</i></div>
   </div>
   <div class="fs-wish sketch" id="fsWish" hidden></div>
-  <p class="fs-quote" id="fsQuote"></p>
   <div class="fs-ctrl" id="fsCtrl"></div>
 </div>
 <button type="button" class="f-pill" id="fPill" hidden><svg viewBox="0 0 100 100" class="tom" id="fPillTom"></svg><span id="fPillTime"></span></button>
@@ -1137,10 +1096,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "今晚在忙什么？为什么加班？": "What kept you late tonight?", "价格": "Price", "价格 $": "Price $", "金额": "Amount", "金额 $": "Amount $",
     "设置和记录": "Settings and history", "关闭": "Close", "前一天": "Previous day", "后一天": "Next day", "常买": "Usual", "想买什么": "What do you want", "想买的东西": "Wish item",
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "回到专注": "Back to focus",
-    "今天专注": "Today", "今天的番茄": "Sessions today", "本周专注": "This week", "愿望进度": "Wish progress", "最近的番茄": "Recent sessions", "收起": "Minimize",
+    "收起": "Minimize",
     "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
-    "专注时不能离开：切出 App 超过 10 秒，番茄就会坏掉，要重新开始。": "No leaving: switch away for more than 10 seconds and the tomato goes bad, so you start over.", "别离开这一页": "Stay on this page",
+    "别离开这一页": "Stay on this page",
     "一个番茄": "one focus session", "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
@@ -1919,7 +1878,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const goalLeft = (w) => Math.max(0, (w.focusGoal || 0) - focusFor(w.id));
   const isLocked = (w) => !w.got && w.focusGoal > 0 && goalLeft(w) > 0;
   const fmtMin = (m) => m >= 60 ? L(`${Math.floor(m / 60)} 小时${m % 60 ? ` ${m % 60} 分钟` : ""}`, `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}`) : L(`${m} 分钟`, `${m} min`);
-  const fmtShort = (m) => m >= 60 ? `${Math.round(m / 6) / 10}h` : L(`${m}分`, `${m}m`);
   const goalWishes = () => wishes.filter(w => !w.got && w.focusGoal > 0);
   const fWishObj = (id) => id ? wishes.find(w => w.id === id) : null;
   function pbar(done, live, goal) {
@@ -2089,14 +2047,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       + `<circle class="track" cx="160" cy="160" r="${RR}"/><circle class="arc" id="fsArc" cx="160" cy="160" r="${RR}" transform="rotate(-90 160 160)" stroke-dasharray="${RC.toFixed(1)}" stroke-dashoffset="${RC.toFixed(1)}"/>`
       + `<g class="mk" id="fsMark"><g class="tom" transform="translate(-19 -21) scale(.38)">${TOMATO}</g></g></svg>`;
   }
-  const QUOTES = {
-    focus: [["手机放远一点", "Put the phone face down"], ["一次只做一件事", "One thing at a time"], ["先做五分钟，就会顺下去", "Just start; the rest will follow"],
-      ["慢一点也没关系", "Slow is fine"], ["这一段时间只属于你", "This time is yours"], ["喝口水，肩膀放松", "Sip some water, drop your shoulders"]],
-    brk: [["站起来走走，看看远处", "Stand up and look far away"], ["闭上眼睛，深呼吸三次", "Close your eyes, three deep breaths"], ["伸个懒腰，转转脖子", "Stretch, roll your neck"]],
-    done: [["做得好，对自己好一点", "Well done. Be kind to yourself"], ["又往愿望走近了一步", "One step closer"]],
-    broken: [["没关系，重新种一个", "That's okay. Grow a new one"], ["下次把手机扣在桌上", "Next time, put the phone face down"]],
-  };
-  const quote = (k, n) => { const q = QUOTES[k][n % QUOTES[k].length]; return L(q[0], q[1]); };
   function ctrlBtn(cls, label, fn) { const b = document.createElement("button"); b.type = "button"; b.className = cls; b.innerHTML = label; b.onclick = fn; return b; }
   const ROTTEN = '<svg viewBox="0 0 100 100" class="tom rot" aria-hidden="true"><path class="tb" d="M12 72 C10 58 30 51 50 52 C72 51 92 58 88 72 C86 82 68 86 50 86 C30 86 13 82 12 72Z"/><path class="crack" d="M38 53 L45 62 L39 69 L47 78"/><path class="crack" d="M66 56 L61 64 L67 70"/><path class="tl" d="M54 53 L45 47 L52 47 L50 39 L57 46 L65 41 L61 50Z"/><circle class="drip" cx="22" cy="90" r="3.4"/><circle class="drip" cx="80" cy="92" r="2.6"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M7 5 Q8.5 4.6 10 5 L10 19 Q8.5 19.4 7 19Z"/><path d="M14 5 Q15.5 4.6 17 5 L17 19 Q15.5 19.4 14 19Z"/></svg>';
@@ -2115,9 +2065,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const dots = document.createElement("span"); dots.className = "fs-dots";
       const inSet = (frun.cycle || 0) % 4, filled = ph === "done" && inSet === 0 ? 4 : inSet;
       for (let i = 0; i < 4; i++) dots.insertAdjacentHTML("beforeend", tomSVG(i < filled ? "full" : ""));
-      const lab = document.createElement("span");
-      lab.textContent = ph === "focus" ? L(`第 ${(frun.cycle || 0) + 1} 个番茄`, `Session ${(frun.cycle || 0) + 1}`) : L(`完成 ${frun.cycle || 0} 个`, `${frun.cycle || 0} done`);
-      cyc.append(dots, lab);
+      cyc.append(dots);
       $("fsPhase").textContent = ph === "focus" ? (frun.pausedAt ? L("暂停中", "Paused") : L("专注中", "Focusing"))
         : ph === "break" ? (frun.pausedAt ? L("暂停中", "Paused") : frun.long ? L("长休息", "Long break") : L("休息一下", "Break"))
         : ph === "done" ? L("番茄完成", "Session done") : L("休息好了", "Break's over");
@@ -2163,7 +2111,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("fsSub").textContent = act ? (frun.pausedAt ? L("点下面的按钮继续", "Tap below to resume") : L(`${hhmm(Date.now() + fLeft())} 结束`, `Ends at ${hhmm(Date.now() + fLeft())}`))
       : ph === "done" ? L("分钟，已经记下", "minutes saved") : ph === "broken" ? L(`离开太久，这 ${Math.floor(el / 60000)} 分钟没有记下`, `You left too long. ${Math.floor(el / 60000)} min not saved`)
       : L("准备好就开始下一个", "Start the next one when ready");
-    $("fsQuote").textContent = ph === "focus" ? quote("focus", Math.floor(el / 120000)) : ph === "break" ? quote("brk", Math.floor(el / 60000)) : ph === "done" ? quote("done", frun.cycle || 0) : ph === "broken" ? quote("broken", frun.cycle || 0) : quote("brk", 0);
     // 绑定的愿望：已攒的 + 这个番茄正在攒的
     const w = fWishObj(frun.wishId), box = $("fsWish");
     box.hidden = !w || !(w.focusGoal > 0);
@@ -2177,11 +2124,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const nm = document.createElement("span"); const sm = document.createElement("small"); sm.textContent = L("为了", "For"); nm.append(sm, w.name);
         const n = document.createElement("b"); n.textContent = `${Math.min(w.focusGoal, done + live)} / ${w.focusGoal}`;
         top.append(nm, n);
-        const tip = document.createElement("p");
-        tip.textContent = left === 0 ? (frun.unlocked ? L(`解锁了！「${w.name}」是你应得的奖励`, `Unlocked! You've earned "${w.name}"`) : L("已经解锁，可以去买啦", "Unlocked. Go treat yourself."))
-          : ph === "focus" ? (after === 0 ? L("专注完这个番茄就解锁！", "Finish this one to unlock it!") : L(`这个番茄结束后还差 ${fmtMin(after)}`, `${fmtMin(after)} to go after this one`))
-          : L(`还差 ${fmtMin(left)}，约 ${Math.ceil(left / Math.max(1, frun.f))} 个番茄`, `${fmtMin(left)} to go, about ${Math.ceil(left / Math.max(1, frun.f))} more`);
-        box.append(top, pbar(done, live, w.focusGoal), tip);
+        box.append(top, pbar(done, live, w.focusGoal));
       }
     }
   }
@@ -2220,13 +2163,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const sel = $("fWish"); sel.textContent = "";
     const gw = goalWishes().filter(isLocked).sort((a, b) => goalLeft(a) - goalLeft(b));
     if (fpref.wish && !gw.some(w => w.id === fpref.wish)) fpref.wish = "";
-    const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不绑定愿望，单纯专注", "Nothing in particular"); sel.append(o0);
+    const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不选", "None"); sel.append(o0);
     gw.forEach(w => { const o = document.createElement("option"); o.value = w.id; o.textContent = `${w.name} · ` + L(`还差 ${fmtMin(goalLeft(w))}`, `${fmtMin(goalLeft(w))} to go`); sel.append(o); });
     sel.value = fpref.wish;
-    const cw = fWishObj(fpref.wish);
-    $("fTip").textContent = cw ? L(`专注完这 ${fpref.f} 分钟，「${cw.name}」${goalLeft(cw) <= fpref.f ? "就解锁了！" : `还差 ${fmtMin(goalLeft(cw) - fpref.f)}`}`, `After these ${fpref.f} minutes, "${cw.name}" ${goalLeft(cw) <= fpref.f ? "unlocks!" : `needs ${fmtMin(goalLeft(cw) - fpref.f)} more`}`)
-      : gw.length ? L("选一个愿望，专注的时间会攒给它。", "Pick a wish and your focus time counts toward it.")
-      : L("许愿时填上专注分钟，攒够了才解锁那个愿望。", "Add focus minutes to a wish; it unlocks when you've earned them.");
+    $("fFor").hidden = !gw.length;   // 没有要攒专注的愿望，就不用选
 
     $("fSetup").hidden = fActive(); $("fRunning").hidden = !fActive();
     if (fActive()) {
@@ -2234,49 +2174,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       $("fRunTime").textContent = mmss(fLeft());
     }
 
-    // 今天 / 本周
-    const today = nightOf(), wkStart = shift(today, -((parse(today).getDay() + 6) % 7));
-    const dayOf = (s) => nightOf(new Date(s.start));
-    const tdy = focusLog.filter(s => dayOf(s) === today), wk = focusLog.filter(s => dayOf(s) >= wkStart && dayOf(s) <= today);
-    const tMin = tdy.reduce((a, s) => a + s.min, 0);
-    $("fToday").textContent = fmtShort(tMin); $("fCount").textContent = tdy.length; $("fWeek").textContent = fmtShort(wk.reduce((a, s) => a + s.min, 0));
-    const toms = $("fToms"); toms.innerHTML = tdy.slice(0, 16).map(() => tomSVG("full")).join("") + (tdy.length > 16 ? `<span>+${tdy.length - 16}</span>` : "");
-    toms.hidden = !tdy.length;
-
-    // 愿望进度
-    const ul = $("fGoals"); ul.textContent = "";
-    goalWishes().sort((a, b) => goalLeft(a) - goalLeft(b)).forEach(w => {
-      const li = document.createElement("li"), b = document.createElement("button"); b.type = "button"; b.dataset.wish = w.id;
-      b.setAttribute("aria-pressed", String(w.id === fpref.wish));
-      const done = focusFor(w.id), left = goalLeft(w);
-      const top = document.createElement("div"); top.className = "fg-top";
-      const n = document.createElement("span"); n.textContent = w.name;
-      const v = document.createElement("span"); v.textContent = left ? `${done} / ${w.focusGoal} ${L("分钟", "min")}` : L("已解锁 ✓", "Unlocked ✓");
-      top.append(n, v); b.append(top, pbar(done, 0, w.focusGoal)); li.append(b); ul.append(li);
-    });
-    const ge = $("fGoalEmpty"); ge.hidden = goalWishes().length > 0; ge.textContent = "";
-    if (ge.hidden === false) {
-      const s = document.createElement("span"); s.textContent = L("还没有设了专注目标的愿望。去愿望清单许个愿，填上「专注多少分钟」，专注够了它才会解锁。", "No wishes with a focus goal yet. Make a wish and add focus minutes; it unlocks once you've focused that long.");
-      const g = document.createElement("button"); g.type = "button"; g.className = "btn-ghost"; g.textContent = L("去愿望清单", "Go to wishlist"); g.onclick = () => showTab("wishes");
-      ge.append(s, g);
-    }
-
-    // 最近的番茄
-    const ol = $("fLog"); ol.textContent = "";
-    const recent = focusLog.slice().sort((a, b) => b.start - a.start).slice(0, 10);
-    $("fLogHead").hidden = !recent.length;
-    recent.forEach(s => {
-      const li = document.createElement("li"); li.dataset.id = s.id;
-      li.insertAdjacentHTML("beforeend", tomSVG("full"));
-      const mid = document.createElement("div"); mid.className = "fl-mid";
-      const w = fWishObj(s.wishId), nm = document.createElement("span"); nm.textContent = w ? L(`为了「${w.name}」`, `For "${w.name}"`) : L("专注", "Focus");
-      const tm = document.createElement("small");
-      tm.textContent = (dayOf(s) === today ? "" : fmtMD(parse(dayOf(s))) + " ") + `${hhmm(s.start)}–${hhmm(s.end || s.start + s.min * 60000)}`;
-      mid.append(nm, tm);
-      const m = document.createElement("span"); m.className = "fl-min"; m.textContent = fmtMin(s.min);
-      const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.del = s.id; x.setAttribute("aria-label", L("删除这个番茄", "Delete this session"));
-      li.append(mid, m, x); ol.append(li);
-    });
   }
   $("fPresets").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-f]"); if (!b) return;
@@ -2286,16 +2183,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("fCustF").addEventListener("change", (e) => { fpref.f = clampInt(e.target.value, 1, 180, 25); fpref.custom = true; savePref(); renderFocus(); });
   $("fCustB").addEventListener("change", (e) => { fpref.b = clampInt(e.target.value, 0, 60, 5); fpref.custom = true; savePref(); renderFocus(); });
   $("fWish").addEventListener("change", (e) => { fpref.wish = e.target.value; savePref(); renderFocus(); });
-  $("fGoals").addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-wish]"); if (!b) return;
-    const w = fWishObj(b.dataset.wish); if (!w) return;
-    if (!isLocked(w)) { toast(L(`「${w.name}」已经解锁了，去愿望清单勾掉吧`, `"${w.name}" is unlocked. Tick it off in your wishlist.`)); return; }
-    fpref.wish = fpref.wish === w.id ? "" : w.id; savePref(); renderFocus(); window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-  $("fLog").addEventListener("click", (e) => {
-    const x = e.target.closest("button[data-del]"); if (!x) return;
-    twoStep(x, "×", () => { focusLog = focusLog.filter(s => s.id !== x.dataset.del); saveFocus(); renderWishes(); renderFocus(); renderCal(); toast(L("已删除这个番茄", "Session deleted")); });
-  });
   $("fStart").onclick = startFocus;
 
   // ---------- 月度加班账单分享图 ----------
@@ -2666,6 +2553,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const due = last ? now - last >= 7 * DAY : count >= 3;
     const show = count > 0 && due && !snoozed && !(NATIVE && icloud.on);   // App 里已经自动同步到 iCloud，就不用提醒
     $("bkRemind").hidden = !show;
+    document.querySelector(".gear").classList.toggle("dot", show);
     if (show) { const days = Math.round((parse(ymd(new Date(now))) - parse(ymd(new Date(last)))) / DAY); $("bkRemindText").textContent = last ? L(`已经 ${days} 天没备份了`, `${days} days since your last backup`) : L(`已经记了 ${count} 晚，还没备份过`, `${count} nights logged, no backup yet`); }
   }
   $("icloudBtn").onclick = backupToICloud;
