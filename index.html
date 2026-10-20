@@ -1852,10 +1852,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     } catch (e) {}
   }
   // 专注时不让屏幕自动熄灭：App 里用原生开关（锁屏也算离开，会让番茄坏掉），网页用 Wake Lock（支持的浏览器才有效）
-  let wake = null, awakeNative = null;
+  let wake = null, awakeNative = "";
   async function keepAwake(on) {
-    const ka = plug("KeepAwake");
-    if (ka && awakeNative !== on) { awakeNative = on; try { await ka.set({ on }); } catch (e) {} }
+    const ka = plug("KeepAwake"), guarding = !!frun && frun.phase === "focus";
+    const opts = { awake: on, guard: guarding, title: L("番茄要坏掉了！", "Your tomato is going bad!"), body: L("10 秒内回到加班夜记，不然这个番茄就没了。", "Come back within 10 seconds or this session is lost.") };
+    if (ka && awakeNative !== JSON.stringify(opts)) { awakeNative = JSON.stringify(opts); try { await ka.set(opts); } catch (e) {} }
     try {
       if (on && !wake && navigator.wakeLock && document.visibilityState === "visible") { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => (wake = null)); }
       else if (!on && wake) { const w = wake; wake = null; await w.release(); }
@@ -1866,7 +1867,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const f = clampInt(fpref.f, 1, 180, 25), w = fWishObj(fpref.wish);
     const cycle = frun && ["done", "breakdone", "break", "broken"].includes(frun.phase) ? frun.cycle || 0 : 0;
     frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", cycle, open: true };
-    unlockAudio(); saveFrun(); scheduleFocusNote(); renderFocusAll();
+    unlockAudio(); askNotify(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
   function startBreak() {
     const long = frun.cycle > 0 && frun.cycle % 4 === 0;
@@ -1898,7 +1899,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     saveFrun(); renderFocusAll();
   }
   // 专注时离开（切出 App、锁屏、关掉 App）超过 GRACE 毫秒，这个番茄就坏掉了，不计入、要重新开始
-  const GRACE = 10000, FWARN = 901;
+  const GRACE = 10000;
   function breakTomato(at) {
     frun = { ...frun, phase: "broken", pausedAt: frun.pausedAt || at, doneAt: Date.now(), open: true };
     saveFrun(); scheduleFocusNote(); buzz("medium"); renderFocusAll();
@@ -1911,13 +1912,23 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (!frun.pausedAt && endAt <= leftAt + GRACE) { finishFocus(endAt); return true; }
     breakTomato(leftAt); return true;
   }
+  // 离开时的提醒：App 里由原生端在进后台的那一刻发通知（见 KeepAwake 插件）；网页版（装到桌面后）用 Service Worker 立刻弹一条
   async function leaveWarn(on) {
-    const ln = plug("LocalNotifications"); if (!ln) return;
+    if (NATIVE || !("Notification" in window) || Notification.permission !== "granted" || !navigator.serviceWorker) return;
     try {
-      await ln.cancel({ notifications: [{ id: FWARN }] });
-      if (on) await ln.schedule({ notifications: [{ id: FWARN, title: L("番茄要坏掉了！", "Your tomato is going bad!"), body: L("10 秒内回来，继续专注。", "Come back within 10 seconds to keep focusing."), schedule: { at: new Date(Date.now() + 1500) } }] });
+      const reg = await navigator.serviceWorker.getRegistration(); if (!reg) return;
+      if (on) await reg.showNotification(L("番茄要坏掉了！", "Your tomato is going bad!"), { body: L("10 秒内回来，不然这个番茄就没了。", "Come back within 10 seconds or this session is lost."), tag: "focus-leave", renotify: true, requireInteraction: true });
+      else (await reg.getNotifications({ tag: "focus-leave" })).forEach(n => n.close());
     } catch (e) {}
   }
+  // 开始专注时就要好通知权限，离开时才来得及提醒
+  async function askNotify() {
+    const ln = plug("LocalNotifications");
+    if (ln) { try { const p = await ln.checkPermissions(); if (p.display !== "granted") await ln.requestPermissions(); } catch (e) {} return; }
+    try { if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission(); } catch (e) {}
+  }
+  // 网页里关标签页 / 刷新 / 跳走时，浏览器会先问一句「确定离开吗」
+  window.addEventListener("beforeunload", (e) => { if (frun && frun.phase === "focus") { e.preventDefault(); e.returnValue = ""; } });
   document.addEventListener("visibilitychange", () => {
     if (!frun || frun.phase !== "focus") return;
     if (document.visibilityState === "hidden") { frun.leftAt = Date.now(); saveFrun(); leaveWarn(true); return; }
