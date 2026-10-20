@@ -651,6 +651,12 @@ html[lang="en"] header > div:first-child { min-width: 0; }
 .day.future { opacity: .35; cursor: default; }
 .day.hot .d, .day.hot .amt { color: var(--on-money, var(--ink)); }
 .day.blank { visibility: hidden; }
+.day .ctoms { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-wrap: wrap; align-content: center; gap: 1px; padding: 1px 0; }
+.day .ctoms svg { width: var(--ts, 10px); height: var(--ts, 10px); overflow: visible; flex: none; }
+.cal-key .tom { width: 13px; height: 13px; vertical-align: -2px; overflow: visible; }
+.dd-toms { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 3px; font-size: 14px; color: var(--pencil); }
+.dd-toms svg { width: 18px; height: 18px; overflow: visible; }
+.dd-toms span { margin-left: 6px; }
 .day.today .d { display: inline-block; align-self: flex-start; border: 1.5px solid var(--burn); border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); padding: 1px 3px; color: var(--burn); }
 .day.sel { box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); border-width: 2px; border-color: var(--ink); }
 .day:not(.future):hover { border-color: var(--ink); }
@@ -807,6 +813,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="cal-key">
         <span>花得越多颜色越深<span class="ramp"><i style="background:var(--card)"></i><i style="background:color-mix(in srgb, var(--money) 30%, var(--card))"></i><i style="background:color-mix(in srgb, var(--money) 60%, var(--card))"></i><i style="background:var(--money)"></i></span></span>
         <span><span style="color:var(--burn)">×</span> burnout　<span style="color:var(--body)">×</span> 身体不行</span>
+        <span><svg viewBox="0 0 100 100" class="tom full" id="calKeyTom" aria-hidden="true"></svg> 一个番茄</span>
       </div>
       </div>
       <div id="calItemsView" class="items-view" hidden>
@@ -991,13 +998,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 5 A11 11 0 1 0 27 21 A9 9 0 1 1 21 5Z"/></svg>
     <span>今晚</span>
   </button>
-  <button type="button" data-go="calendar">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8 Q16 7 27 8.5 Q27.5 18 26.5 27 Q16 27.8 5.5 26.8 Q4.5 18 5 8Z"/><path d="M5.2 13.5 Q16 12.8 27 13.8"/><path d="M11 4.5 L11 10"/><path d="M21 4.5 L21 10"/><path d="M10 19 L10.5 19M16 19 L16.5 19M22 19 L22.5 19M10 23 L10.5 23M16 23 L16.5 23"/></svg>
-    <span>日历</span>
-  </button>
   <button type="button" data-go="focus">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 9.5 C8.5 9.3 4.6 14.2 5 19.6 C5.5 25.4 10.4 28.2 16 28.2 C21.7 28.2 26.6 25.3 27 19.6 C27.4 14 23.4 9.4 16 9.5Z"/><path d="M16 10 L12 7.4 M16 10 L20 7.4 M16 10 L16 6.5 Q16.4 4.2 19 3.6"/></svg>
     <span>专注</span>
+  </button>
+  <button type="button" data-go="calendar">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8 Q16 7 27 8.5 Q27.5 18 26.5 27 Q16 27.8 5.5 26.8 Q4.5 18 5 8Z"/><path d="M5.2 13.5 Q16 12.8 27 13.8"/><path d="M11 4.5 L11 10"/><path d="M21 4.5 L21 10"/><path d="M10 19 L10.5 19M16 19 L16.5 19M22 19 L22.5 19M10 23 L10.5 23M16 23 L16.5 23"/></svg>
+    <span>日历</span>
   </button>
   <button type="button" data-go="records">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 4.5 Q17 4 25 5 Q25.8 16 25 27.5 Q16 28 8 27.2 Q7.3 16 8 4.5Z"/><path d="M5 9 L10 9M5 16 L10 16M5 23 L10 23"/><path d="M13 11 Q17 10.6 21 11.2M13 16 Q17 15.6 21 16.2M13 21 Q15.5 20.7 18 21.1"/></svg>
@@ -1096,7 +1103,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
     "专注时不能离开：切出 App 超过 10 秒，番茄就会坏掉，要重新开始。": "No leaving: switch away for more than 10 seconds and the tomato goes bad, so you start over.", "别离开这一页": "Stay on this page",
-    "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1342,8 +1349,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
 
   // ---------- render: calendar ----------
+  // 每天专注了几个番茄、多少分钟（跟「今晚」一样凌晨 4 点才换天）
+  function focusByDay() {
+    const out = {};
+    for (const f of focusLog) { const d = nightOf(new Date(f.start)); (out[d] = out[d] || { n: 0, min: 0 }).n++; out[d].min += f.min; }
+    return out;
+  }
   function renderCal() {
-    const [y, m] = calMonth.split("-").map(Number);
+    const [y, m] = calMonth.split("-").map(Number), fd = focusByDay();
     const today = nightOf(), thisMonth = today.slice(0, 7);
     $("calMonth").innerHTML = L(`<span class="num">${y}</span> 年 <span class="num">${m}</span> 月`, `${MONTH_EN[m - 1]} <span class="num">${y}</span>`);
     $("calNext").disabled = calMonth >= thisMonth;
@@ -1360,6 +1373,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const top = recs.slice().sort((a, b) => sum(b) - sum(a))[0];
       if (sum(top) > 0) { const d = parse(top.date); sumEl.append(L(`，最贵的一晚是 ${fmtMD(d)} ${money(sum(top))}`, `. Priciest night: ${fmtMD(d)}, ${money(sum(top))}`)); }
     } else sumEl.textContent = L("这个月还没有加班记录", "No overtime recorded this month");
+    const ft = Object.entries(fd).filter(([d]) => d.slice(0, 7) === calMonth).reduce((a, [, v]) => a + v.n, 0);
+    if (ft) sumEl.append(L(`；专注了 ${ft} 个番茄`, `; ${ft} focus ${ft === 1 ? "session" : "sessions"}`));
 
     const g = $("calGrid"); g.textContent = "";
     weekHead().forEach((w, i) => { const e = document.createElement("div"); e.className = "cal-wd" + (i > 4 ? " we" : ""); e.textContent = w; g.append(e); });
@@ -1380,10 +1395,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         if (n.body) { const x = document.createElement("span"); x.className = "p"; x.textContent = "×"; f.append(x); }
         b.append(f);
       }
+      const tf = fd[date];
+      if (tf) {   // 有几个番茄就画几个，多了就缩小
+        const t = document.createElement("span"); t.className = "ctoms";
+        t.style.setProperty("--ts", tf.n <= 4 ? "10px" : tf.n <= 8 ? "8px" : tf.n <= 15 ? "6px" : "4.5px");
+        t.innerHTML = tomSVG("full").repeat(tf.n); b.append(t);
+      }
       const a = document.createElement("span"); a.className = "amt"; a.textContent = n ? moneyShort(v) : "";
       b.append(a);
       let label = fmtMD(new Date(y, m - 1, d));
       if (n) label += L(`，花了 ${money(v)}` + (n.burnout ? "，burnout" : "") + (n.body ? "，身体不行" : ""), `, spent ${money(v)}` + (n.burnout ? ", burnout" : "") + (n.body ? ", unwell" : ""));
+      if (tf) label += L(`，专注 ${tf.n} 个番茄`, `, ${tf.n} focus ${tf.n === 1 ? "session" : "sessions"}`);
       b.setAttribute("aria-label", label); b.title = label;
       g.append(b);
     }
@@ -1501,6 +1523,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     head.append(el("h3", null, fmtDay(d)));
     if (n) head.append(el("span", "total", money(sum(n))));
     box.append(head);
+    const tf = focusByDay()[date];
+    if (tf) {
+      const t = el("div", "dd-toms"); t.innerHTML = tomSVG("full").repeat(tf.n);
+      t.append(el("span", null, L(`专注 ${tf.n} 个番茄，${fmtMin(tf.min)}`, `${tf.n} focus ${tf.n === 1 ? "session" : "sessions"}, ${fmtMin(tf.min)}`)));
+      box.append(t);
+    }
     if (n) {
       const meta = el("div", "dd-meta");
       if (n.end) meta.append(el("span", null, L(`${n.end} 下班`, `left at ${n.end}`)));
@@ -1787,7 +1815,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function renderFocusAll() { renderFocus(); renderStage(true); }
   const TOMATO = '<path class="tb" d="M50 24 C25 23 9 40 11 60 C13 81 31 93 50 93 C70 93 88 81 89 60 C91 40 75 23 50 24Z"/><path class="tg" d="M27 52 Q28 41 37 35"/><path class="tl" d="M50 31 L39 21 L47 23 L45 12 L53 21 L62 13 L58 24 L69 24 L56 30 L52 37Z"/><path class="ts" d="M51 22 Q51 13 57 8"/>';
   const tomSVG = (cls = "") => `<svg viewBox="0 0 100 100" class="tom ${cls}" aria-hidden="true">${TOMATO}</svg>`;
-  ["fDialTom", "fStartTom", "fRunTom", "fPillTom"].forEach(id => ($(id).innerHTML = TOMATO));
+  ["fDialTom", "fStartTom", "fRunTom", "fPillTom", "calKeyTom"].forEach(id => ($(id).innerHTML = TOMATO));
   const clampInt = (v, lo, hi, d) => { v = Math.round(Number(v)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
   const PRESETS = [[25, 5], [50, 10], [15, 3]];
   const FPREF_KEY = "overtime-focus-pref", FRUN_KEY = "overtime-focus-run";
@@ -1888,7 +1916,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     saveFocus();
     frun = { ...frun, phase: "done", gained: min, unlocked: wasLocked && !isLocked(w), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
     saveFrun(); scheduleFocusNote(); chime(); buzz("success");
-    renderWishes(); renderFocus(); renderStage(true);
+    renderWishes(); renderFocus(); renderCal(); renderStage(true);
     const ring = $("fsRing"); ring.classList.remove("pop"); void ring.offsetWidth; ring.classList.add("pop");
   }
   function endBreak() { frun = { ...frun, phase: "breakdone", pausedAt: 0, doneAt: Date.now() }; saveFrun(); chime(); buzz("success"); renderStage(true); }
@@ -2179,7 +2207,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   });
   $("fLog").addEventListener("click", (e) => {
     const x = e.target.closest("button[data-del]"); if (!x) return;
-    twoStep(x, "×", () => { focusLog = focusLog.filter(s => s.id !== x.dataset.del); saveFocus(); renderWishes(); renderFocus(); toast(L("已删除这个番茄", "Session deleted")); });
+    twoStep(x, "×", () => { focusLog = focusLog.filter(s => s.id !== x.dataset.del); saveFocus(); renderWishes(); renderFocus(); renderCal(); toast(L("已删除这个番茄", "Session deleted")); });
   });
   $("fStart").onclick = startFocus;
 
