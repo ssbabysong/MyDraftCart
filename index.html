@@ -118,7 +118,18 @@ h2.underlined { display: inline-block; background: linear-gradient(var(--ink), v
 }
 .field-inline { display: flex; align-items: center; gap: 10px; font-size: 16px; }
 
-.counters { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.night-row { display: flex; justify-content: space-between; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.burn-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 14px 3px 6px; font-size: 16px; color: var(--pencil); background: transparent;
+  border: var(--bw, 1.5px) dashed var(--pencil); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); transition: background .15s, color .15s;
+}
+.burn-chip .mark { width: 26px; height: 26px; }
+.burn-chip .mark .box { stroke: currentColor; fill: var(--card); }
+.burn-chip .mark .x { stroke: var(--burn); }
+.burn-chip[aria-pressed="true"] { border-style: solid; border-color: var(--burn); background: var(--burn-hi); color: var(--burn); transform: rotate(calc(-1.5deg * var(--tilt, 1))); }
+.burn-chip[aria-pressed="true"] .mark .x { opacity: 1; stroke-dashoffset: 0; transition: stroke-dashoffset .18s ease-out, opacity 0s; }
+.burn-chip[aria-pressed="true"] .mark .x2 { transition-delay: .12s, .12s; }
+.burn-chip:active { transform: scale(.95); }
 .counter { border: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .counter.burn { border-radius: var(--rad, var(--wob2)); background: var(--burn-hi); }
 .counter.body { border-radius: var(--rad, var(--wob3)); background: var(--body-hi); transform: rotate(calc(.6deg * var(--tilt, 1))); }
@@ -164,18 +175,30 @@ ul.items li.editing { display: block; padding: 8px 2px 10px; }
 .x { border: 0; background: transparent; color: var(--pencil); font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 50%; }
 .x:hover, .x:focus-visible { color: var(--burn); }
 .no-items { font-size: 14px; color: var(--pencil); padding: 6px 2px; }
-form.buy { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: end; }
+form.buy { display: grid; grid-template-columns: minmax(0, 1fr) 96px 46px; gap: 10px; align-items: end; }
 form.buy input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
 form.buy input[type=number] { font-family: var(--f-num); font-size: 18px; }
-form.buy .add { border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); background: var(--money); color: var(--on-money, #26354D); padding: 6px 16px; box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); }
+form.buy .add {
+  width: 46px; height: 46px; padding: 0; display: grid; place-items: center; font-family: var(--f-num); font-size: 30px; line-height: 1;
+  border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--money); color: var(--on-money, #26354D); box-shadow: var(--sh-hard, 2px 3px 0 var(--ink));
+}
 form.buy .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .chips button { border: var(--bw, 1.5px) dashed var(--bc, var(--ink)); background: transparent; border-radius: var(--rad, var(--wob2)); padding: 2px 12px; font-size: 14px; }
 .chips button:nth-child(odd) { transform: rotate(calc(-1.5deg * var(--tilt, 1))); }
 .chips button:nth-child(even) { transform: rotate(calc(1.2deg * var(--tilt, 1))); }
 .chips button:hover { background: var(--money-hi); }
-.wish-pick { display: flex; flex-direction: column; gap: 6px; }
-#wishChips button { border-style: solid; background: var(--body-hi); display: inline-flex; align-items: center; gap: 5px; }
+/* 常买 / 愿望：一行横向滑动，点一下直接记一笔 */
+.quick { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.quick-k { font-size: 13px; color: var(--pencil); white-space: nowrap; }
+.chips.scroll { flex-wrap: nowrap; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+.chips.scroll::-webkit-scrollbar { display: none; }
+.chips.scroll button { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px 3px 4px; }
+.chips.scroll button:last-child { margin-right: 28px; }
+.chips .logo.xs { width: 24px; height: 24px; border-width: 1.5px; }
+.chips .logo.xs .ch { font-size: 13px; }
+.chips button .pr { font-family: var(--f-num); font-size: 15px; color: var(--pencil); }
+#wishChips button { border-style: solid; background: var(--body-hi); padding-left: 10px; }
 #wishChips button.locked { background: transparent; border-style: dashed; color: var(--pencil); }
 #wishChips svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 ul.items .wtag { font-size: 12px; color: var(--body); margin-left: 6px; white-space: nowrap; }
@@ -725,8 +748,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   .big { font-size: 40px; }
   .counter { padding: 12px 10px; }
   .pm button { width: 38px; height: 38px; }
-  form.buy { grid-template-columns: 1fr 90px; }
-  form.buy .add { grid-column: 1 / -1; padding: 8px; }
+  form.buy { grid-template-columns: minmax(0, 1fr) 84px 46px; gap: 8px; }
   ul.history li button { grid-template-columns: 58px 1fr; }
   .h-right { grid-column: 1 / -1; justify-content: flex-start; }
 }
@@ -771,13 +793,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       </div>
     </div>
 
-    <label class="field-inline" for="endTime">下班时间 <input type="time" id="endTime"></label>
-
-    <div class="counters">
-      <button type="button" class="counter burn" id="burnToggle" aria-pressed="false">
-        <span class="row"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg><span class="label">Burnout</span></span>
-        <span class="state" id="burnState"></span>
-        <span class="hint">崩溃、想摆烂、脑子转不动、身体不舒服</span>
+    <div class="night-row">
+      <label class="field-inline" for="endTime">下班时间 <input type="time" id="endTime"></label>
+      <button type="button" class="burn-chip" id="burnToggle" aria-pressed="false" title="崩溃、想摆烂、脑子转不动、身体不舒服">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg>
+        <span>Burnout</span>
       </button>
     </div>
 
@@ -787,12 +807,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <form class="buy" id="buyForm" autocomplete="off">
         <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
         <input type="number" id="buyAmt" placeholder="金额 $" min="0" step="0.01" inputmode="decimal" aria-label="金额">
-        <button type="submit" class="add">记一笔</button>
+        <button type="submit" class="add" aria-label="记一笔">+</button>
       </form>
-      <div class="chips" id="chips" aria-label="常买"></div>
-      <div class="wish-pick" id="wishPick" hidden>
-        <span class="eyebrow">从愿望清单里买</span>
-        <div class="chips" id="wishChips"></div>
+      <div class="quick">
+        <span class="quick-k">常买</span>
+        <div class="chips scroll" id="chips"></div>
+      </div>
+      <div class="quick" id="wishPick" hidden>
+        <span class="quick-k">愿望</span>
+        <div class="chips scroll" id="wishChips"></div>
       </div>
     </div>
 
@@ -1088,7 +1111,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const EN_TEXT = {
     "加班": "Overtime ", "夜记": "Night Log", "今晚": "Tonight", "下班时间": "Left work at", "身体不行": "Unwell",
     "崩溃、想摆烂、脑子转不动、身体不舒服": "Melting down, brain fried, or feeling unwell",
-    "今晚买了": "Bought tonight", "从愿望清单里买": "From my wishlist", "记一笔": "Add", "备注": "Note", "删除这一晚": "Delete this night",
+    "今晚买了": "Bought tonight", "记一笔": "Add", "备注": "Note", "删除这一晚": "Delete this night",
     "日历": "Calendar", "月历": "Month", "商品": "Items", "本月": "This month", "本周": "This week", "全部": "All time",
     "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每晚买了什么": "What I bought each night",
     "统计": "Stats", "加班晚数": "Overtime nights", "总花费": "Total spent", "平均每晚": "Per night", "Burnout 晚数": "Burnout nights",
@@ -1112,7 +1135,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     // 属性：placeholder / aria-label / title / alt
     "上个月": "Previous month", "下个月": "Next month", "主菜单": "Main menu", "买了什么": "What did you buy", "物品": "Item",
     "今晚在忙什么？为什么加班？": "What kept you late tonight?", "价格": "Price", "价格 $": "Price $", "金额": "Amount", "金额 $": "Amount $",
-    "设置和记录": "Settings and history", "关闭": "Close", "前一天": "Previous day", "后一天": "Next day", "常买": "Frequent buys", "想买什么": "What do you want", "想买的东西": "Wish item",
+    "设置和记录": "Settings and history", "关闭": "Close", "前一天": "Previous day", "后一天": "Next day", "常买": "Usual", "想买什么": "What do you want", "想买的东西": "Wish item",
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "回到专注": "Back to focus",
     "今天专注": "Today", "今天的番茄": "Sessions today", "本周专注": "This week", "愿望进度": "Wish progress", "最近的番茄": "Recent sessions", "收起": "Minimize",
     "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
@@ -1233,10 +1256,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("nextDay").disabled = current >= nightOf();
     if (document.activeElement !== $("endTime")) $("endTime").value = n.end || "";
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
-    [["burn", n.burnout]].forEach(([k, on]) => {
-      $(k + "Toggle").setAttribute("aria-pressed", String(!!on));
-      $(k + "State").textContent = on ? L("今晚有", "Yes tonight") : L("今晚没有，挺好", "Not tonight. Good.");
-    });
+    $("burnToggle").setAttribute("aria-pressed", String(!!n.burnout));
+    $("burnToggle").setAttribute("aria-label", n.burnout ? L("今晚 burnout 了，点一下取消", "Burnout tonight. Tap to undo.") : L("今晚 burnout 了吗？点一下标记", "Burnout tonight? Tap to mark."));
     $("nightTotal").textContent = money(sum(n));
     const ul = $("items"); ul.textContent = "";
     if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = L("还没记。点下面的常买项，或者自己填。", "Nothing yet. Tap a frequent buy below or type your own."); ul.append(li); }
@@ -1250,7 +1271,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.i = i; x.setAttribute("aria-label", L("删除 ", "Delete ") + it.name);
       li.append(logoFor(it.name, true), nm, am, x); ul.append(li);
     });
-    renderWishPick();
+    renderChips(); renderWishPick();
     $("deleteNight").hidden = !nights[current];
     $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
   }
@@ -1613,15 +1634,39 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     update(n => n.items.push({ name, amount: toBase(amt) }));
     $("buyName").value = ""; $("buyAmt").value = ""; $("buyName").focus();
   });
-  function renderChips() {
-    $("chips").textContent = "";
-    chipList().forEach(([name, amt]) => {
-      const shown = niceDisp(amt);
-      const b = document.createElement("button"); b.type = "button"; b.textContent = `${name} ${fmtCur(shown, Number.isInteger(shown) ? 0 : 2)}`;
-      b.onclick = () => { $("buyName").value = name; $("buyAmt").value = shown; $("buyAmt").focus(); $("buyAmt").select(); };
-      $("chips").append(b);
-    });
+  // 常买：先放自己最常买的（按次数，金额取最近一次），不够 8 个再用默认的补上。点一下直接记一笔，金额不对点金额就能改
+  function quickList() {
+    const t = {};
+    Object.values(nights).filter(n => !n.sample).sort((a, b) => a.date.localeCompare(b.date)).forEach(n => n.items.forEach(i => {
+      const k = (i.name || "").trim(); if (!k || i.wishId) return;
+      const e = t[k] || (t[k] = { c: 0, usd: 0 }); e.c++; e.usd = Number(i.amount) || 0;
+    }));
+    const list = Object.entries(t).sort((a, b) => b[1].c - a[1].c).slice(0, 8).map(([name, e]) => ({ name, usd: e.usd }));
+    const seen = new Set(list.map(x => x.name.toLowerCase()));
+    for (const [name, amt] of chipList()) {
+      if (list.length >= 8) break;
+      if (!seen.has(name.toLowerCase())) list.push({ name, usd: toBase(niceDisp(amt)) });
+    }
+    return list;
   }
+  function renderChips() {
+    const box = $("chips"), sx = box.scrollLeft; box.textContent = "";
+    quickList().forEach(({ name, usd }) => {
+      const b = document.createElement("button"); b.type = "button"; b.dataset.name = name; b.dataset.usd = usd;
+      const lg = logoFor(name, true); lg.classList.add("xs");
+      const pr = document.createElement("span"); pr.className = "pr"; pr.textContent = money(usd);
+      b.append(lg, name, pr);
+      b.setAttribute("aria-label", L(`记一笔：${name} ${money(usd)}`, `Add ${name} ${money(usd)}`));
+      box.append(b);
+    });
+    box.scrollLeft = sx;
+  }
+  $("chips").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-name]"); if (!b) return;
+    const name = b.dataset.name, usd = Number(b.dataset.usd) || 0;
+    update(n => n.items.push({ name, amount: usd }));
+    toast(L(`记了 ${name} ${money(usd)}，金额不对点一下就能改`, `Added ${name} ${money(usd)}. Tap the amount to change it.`));
+  });
   renderChips();
   // 从愿望清单里买：点一下就记成今晚的一笔，同时把这个愿望勾成「买到了」。还没攒够专注的愿望要再点一下确认
   let pickArmed = null;
@@ -1633,7 +1678,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const b = document.createElement("button"); b.type = "button"; b.dataset.wish = w.id;
       const locked = isLocked(w); if (locked) b.className = "locked";
       b.innerHTML = locked ? LOCK : '<svg viewBox="0 0 24 24"><path d="M12 3.5 L14.4 8.6 L20 9.3 L15.9 13.1 L17 18.7 L12 16 L7 18.7 L8.1 13.1 L4 9.3 L9.6 8.6Z"/></svg>';
-      b.append(`${w.name} ${money(w.price || 0)}`);
+      const pr = document.createElement("span"); pr.className = "pr"; pr.textContent = money(w.price || 0);
+      b.append(w.name, pr);
       b.setAttribute("aria-label", L(`买了愿望「${w.name}」${money(w.price || 0)}`, `Bought wish "${w.name}" ${money(w.price || 0)}`) + (locked ? L("（还没解锁）", " (still locked)") : ""));
       box.append(b);
     });
@@ -2685,7 +2731,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const b = e.target.closest("button"); if (!b) return;
     if (b.matches(".wbox") && !b.closest(".got")) buzz("success");
     else if (b.matches(".x, #deleteNight")) buzz("medium");
-    else if (b.matches(".pm button, .add, .chips button, .tabbar button, .gear, .day, .skin, .share-cta, .f-start, .f-presets button, .fs-main, .fs-btn, .f-pill")) buzz();
+    else if (b.matches(".pm button, .add, .chips button, .burn-chip, .tabbar button, .gear, .day, .skin, .share-cta, .f-start, .f-presets button, .fs-main, .fs-btn, .f-pill")) buzz();
   }, true);
   // 状态栏：深色主题用浅色字
   function syncStatusBar() {
