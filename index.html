@@ -229,7 +229,13 @@ form.task-add .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 
 .today-focus .toms svg { width: 20px; height: 20px; overflow: visible; }
 .today-focus b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); }
 .today-focus .go { margin-left: auto; }
-.spend-card { gap: 16px; border-radius: var(--rad, var(--wob2)); }
+.spend-card { gap: 0; padding-top: 14px; padding-bottom: 14px; border-radius: var(--rad, var(--wob2)); }
+.spend-toggle { display: grid; grid-template-columns: auto 1fr auto auto; align-items: baseline; gap: 10px; width: 100%; padding: 2px 0; border: 0; background: none; color: inherit; text-align: left; }
+.spend-toggle .spend-n { font-size: 13px; color: var(--pencil); }
+.spend-toggle .total { font-family: var(--f-num); font-size: 26px; line-height: 1; }
+.spend-toggle .chev { font-size: 22px; color: var(--pencil); transition: transform .2s; line-height: 1; }
+.spend-toggle[aria-expanded="true"] .chev { transform: rotate(90deg); }
+.spend-body { display: flex; flex-direction: column; gap: 16px; padding-top: 14px; }
 .spend-card::before { display: none; }
 .spend-card .night-row { margin-bottom: 2px; }
 /* receipt */
@@ -914,8 +920,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   </section>
 
   <section class="card sketch spend-card" aria-labelledby="spendTitle">
+    <button type="button" class="spend-toggle" id="spendToggle" aria-expanded="false" aria-controls="spendBody">
+      <span class="eyebrow" id="spendTitle">今天花了</span><span class="spend-n" id="spendCount"></span>
+      <span class="total" id="nightTotal">$0</span><span class="chev" aria-hidden="true">›</span>
+    </button>
+    <div id="spendBody" class="spend-body" hidden>
     <div class="receipt">
-      <div class="receipt-head"><span class="eyebrow" id="spendTitle">今天花了</span><span class="total" id="nightTotal">$0</span></div>
       <ul class="items" id="items"></ul>
       <form class="buy" id="buyForm" autocomplete="off">
         <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
@@ -944,6 +954,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="saved" id="saved"></div>
     </div>
     <div style="text-align:right"><button type="button" class="link" id="deleteNight" hidden>清空这天的花销和备注</button></div>
+    </div>
   </section>
   </main>
 
@@ -1035,8 +1046,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <label>专注 <input type="number" id="fCustF" min="1" max="180" step="1" inputmode="numeric" aria-label="专注分钟"> 分钟</label>
         <label>休息 <input type="number" id="fCustB" min="0" max="60" step="1" inputmode="numeric" aria-label="休息分钟"> 分钟</label>
       </div>
-      <label class="f-for" id="fGoalFor"><span>为了哪个目标</span><select id="fGoal"></select></label>
-      <label class="f-for" id="fFor"><span>为了哪个愿望</span><select id="fWish"></select></label>
       <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
     </div>
     <div class="f-running sketch" id="fRunning" hidden>
@@ -1074,7 +1083,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <input type="number" id="wishGoal" placeholder="专注分钟" min="0" max="100000" step="1" inputmode="numeric" aria-label="专注多少分钟后解锁">
       <button type="submit" class="add">许个愿</button>
     </form>
-    <p class="wish-hint">专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。</p>
+    <p class="wish-hint">专注分钟可以不填；填了，从现在起累计专注够这么久，愿望才会解锁。</p>
     <ul class="wishes" id="wishList"></ul>
     <div class="empty" id="wishEmpty" hidden></div>
     <div class="got-head" id="gotHead" hidden></div>
@@ -1267,7 +1276,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "回到专注": "Back to focus",
     "收起": "Minimize",
     "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
-    "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
+    "专注分钟可以不填；填了，从现在起累计专注够这么久，愿望才会解锁。": "Focus minutes are optional. If set, the wish unlocks once you've focused that long in total from now on.",
     "别离开这一页": "Stay on this page",
     "一个番茄": "one focus session", "我的目标": "My goals", "为了哪个目标": "Goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
@@ -1389,6 +1398,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("burnToggle").setAttribute("aria-label", n.burnout ? L("今天 burnout 了，点一下取消", "Burnout today. Tap to undo.") : L("今天 burnout 了吗？点一下标记", "Burnout today? Tap to mark."));
     renderPlan();
     $("nightTotal").textContent = money(sum(n));
+    $("spendCount").textContent = n.items.length ? L(`${n.items.length} 笔`, `${n.items.length} ${n.items.length === 1 ? "item" : "items"}`) : L("记一笔", "add");
     const ul = $("items"); ul.textContent = "";
     if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = L("还没花钱。买了东西点下面的常买，或者自己填。", "Nothing spent yet. Tap a usual buy below or type your own."); ul.append(li); }
     if (editingItem && (editingItem.date !== current || !n.items[editingItem.i])) editingItem = null;
@@ -1858,6 +1868,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     update(n => n.items.splice(Number(x.dataset.i), 1));
   });
 
+  // 花销默认收起成一行，点开再记账；展开状态记在本机
+  const SPEND_KEY = "overtime-spend-open";
+  function setSpendOpen(open) { $("spendBody").hidden = !open; $("spendToggle").setAttribute("aria-expanded", String(open)); try { localStorage.setItem(SPEND_KEY, open ? "1" : ""); } catch (e) {} }
+  $("spendToggle").addEventListener("click", () => setSpendOpen($("spendBody").hidden));
+  try { if (localStorage.getItem(SPEND_KEY)) setSpendOpen(true); } catch (e) {}
+
   // ---------- 今日计划 ----------
   // 今天显示：日期是今天的计划 + 之前没做完的（带过来）。翻到过去的某天，只显示那天写下的
   const tasksFor = (date) => tasks.filter(t => t.date === date || (date === nightOf() && t.date < date && !t.done)).sort((a, b) => (a.done - b.done) || (a.created - b.created));
@@ -1891,6 +1907,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不属于目标", "No goal"); gs.append(o0);
     ag.forEach(g => { const o = document.createElement("option"); o.value = g.id; o.textContent = "◎ " + g.title; gs.append(o); });
     gs.value = ag.some(g => g.id === keep) ? keep : "";
+    gs.hidden = !ag.length || !$("taskName").value.trim();   // 只有在写计划时才出现
     // 今天专注了多少
     const box = $("todayFocus"); box.textContent = "";
     const fd = focusByDay()[current];
@@ -1899,18 +1916,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const b = document.createElement("b"); b.textContent = fmtMin(fd.min);
       box.append(current === nightOf() ? L("今天专注了 ", "Focused ") : L("这天专注了 ", "Focused "), b, lang === "en" ? (current === nightOf() ? " today" : "") : "");
     } else box.append(current === nightOf() ? L("今天还没开始专注", "No focus yet today") : L("这天没有专注", "No focus this day"));
-    if (current === nightOf() && !fActive()) {
-      const g = document.createElement("button"); g.type = "button"; g.className = "btn-ghost go"; g.textContent = L("开始专注", "Start focusing"); g.onclick = () => showTab("focus");
-      box.append(g);
-    }
   }
+  $("taskName").addEventListener("input", () => { $("taskGoal").hidden = !activeGoals().length || !$("taskName").value.trim(); });
   $("taskForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const title = $("taskName").value.trim(); if (!title) { $("taskName").focus(); return; }
     const gid = $("taskGoal").value;
     tasks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: current, title, done: false, ...(gid ? { goalId: gid } : {}), created: Date.now() });
     saveTasks(); renderPlan(); renderCal(); renderGoals();
-    $("taskName").value = ""; $("taskName").focus();
+    $("taskName").value = ""; $("taskGoal").hidden = true; $("taskName").focus();
   });
   function setTaskDone(t, done) {
     t.done = done; if (done) t.doneAt = Date.now(); else delete t.doneAt;
@@ -2048,7 +2062,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       body.append(meta);
     }
     if (!w.got && w.focusGoal > 0) {
-      const done = focusFor(w.id), left = goalLeft(w);
+      const done = focusFor(w), left = goalLeft(w);
       const gb = document.createElement("div"); gb.className = "wgoal";
       const gl = document.createElement("div"); gl.className = "gl";
       const t = document.createElement("span");
@@ -2113,7 +2127,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const el = e.target.closest("[data-act]"); if (!el) return;
     const id = el.closest("li").dataset.id, w = wishes.find(x => x.id === id); if (!w) return;
     if (el.dataset.act === "edit") { editingWish = id; renderWishes(); return; }
-    if (el.dataset.act === "focus") { fpref.wish = id; savePref(); showTab("focus"); renderFocus(); return; }
+    if (el.dataset.act === "focus") { showTab("focus"); return; }
     if (el.dataset.act === "got" && isLocked(w) && lockArmed !== id) {
       lockArmed = id; clearTimeout(onWishClick.t); onWishClick.t = setTimeout(() => (lockArmed = null), 3000);
       toast(L(`还差 ${fmtMin(goalLeft(w))} 专注才解锁。忍不住了？再点一下也能勾掉`, `${fmtMin(goalLeft(w))} of focus to go. Can't wait? Tap again to tick it off anyway.`)); return;
@@ -2149,12 +2163,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (frun && frun.phase === "focus") frun.open = true;   // 专注中不能收起（旧版本可能存了收起状态）
   const saveFrun = () => { try { frun ? localStorage.setItem(FRUN_KEY, JSON.stringify(frun)) : localStorage.removeItem(FRUN_KEY); } catch (e) {} };
 
-  const focusFor = (id) => focusLog.reduce((a, s) => a + (s.wishId === id ? s.min : 0), 0);
-  const goalLeft = (w) => Math.max(0, (w.focusGoal || 0) - focusFor(w.id));
+  // 愿望不用绑定：许愿之后所有的专注都算数（旧版本绑定过这个愿望的番茄也算）
+  const focusFor = (w) => focusLog.reduce((a, s) => a + (s.wishId === w.id || s.start >= (w.created || 0) ? s.min : 0), 0);
+  const goalLeft = (w) => Math.max(0, (w.focusGoal || 0) - focusFor(w));
   const isLocked = (w) => !w.got && w.focusGoal > 0 && goalLeft(w) > 0;
   const fmtMin = (m) => m >= 60 ? L(`${Math.floor(m / 60)} 小时${m % 60 ? ` ${m % 60} 分钟` : ""}`, `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}`) : L(`${m} 分钟`, `${m} min`);
   const goalWishes = () => wishes.filter(w => !w.got && w.focusGoal > 0);
-  const fWishObj = (id) => id ? wishes.find(w => w.id === id) : null;
   function pbar(done, live, goal) {
     const el = document.createElement("div"); el.className = "pbar" + (done >= goal ? " full" : "");
     const a = document.createElement("i"); a.style.width = Math.min(100, done / goal * 100) + "%";
@@ -2191,10 +2205,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       let perm = await ln.checkPermissions();
       if (perm.display !== "granted") perm = await ln.requestPermissions();
       if (perm.display !== "granted" || !fActive() || frun.pausedAt) return;
-      const w = fWishObj(frun.wishId);
       const title = frun.phase === "focus" ? L("番茄完成！", "Focus session done!") : L("休息结束", "Break's over");
       const body = frun.phase === "focus"
-        ? (w ? L(`又攒了 ${Math.round(frun.dur / 60000)} 分钟，离「${w.name}」更近了。`, `${Math.round(frun.dur / 60000)} more minutes toward "${w.name}".`) : L(`专注了 ${Math.round(frun.dur / 60000)} 分钟，休息一下吧。`, `You focused for ${Math.round(frun.dur / 60000)} minutes. Take a break.`))
+        ? L(`专注了 ${Math.round(frun.dur / 60000)} 分钟，休息一下吧。`, `You focused for ${Math.round(frun.dur / 60000)} minutes. Take a break.`)
         : L("回来开始下一个番茄吧。", "Come back for the next session.");
       await ln.schedule({ notifications: [{ id: FNOTE, title, body, schedule: { at: new Date(Date.now() + fLeft()), allowWhileIdle: true } }] });
     } catch (e) {}
@@ -2214,15 +2227,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // taskId：从「今日计划」点 ▶ 开的番茄记在那件事上；再来一个 / 重新开始时沿用上一个番茄的那件事
   // o：{taskId} 从计划点 ▶、{goalId} 从目标点 ▶；不传（专注页的开始、再来一个、重新开始）就沿用上一个番茄的，没有再用专注页选的目标
   function startFocus(o) {
-    const f = clampInt(fpref.f, 1, 180, 25), w = fWishObj(fpref.wish);
+    const f = clampInt(fpref.f, 1, 180, 25);
     const cycle = frun && ["done", "breakdone", "break", "broken"].includes(frun.phase) ? frun.cycle || 0 : 0;
     const given = o && typeof o === "object" && !o.target ? o : null;
     let tid = given ? given.taskId || "" : frun && frun.taskId || "";
     if (tid && !tasks.some(t => t.id === tid && !t.done)) tid = "";
     const tk = tid && tasks.find(t => t.id === tid);
-    let gid = given ? given.goalId || (tk && tk.goalId) || "" : (frun && frun.goalId) || (tk && tk.goalId) || fpref.goal || "";
+    let gid = given ? given.goalId || (tk && tk.goalId) || "" : (frun && frun.goalId) || (tk && tk.goalId) || "";
     if (gid && !goals.some(g => g.id === gid && !g.closed)) gid = "";
-    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", taskId: tid, goalId: gid, cycle, open: true };
+    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), taskId: tid, goalId: gid, cycle, open: true };
     unlockAudio(); askNotify(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
   function startBreak() {
@@ -2239,10 +2252,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function finishFocus(endAt) {
     const ms = Math.min(frun.dur, Math.max(0, endAt - frun.start - frun.paused)), min = Math.round(ms / 60000);
     if (min < 1) { frun = null; saveFrun(); scheduleFocusNote(); renderFocusAll(); toast(L("不到 1 分钟，这次就不记了", "Under a minute, so this one wasn't saved")); return; }
-    const w = fWishObj(frun.wishId), wasLocked = !!w && isLocked(w);
-    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(w ? { wishId: w.id } : {}), ...(frun.taskId ? { taskId: frun.taskId } : {}), ...(frun.goalId ? { goalId: frun.goalId } : {}) });
+    const lockedBefore = goalWishes().filter(isLocked);
+    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(frun.taskId ? { taskId: frun.taskId } : {}), ...(frun.goalId ? { goalId: frun.goalId } : {}) });
     saveFocus();
-    frun = { ...frun, phase: "done", gained: min, unlocked: wasLocked && !isLocked(w), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
+    frun = { ...frun, phase: "done", gained: min, unlocked: lockedBefore.filter(w => !isLocked(w)).map(w => w.name), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
     saveFrun(); scheduleFocusNote(); chime(); buzz("success");
     renderWishes(); renderFocus(); renderCal(); renderNight(); renderStats(); renderGoals(); renderStage(true);
     const ring = $("fsRing"); ring.classList.remove("pop"); void ring.offsetWidth; ring.classList.add("pop");
@@ -2402,21 +2415,21 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("fsSub").textContent = act ? (frun.pausedAt ? L("点下面的按钮继续", "Tap below to resume") : L(`${hhmm(Date.now() + fLeft())} 结束`, `Ends at ${hhmm(Date.now() + fLeft())}`))
       : ph === "done" ? L("分钟，已经记下", "minutes saved") : ph === "broken" ? L(`离开太久，这 ${Math.floor(el / 60000)} 分钟没有记下`, `You left too long. ${Math.floor(el / 60000)} min not saved`)
       : L("准备好就开始下一个", "Start the next one when ready");
-    // 绑定的愿望：已攒的 + 这个番茄正在攒的
-    const w = fWishObj(frun.wishId), box = $("fsWish");
-    box.hidden = !w || !(w.focusGoal > 0);
-    if (!box.hidden) {
-      const done = focusFor(w.id), live = ph === "focus" ? Math.floor(el / 60000) : 0, left = Math.max(0, w.focusGoal - done);
-      const after = Math.max(0, left - (ph === "focus" ? Math.round(frun.dur / 60000) : 0));
-      const key = [w.id, done, live, ph, left].join("|");
-      if (box.dataset.k !== key) {
-        box.dataset.k = key; box.textContent = ""; box.className = "fs-wish sketch" + (left === 0 ? " unlocked" : "");
-        const top = document.createElement("div"); top.className = "fw-top";
-        const nm = document.createElement("span"); const sm = document.createElement("small"); sm.textContent = L("为了", "For"); nm.append(sm, w.name);
-        const n = document.createElement("b"); n.textContent = `${Math.min(w.focusGoal, done + live)} / ${w.focusGoal}`;
-        top.append(nm, n);
-        box.append(top, pbar(done, live, w.focusGoal));
+    // 完成页顺带说一句愿望：这个番茄解锁了哪个，或者离最近的那个还差多少
+    const box = $("fsWish"), un = ph === "done" && frun.unlocked && frun.unlocked.length ? frun.unlocked : null;
+    const near = ph === "done" && !un ? goalWishes().filter(isLocked).sort((a, b) => goalLeft(a) - goalLeft(b))[0] : null;
+    box.hidden = !un && !near;
+    const key = un ? "u" + un.join() : near ? near.id + goalLeft(near) : "";
+    if (!box.hidden && box.dataset.k !== key) {
+      box.dataset.k = key; box.textContent = ""; box.className = "fs-wish sketch" + (un ? " unlocked" : "");
+      const top = document.createElement("div"); top.className = "fw-top";
+      const nm = document.createElement("span");
+      if (un) nm.textContent = L(`🎉 解锁了「${un.join("」「")}」`, `🎉 Unlocked "${un.join('", "')}"`);
+      else {
+        nm.textContent = L(`离「${near.name}」还差 ${fmtMin(goalLeft(near))}`, `${fmtMin(goalLeft(near))} to go for "${near.name}"`);
+        top.append(nm); box.append(top, pbar(focusFor(near), 0, near.focusGoal)); return;
       }
+      top.append(nm); box.append(top);
     }
   }
   function renderPill() {
@@ -2451,19 +2464,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (document.activeElement !== $("fCustB")) $("fCustB").value = fpref.b;
     $("fDialMin").textContent = fpref.f;
 
-    const sel = $("fWish"); sel.textContent = "";
-    const gw = goalWishes().filter(isLocked).sort((a, b) => goalLeft(a) - goalLeft(b));
-    if (fpref.wish && !gw.some(w => w.id === fpref.wish)) fpref.wish = "";
-    const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不选", "None"); sel.append(o0);
-    gw.forEach(w => { const o = document.createElement("option"); o.value = w.id; o.textContent = `${w.name} · ` + L(`还差 ${fmtMin(goalLeft(w))}`, `${fmtMin(goalLeft(w))} to go`); sel.append(o); });
-    sel.value = fpref.wish;
-    const gsel = $("fGoal"), ag = activeGoals(); gsel.textContent = "";
-    if (fpref.goal && !ag.some(g => g.id === fpref.goal)) fpref.goal = "";
-    const g0 = document.createElement("option"); g0.value = ""; g0.textContent = L("不选", "None"); gsel.append(g0);
-    ag.forEach(g => { const o = document.createElement("option"); o.value = g.id; o.textContent = g.title; gsel.append(o); });
-    gsel.value = fpref.goal || ""; $("fGoalFor").hidden = !ag.length;
     renderGoals();
-    $("fFor").hidden = !gw.length;   // 没有要攒专注的愿望，就不用选
 
     $("fSetup").hidden = fActive(); $("fRunning").hidden = !fActive();
     if (fActive()) {
@@ -2479,8 +2480,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   });
   $("fCustF").addEventListener("change", (e) => { fpref.f = clampInt(e.target.value, 1, 180, 25); fpref.custom = true; savePref(); renderFocus(); });
   $("fCustB").addEventListener("change", (e) => { fpref.b = clampInt(e.target.value, 0, 60, 5); fpref.custom = true; savePref(); renderFocus(); });
-  $("fWish").addEventListener("change", (e) => { fpref.wish = e.target.value; savePref(); renderFocus(); });
-  $("fGoal").addEventListener("change", (e) => { fpref.goal = e.target.value; savePref(); });
 
   // ---------- 目标 ----------
   // 一天在某个目标上的情况：专注分钟、有没有打卡（专注过 / 做完了属于它的计划 / 手动打卡）
