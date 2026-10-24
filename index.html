@@ -166,9 +166,12 @@ ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .g-acts { display: flex; gap: 8px; align-items: center; }
 .g-check { border: var(--bw, 1.5px) dashed var(--pencil); background: transparent; color: var(--pencil); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); padding: 3px 12px; font-size: 14px; white-space: nowrap; }
 .g-check[aria-pressed="true"] { border-style: solid; border-color: var(--leaf); background: color-mix(in srgb, var(--leaf) 22%, var(--card)); color: var(--ink); }
-.goal .tgo { width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--burn-hi); color: var(--ink); }
-.goal .tgo svg { width: 18px; height: 18px; fill: currentColor; }
-.goal .tgo:disabled { opacity: .3; }
+/* 「专注」小按钮：小番茄 + 字，一看就是开始做 */
+.tgo { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px 0 6px; white-space: nowrap; font-size: 14px; color: var(--ink);
+  border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); background: var(--burn-hi); box-shadow: var(--sh-hard, 1.5px 2px 0 var(--ink)); }
+.tgo svg { width: 20px; height: 20px; overflow: visible; flex: none; }
+.tgo:active { transform: translate(1px, 1px); box-shadow: none; }
+.tgo:disabled { opacity: .35; box-shadow: none; }
 .g-stats { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--pencil); }
 .g-stats b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); margin-right: 2px; }
 .g-foot { display: flex; justify-content: flex-end; gap: 14px; }
@@ -211,9 +214,6 @@ ul.tasks .done .tname { text-decoration: line-through; text-decoration-color: va
 ul.tasks .done .wbox { color: var(--burn); }
 ul.tasks .ttoms { display: inline-flex; align-items: center; gap: 1px; font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
 ul.tasks .ttoms svg { width: 15px; height: 15px; overflow: visible; }
-ul.tasks .tgo { width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--burn-hi); color: var(--ink); }
-ul.tasks .tgo svg { width: 16px; height: 16px; fill: currentColor; }
-ul.tasks .tgo:disabled { opacity: .3; }
 ul.tasks .tend { display: inline-flex; align-items: center; gap: 2px; }
 .no-tasks { font-size: 14px; color: var(--pencil); padding: 6px 2px; list-style: none; }
 form.task-add { display: grid; grid-template-columns: minmax(0, 1fr) auto 46px; gap: 10px; align-items: end; }
@@ -1802,13 +1802,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   // ---------- 今日计划 ----------
   // 今天显示：日期是今天的计划 + 之前没做完的（带过来）。翻到过去的某天，只显示那天写下的
-  const PLAY = '<svg viewBox="0 0 24 24"><path d="M8 4.5 Q19 11 19.5 12 Q19 13 8 19.5 Q7.4 12 8 4.5Z"/></svg>';
   const tasksFor = (date) => tasks.filter(t => t.date === date || (date === nightOf() && t.date < date && !t.done)).sort((a, b) => (a.done - b.done) || (a.created - b.created));
   const taskToms = (id) => focusLog.filter(f => f.taskId === id).length;
   function renderPlan() {
     const ul = $("tasks"); ul.textContent = "";
     const list = tasksFor(current);
-    if (!list.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = current === nightOf() ? L("写下今天想学的一两件事，做的时候点 ▶ 开一个番茄。", "Write down one or two things to learn today. Tap ▶ to start a focus session.") : L("这天没有写计划。", "No plan this day."); ul.append(li); }
+    if (!list.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = current === nightOf() ? L("写下今天想学的一两件事，做的时候点「专注」开一个番茄。", "Write down one or two things to learn today. Tap Focus to start a session.") : L("这天没有写计划。", "No plan this day."); ul.append(li); }
     list.forEach(t => {
       const li = document.createElement("li"); li.dataset.id = t.id; if (t.done) li.className = "done";
       const box = document.createElement("button"); box.type = "button"; box.className = "wbox"; box.dataset.act = "done"; box.innerHTML = CHECK;
@@ -1821,7 +1820,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (n) tm.innerHTML = n <= 4 ? tomSVG("full").repeat(n) : tomSVG("full") + `×${n}`;
       const end = document.createElement("span"); end.className = "tend";
       if (!t.done) {
-        const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = PLAY;
+        const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = tomSVG("full") + `<span>${L("专注", "Focus")}</span>`;
         go.setAttribute("aria-label", L(`为「${t.title}」开一个番茄`, `Start a focus session for "${t.title}"`)); go.disabled = fActive();
         end.append(go);
       }
@@ -2475,7 +2474,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const hitToday = !!(days[today] && days[today].hit), manual = g.checks.includes(today);
       ck.setAttribute("aria-pressed", String(hitToday)); ck.textContent = hitToday ? L("今天 ✓", "Today ✓") : L("打卡", "Check in");
       if (hitToday && !manual) ck.disabled = true;   // 专注过 / 做完计划已经算打卡了
-      const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = PLAY; go.disabled = fActive();
+      const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = tomSVG("full") + `<span>${L("专注", "Focus")}</span>`; go.disabled = fActive();
       go.setAttribute("aria-label", L(`为「${g.title}」开一个番茄`, `Start a focus session for "${g.title}"`));
       acts.append(ck, go);
     }
