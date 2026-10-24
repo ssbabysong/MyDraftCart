@@ -8,6 +8,7 @@
   // 尽早套上主题和语言，避免打开时先闪一下默认样式
   try {
     var sk = localStorage.getItem("overtime-skin") || "pencil"; if (sk !== "grid") document.documentElement.setAttribute("data-skin", sk);
+    if (["pencil", "night", "matcha", "latte"].indexOf(sk) >= 0) document.documentElement.classList.add("minimal");
     var lg = localStorage.getItem("overtime-lang") || (/^zh/i.test(navigator.language || "") ? "zh" : "en");
     document.documentElement.lang = lg === "en" ? "en" : "zh-CN";
   } catch (e) {}
@@ -666,63 +667,83 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 :root[data-skin="pop"] h1 { font-size: clamp(42px, 11vw, 60px); }
 :root[data-skin="pop"] .tabbar { border-top-width: 3px; }
 /* 铅笔：手绘但极简。米白纸、细浅线、只有一个番茄红强调色；不倾斜、没阴影、没胶带；正文用干净的黑体，标题和数字留手写 */
-:root[data-skin="pencil"] {
-  --paper: #FAF8F4; --grid: #ECE8E0; --ink: #2E2C29; --pencil: #8E897F; --card: #FFFEFB;
-  --money: #E9C46A; --money-hi: #F7EED6; --burn: #D9614C; --burn-hi: #F8E5DF; --body: #6F7F92; --body-hi: #EEF0F2; --leaf: #82A97C; --on-money: #2E2C29;
+:root.minimal {
   --f-title: "ZCOOL KuaiLe", "Patrick Hand", sans-serif; --f-hand: "Noto Sans SC", -apple-system, system-ui, sans-serif; --f-num: "Patrick Hand", "ZCOOL KuaiLe", sans-serif;
-  --tilt: 0; --bw: 1.5px; --bc: #CFC9BE; --sh-hard: none; --paper-img: none; --tape: none;
+  --tilt: 0; --bw: 1.5px; --sh-hard: none; --paper-img: none; --tape: none;
+}
+:root[data-skin="pencil"] {
+  --paper: #FAF8F4; --grid: #ECE8E0; --ink: #2E2C29; --pencil: #8E897F; --card: #FFFEFB; --bc: #CFC9BE;
+  --money: #E9C46A; --money-hi: #F7EED6; --burn: #D9614C; --burn-hi: #F8E5DF; --body: #6F7F92; --body-hi: #EEF0F2; --leaf: #82A97C; --on-money: #2E2C29;
   color-scheme: light;
 }
-:root[data-skin="pencil"] body { font-size: 15px; }
-:root[data-skin="pencil"] h1 { font-size: clamp(34px, 9vw, 46px); }
-:root[lang="en"][data-skin="pencil"] h1, :root[lang="en"][data-skin="pencil"] h2, :root[lang="en"][data-skin="pencil"] .pg-switch button { font-family: "Patrick Hand", sans-serif; }
-:root[lang="en"][data-skin="pencil"] h1 { font-size: clamp(30px, 8vw, 40px); white-space: nowrap; }
-:root[data-skin="pencil"] h1 .hl { background: linear-gradient(transparent 82%, var(--burn) 82%, var(--burn) 92%, transparent 92%); }
-:root[data-skin="pencil"] h2 { font-family: var(--f-title); font-size: 22px; }
-:root[data-skin="pencil"] h2.underlined, :root[data-skin="pencil"] .pg-switch button[aria-current="page"] { background: linear-gradient(var(--burn), var(--burn)) no-repeat 0 100% / 24px 3px; padding-bottom: 6px; }
-:root[data-skin="pencil"] .pg-switch button { font-family: var(--f-title); }
-:root[data-skin="pencil"] .eyebrow { letter-spacing: .02em; }
+/* 夜读：深色的铅笔，暖黄台灯色 */
+:root[data-skin="night"] {
+  --paper: #1E2022; --grid: #303336; --ink: #ECE6DA; --pencil: #9C978D; --card: #25282B; --bc: #3F4347;
+  --money: #D9B25F; --money-hi: #3A3324; --burn: #E47B63; --burn-hi: #45302B; --body: #9BB0C8; --body-hi: #2C333B; --leaf: #8DBA84; --on-money: #1E2022;
+  color-scheme: dark;
+}
+/* 抹茶：淡绿纸面，墨绿字 */
+:root[data-skin="matcha"] {
+  --paper: #F2F5EC; --grid: #E0E7D7; --ink: #2E3A2D; --pencil: #7E8B7A; --card: #FBFDF8; --bc: #C7D1BE;
+  --money: #D8C26A; --money-hi: #F0EBCD; --burn: #D9614C; --burn-hi: #F6E2DC; --body: #6F8291; --body-hi: #E8EEF0; --leaf: #6A9A62; --on-money: #2E3A2D;
+  color-scheme: light;
+}
+/* 拿铁：暖奶咖色，咖啡色字 */
+:root[data-skin="latte"] {
+  --paper: #F4EDE3; --grid: #E7DDCF; --ink: #3B2F27; --pencil: #94857A; --card: #FBF7F1; --bc: #D4C6B6;
+  --money: #D9A65B; --money-hi: #F3E5CC; --burn: #C8604A; --burn-hi: #F3DED6; --body: #7D8A9B; --body-hi: #ECEEF0; --leaf: #87A177; --on-money: #3B2F27;
+  color-scheme: light;
+}
+:root.minimal body { font-size: 15px; }
+:root.minimal h1 { font-size: clamp(34px, 9vw, 46px); }
+:root.minimal[lang="en"] h1, :root.minimal[lang="en"] h2, :root.minimal[lang="en"] .pg-switch button { font-family: "Patrick Hand", sans-serif; }
+:root.minimal[lang="en"] h1 { font-size: clamp(30px, 8vw, 40px); white-space: nowrap; }
+:root.minimal h1 .hl { background: linear-gradient(transparent 82%, var(--burn) 82%, var(--burn) 92%, transparent 92%); }
+:root.minimal h2 { font-family: var(--f-title); font-size: 22px; }
+:root.minimal h2.underlined, :root.minimal .pg-switch button[aria-current="page"] { background: linear-gradient(var(--burn), var(--burn)) no-repeat 0 100% / 24px 3px; padding-bottom: 6px; }
+:root.minimal .pg-switch button { font-family: var(--f-title); }
+:root.minimal .eyebrow { letter-spacing: .02em; }
 /* 卡片：细浅边，不要阴影 */
-:root[data-skin="pencil"] .card { gap: 18px; }
-:root[data-skin="pencil"] .tile, :root[data-skin="pencil"] .wall-card, :root[data-skin="pencil"] ul.wishes li, :root[data-skin="pencil"] ul.history li button { border-color: var(--bc); }
-:root[data-skin="pencil"] .tile.money .v, :root[data-skin="pencil"] .wish-sum .big-total span, :root[data-skin="pencil"] .cal-sum b, :root[data-skin="pencil"] .dd-head .total { background: none; }
+:root.minimal .card { gap: 18px; }
+:root.minimal .tile, :root.minimal .wall-card, :root.minimal ul.wishes li, :root.minimal ul.history li button { border-color: var(--bc); }
+:root.minimal .tile.money .v, :root.minimal .wish-sum .big-total span, :root.minimal .cal-sum b, :root.minimal .dd-head .total { background: none; }
 /* 主按钮：深色实心；次按钮：只有细边 */
-:root[data-skin="pencil"] .f-start, :root[data-skin="pencil"] .add, :root[data-skin="pencil"] .share-go, :root[data-skin="pencil"] .fs-btn, :root[data-skin="pencil"] .fs-main, :root[data-skin="pencil"] form.wish .add, :root[data-skin="pencil"] .wedit .save, :root[data-skin="pencil"] .iedit .save {
+:root.minimal .f-start, :root.minimal .add, :root.minimal .share-go, :root.minimal .fs-btn, :root.minimal .fs-main, :root.minimal form.wish .add, :root.minimal .wedit .save, :root.minimal .iedit .save {
   background: var(--ink); color: var(--paper); border-color: var(--ink);
 }
-:root[data-skin="pencil"] .fs-btn.alt { background: transparent; color: var(--ink); border-color: var(--bc); }
-:root[data-skin="pencil"] .btn-ghost, :root[data-skin="pencil"] .share-cta, :root[data-skin="pencil"] .bk-remind .go { background: transparent; color: var(--ink); border-color: var(--bc); }
-:root[data-skin="pencil"] .share-cta, :root[data-skin="pencil"] .bk-remind { background: var(--card); }
-:root[data-skin="pencil"] .tgo { background: transparent; border-color: var(--bc); }
-:root[data-skin="pencil"] .f-presets button, :root[data-skin="pencil"] .chips button, :root[data-skin="pencil"] .burn-chip, :root[data-skin="pencil"] .g-check { border-style: solid; border-color: var(--bc); }
-:root[data-skin="pencil"] .f-presets button[aria-pressed="true"] { background: var(--burn-hi); border-color: var(--burn); }
-:root[data-skin="pencil"] #wishChips button { background: transparent; }
-:root[data-skin="pencil"] .seg button[aria-pressed="true"] { border-color: var(--bc); background: var(--card); }
-:root[data-skin="pencil"] .insight { border: 0; background: var(--money-hi); }
-:root[data-skin="pencil"] .bar { border-color: var(--money); background: var(--money-hi); }
-:root[data-skin="pencil"] .bar.today { background: var(--money); }
-:root[data-skin="pencil"] .day.has { border-color: var(--bc); }
-:root[data-skin="pencil"] .day.sel { border-color: var(--ink); }
-:root[data-skin="pencil"] .logo { border-color: var(--bc); }
-:root[data-skin="pencil"] .lg-0, :root[data-skin="pencil"] .lg-1, :root[data-skin="pencil"] .lg-2, :root[data-skin="pencil"] .lg-3 { background: var(--card); }
-:root[data-skin="pencil"] ul.items li, :root[data-skin="pencil"] ul.tasks li, :root[data-skin="pencil"] .dd-items li, :root[data-skin="pencil"] ol.night-list > li { border-bottom-style: solid; border-bottom-width: 1px; border-color: var(--grid); }
-:root[data-skin="pencil"] .tabbar { border-top-width: 1px; border-color: var(--bc); box-shadow: none; }
-:root[data-skin="pencil"] .tabbar button[aria-current="page"] span { background: linear-gradient(var(--burn), var(--burn)) no-repeat 50% 100% / 14px 2px; padding-bottom: 2px; }
-:root[data-skin="pencil"] .tabbar button[data-go][aria-current="page"] svg { fill: none; }
-:root[data-skin="pencil"] .tabbar svg { stroke-width: 1.8; }
-:root[data-skin="pencil"] .toast, :root[data-skin="pencil"] .update-bar { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-:root[data-skin="pencil"] .goal.closed { border-style: solid; }
+:root.minimal .fs-btn.alt { background: transparent; color: var(--ink); border-color: var(--bc); }
+:root.minimal .btn-ghost, :root.minimal .share-cta, :root.minimal .bk-remind .go { background: transparent; color: var(--ink); border-color: var(--bc); }
+:root.minimal .share-cta, :root.minimal .bk-remind { background: var(--card); }
+:root.minimal .tgo { background: transparent; border-color: var(--bc); }
+:root.minimal .f-presets button, :root.minimal .chips button, :root.minimal .burn-chip, :root.minimal .g-check { border-style: solid; border-color: var(--bc); }
+:root.minimal .f-presets button[aria-pressed="true"] { background: var(--burn-hi); border-color: var(--burn); }
+:root.minimal #wishChips button { background: transparent; }
+:root.minimal .seg button[aria-pressed="true"] { border-color: var(--bc); background: var(--card); }
+:root.minimal .insight { border: 0; background: var(--money-hi); }
+:root.minimal .bar { border-color: var(--money); background: var(--money-hi); }
+:root.minimal .bar.today { background: var(--money); }
+:root.minimal .day.has { border-color: var(--bc); }
+:root.minimal .day.sel { border-color: var(--ink); }
+:root.minimal .logo { border-color: var(--bc); }
+:root.minimal .lg-0, :root.minimal .lg-1, :root.minimal .lg-2, :root.minimal .lg-3 { background: var(--card); }
+:root.minimal ul.items li, :root.minimal ul.tasks li, :root.minimal .dd-items li, :root.minimal ol.night-list > li { border-bottom-style: solid; border-bottom-width: 1px; border-color: var(--grid); }
+:root.minimal .tabbar { border-top-width: 1px; border-color: var(--bc); box-shadow: none; }
+:root.minimal .tabbar button[aria-current="page"] span { background: linear-gradient(var(--burn), var(--burn)) no-repeat 50% 100% / 14px 2px; padding-bottom: 2px; }
+:root.minimal .tabbar button[data-go][aria-current="page"] svg { fill: none; }
+:root.minimal .tabbar svg { stroke-width: 1.8; }
+:root.minimal .toast, :root.minimal .update-bar { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+:root.minimal .goal.closed { border-style: solid; }
 /* 小控件用圆润的胶囊 / 圆形，大卡片保留手绘的不规则边 */
-:root[data-skin="pencil"] .chips button, :root[data-skin="pencil"] .btn-ghost, :root[data-skin="pencil"] .seg button, :root[data-skin="pencil"] .bk-remind .go, :root[data-skin="pencil"] .fs-close, :root[data-skin="pencil"] .share-cta { border-radius: 999px; }
-:root[data-skin="pencil"] .datepick button, :root[data-skin="pencil"] .cal-nav button, :root[data-skin="pencil"] .dd-nav button, :root[data-skin="pencil"] .share-head button:not(.close) { border-radius: 50%; border-color: var(--bc); }
-:root[data-skin="pencil"] .wbox { border-radius: 9px 11px 10px 12px / 11px 9px 12px 10px; border-color: #BDB6A9; }
-:root[data-skin="pencil"] .f-presets button { border-radius: 18px 20px 17px 19px / 20px 18px 19px 17px; }
-:root[data-skin="pencil"] .fs-main { border-radius: 50%; }
-:root[data-skin="pencil"] .day { border-radius: 10px; }
-:root[data-skin="pencil"] .tile { border-radius: 18px 22px 17px 21px / 21px 17px 22px 18px; }
-:root[data-skin="pencil"] .wgoal .go, :root[data-skin="pencil"] form.wish .add, :root[data-skin="pencil"] .wedit .save, :root[data-skin="pencil"] .iedit .save, :root[data-skin="pencil"] .update-bar button { border-radius: 999px; }
-:root[data-skin="pencil"] .wgoal .go { background: transparent; border-color: var(--bc); }
-:root[data-skin="pencil"] .focus-stage::before { opacity: .5; }
+:root.minimal .chips button, :root.minimal .btn-ghost, :root.minimal .seg button, :root.minimal .bk-remind .go, :root.minimal .fs-close, :root.minimal .share-cta { border-radius: 999px; }
+:root.minimal .datepick button, :root.minimal .cal-nav button, :root.minimal .dd-nav button, :root.minimal .share-head button:not(.close) { border-radius: 50%; border-color: var(--bc); }
+:root.minimal .wbox { border-radius: 9px 11px 10px 12px / 11px 9px 12px 10px; border-color: var(--bc); }
+:root.minimal .f-presets button { border-radius: 18px 20px 17px 19px / 20px 18px 19px 17px; }
+:root.minimal .fs-main { border-radius: 50%; }
+:root.minimal .day { border-radius: 10px; }
+:root.minimal .tile { border-radius: 18px 22px 17px 21px / 21px 17px 22px 18px; }
+:root.minimal .wgoal .go, :root.minimal form.wish .add, :root.minimal .wedit .save, :root.minimal .iedit .save, :root.minimal .update-bar button { border-radius: 999px; }
+:root.minimal .wgoal .go { background: transparent; border-color: var(--bc); }
+:root.minimal .focus-stage::before { opacity: .5; }
 .cur-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
 .cur-row select, .cur-row input { font: inherit; color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid var(--ink); padding: 4px 2px; min-width: 0; }
 .cur-row input { width: 7em; font-family: var(--f-num); font-size: 17px; }
@@ -2832,8 +2853,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   // ---------- 设置：语言、主题 ----------
   const SKIN_KEY = "overtime-skin";
+  const MINIMAL = ["pencil", "night", "matcha", "latte"];
   const SKINS = [
     { id: "pencil", zh: "铅笔", en: "Pencil", noteZh: "手绘 · 极简", noteEn: "Hand-drawn, minimal", c: ["#FAF8F4", "#ECE8E0", "#2E2C29", "#E9C46A", "#D9614C"], font: '"ZCOOL KuaiLe", sans-serif', r: "12px 14px 13px 15px / 14px 12px 15px 13px" },
+    { id: "night", zh: "夜读", en: "Night study", noteZh: "极简 · 深色", noteEn: "Minimal, dark", c: ["#1E2022", "#303336", "#ECE6DA", "#D9B25F", "#E47B63"], font: '"ZCOOL KuaiLe", sans-serif', r: "12px 14px 13px 15px / 14px 12px 15px 13px" },
+    { id: "matcha", zh: "抹茶", en: "Matcha", noteZh: "极简 · 淡绿", noteEn: "Minimal, soft green", c: ["#F2F5EC", "#E0E7D7", "#2E3A2D", "#D8C26A", "#6A9A62"], font: '"ZCOOL KuaiLe", sans-serif', r: "12px 14px 13px 15px / 14px 12px 15px 13px" },
+    { id: "latte", zh: "拿铁", en: "Latte", noteZh: "极简 · 暖咖", noteEn: "Minimal, warm", c: ["#F4EDE3", "#E7DDCF", "#3B2F27", "#D9A65B", "#C8604A"], font: '"ZCOOL KuaiLe", sans-serif', r: "12px 14px 13px 15px / 14px 12px 15px 13px" },
     { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "手绘 · 跟随深浅色", noteEn: "Hand-drawn · auto dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
     { id: "sakura", zh: "樱花", en: "Sakura", noteZh: "手绘", noteEn: "Hand-drawn", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"], font: '"ZCOOL KuaiLe", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
     { id: "washi", zh: "和纸手账", en: "Washi", noteZh: "横线本 · 纸胶带", noteEn: "Ruled notebook, washi tape", c: ["#F6F0E2", "#E2D6BC", "#2B3654", "#E3A83B", "#C8553D"], font: '"Long Cang", "Ma Shan Zheng", cursive', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "ruled" },
@@ -2845,6 +2870,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (!SKINS.some(k => k.id === skin)) { skin = "grid"; try { localStorage.setItem(SKIN_KEY, "grid"); } catch (e) {} }   // 旧版本的牛皮纸 / 深夜 / 薄荷 / 简约 / 终端已下线
   function applySkin() {
     if (skin === "grid") document.documentElement.removeAttribute("data-skin"); else document.documentElement.setAttribute("data-skin", skin);
+    document.documentElement.classList.toggle("minimal", MINIMAL.includes(skin));   // 铅笔一家：同一套极简手绘样式，只换配色
     syncStatusBar();
     const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
     document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
