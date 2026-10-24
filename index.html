@@ -2507,16 +2507,15 @@ form.adder.pg-form { margin-top: 8px; }
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
     grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `16px repeat(${cols}, 8px)`;
-    // 第一行：月份（这一周里有 1 号，或者第一列）。月份字要占大约 3 列，挨太近就只留真正的 1 号那个
+    // 第一行：月份。第一列一定标开始那个月；之后在有 1 号的那周标新月份。月份字约占 3 列，挨太近就往后挪到还在这个月的那周
     grid.append(document.createElement("b"));
-    const labs = [];
+    const s0 = first > g.start ? first : g.start, labs = [{ c: 0, m: s0.slice(0, 7) }], lastOk = cols < maxCols ? cols - 1 : cols - 2;
     for (let c = 0; c < cols; c++) {
-      const mon = shift(first, c * 7), one = [0, 1, 2, 3, 4, 5, 6].map(k => shift(mon, k)).find(d => d.endsWith("-01"));
-      const m = (one || (c === 0 ? mon : "")).slice(0, 7);
-      if (!m || (labs.length && labs[labs.length - 1].m === m) || (c > cols - 2 && cols >= 3)) continue;
-      const prev = labs[labs.length - 1];
-      if (prev && c - prev.c < 3) { if (prev.c === 0 && !prev.one) labs.pop(); else continue; }
-      labs.push({ c, m, one: !!one });
+      const one = [0, 1, 2, 3, 4, 5, 6].map(k => shift(first, c * 7 + k)).find(d => d.endsWith("-01") && d > s0), m = one ? one.slice(0, 7) : "";
+      if (!m || m <= labs[labs.length - 1].m) continue;
+      let at = Math.max(c, labs[labs.length - 1].c + 3);
+      if (at > c) while (at <= lastOk && shift(first, at * 7).slice(0, 7) < m) at++;
+      if (at <= lastOk && (at === c || shift(first, at * 7).slice(0, 7) === m)) labs.push({ c: at, m });
     }
     for (let c = 0; c < cols; c++) {
       const lab = document.createElement("b"), x = labs.find(o => o.c === c); lab.className = "hm";
