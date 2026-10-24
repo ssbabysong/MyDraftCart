@@ -156,6 +156,48 @@ button.counter:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) { .mark .x { transition: none !important; } }
 .counter .hint { font-size: 13px; color: var(--pencil); }
 
+/* 目标 */
+ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.goal { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--rad, var(--wob1)); }
+.goals li:nth-child(even) .goal { border-radius: var(--rad, var(--wob2)); }
+.g-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.g-name { font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
+.g-name small { display: block; font-size: 13px; color: var(--pencil); margin-top: 2px; }
+.g-acts { display: flex; gap: 8px; align-items: center; }
+.g-check { border: var(--bw, 1.5px) dashed var(--pencil); background: transparent; color: var(--pencil); border-radius: var(--rad, 999px 900px 999px 950px / 950px 999px 900px 999px); padding: 3px 12px; font-size: 14px; white-space: nowrap; }
+.g-check[aria-pressed="true"] { border-style: solid; border-color: var(--leaf); background: color-mix(in srgb, var(--leaf) 22%, var(--card)); color: var(--ink); }
+.goal .tgo { width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--burn-hi); color: var(--ink); }
+.goal .tgo svg { width: 18px; height: 18px; fill: currentColor; }
+.goal .tgo:disabled { opacity: .3; }
+.g-stats { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--pencil); }
+.g-stats b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); margin-right: 2px; }
+.g-foot { display: flex; justify-content: flex-end; gap: 14px; }
+/* 打卡记录：像 GitHub 的提交记录，一列一周，从上到下周一到周日 */
+.heat { overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.heat::-webkit-scrollbar { display: none; }
+.heat-grid { display: inline-grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--c, 12px)); grid-auto-columns: var(--c, 12px); gap: 3px; }
+.heat-grid i { display: block; border-radius: calc(var(--c, 12px) / 4); background: var(--grid); }
+.heat-grid i.lv1 { background: color-mix(in srgb, var(--leaf) 35%, var(--card)); }
+.heat-grid i.lv2 { background: color-mix(in srgb, var(--leaf) 60%, var(--card)); }
+.heat-grid i.lv3 { background: color-mix(in srgb, var(--leaf) 82%, var(--card)); }
+.heat-grid i.lv4 { background: var(--leaf); }
+.heat-grid i.fut { background: transparent; border: 1px dashed var(--grid); }
+.heat-grid i.pad { visibility: hidden; }
+.heat-grid i.today { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.heat-key { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--pencil); justify-content: flex-end; }
+.heat-key i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+form.goal-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 8px 10px; align-items: end; }
+form.goal-add #goalName { grid-column: 1 / -1; }
+form.goal-add input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
+form.goal-add .goal-end { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--pencil); min-width: 0; }
+form.goal-add .goal-end input { flex: 1; min-width: 0; max-width: 11em; font-family: var(--f-num); font-size: 16px; padding: 4px 2px; color: var(--ink); }
+form.goal-add .add { width: 46px; height: 46px; padding: 0; display: grid; place-items: center; font-family: var(--f-num); font-size: 30px; line-height: 1; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--money); color: var(--on-money, #26354D); box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); }
+.goals-done summary { cursor: pointer; color: var(--pencil); font-size: 15px; }
+.goals-done ul.goals { margin-top: 10px; }
+.goal.closed { background: transparent; box-shadow: none; border-style: dashed; }
+.goal.closed .g-name { color: var(--pencil); }
+.g-tag { display: inline-block; font-size: 12px; color: var(--pencil); border: 1px solid var(--grid); border-radius: 999px; padding: 0 8px; margin-top: 2px; }
+form.task-add select { max-width: 7.5em; font: inherit; font-size: 14px; color: var(--ink); background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 0; }
 /* 今日计划 */
 .plan { display: flex; flex-direction: column; gap: 8px; }
 ul.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -171,7 +213,8 @@ ul.tasks .tgo svg { width: 16px; height: 16px; fill: currentColor; }
 ul.tasks .tgo:disabled { opacity: .3; }
 ul.tasks .tend { display: inline-flex; align-items: center; gap: 2px; }
 .no-tasks { font-size: 14px; color: var(--pencil); padding: 6px 2px; list-style: none; }
-form.task-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 10px; align-items: end; }
+form.task-add { display: grid; grid-template-columns: minmax(0, 1fr) auto 46px; gap: 10px; align-items: end; }
+form.task-add select[hidden] + .add { grid-column: 3; }
 form.task-add input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
 form.task-add .add, form.buy .add {
   width: 46px; height: 46px; padding: 0; display: grid; place-items: center; font-family: var(--f-num); font-size: 30px; line-height: 1;
@@ -802,6 +845,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <ul class="tasks" id="tasks"></ul>
       <form class="task-add" id="taskForm" autocomplete="off">
         <input type="text" id="taskName" placeholder="今天想学点什么？" maxlength="60" aria-label="新的计划">
+        <select id="taskGoal" aria-label="属于哪个目标" hidden></select>
         <button type="submit" class="add" aria-label="加到计划">+</button>
       </form>
     </div>
@@ -930,6 +974,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         <label>专注 <input type="number" id="fCustF" min="1" max="180" step="1" inputmode="numeric" aria-label="专注分钟"> 分钟</label>
         <label>休息 <input type="number" id="fCustB" min="0" max="60" step="1" inputmode="numeric" aria-label="休息分钟"> 分钟</label>
       </div>
+      <label class="f-for" id="fGoalFor"><span>为了哪个目标</span><select id="fGoal"></select></label>
       <label class="f-for" id="fFor"><span>为了哪个愿望</span><select id="fWish"></select></label>
       <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
     </div>
@@ -939,6 +984,18 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <button type="button" class="btn-ghost" id="fRunOpen">回到专注</button>
       <b class="f-run-time" id="fRunTime"></b>
     </div>
+
+    <h2 class="underlined" id="goalTitle">我的目标</h2>
+    <ul class="goals" id="goalList"></ul>
+    <form class="goal-add" id="goalForm" autocomplete="off">
+      <input type="text" id="goalName" placeholder="新目标，比如：三个月考过 N2" maxlength="40" aria-label="新目标">
+      <label class="goal-end"><span>截止日期（可不填）</span><input type="date" id="goalEnd"></label>
+      <button type="submit" class="add" aria-label="添加目标">+</button>
+    </form>
+    <details class="goals-done" id="goalsDone" hidden>
+      <summary id="goalsDoneSum"></summary>
+      <ul class="goals" id="goalDoneList"></ul>
+    </details>
   </section>
   </main>
 
@@ -1151,7 +1208,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
     "别离开这一页": "Stay on this page",
-    "一个番茄": "one focus session", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "我的目标": "My goals", "为了哪个目标": "Goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1755,6 +1812,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       box.setAttribute("aria-label", t.done ? L("改回没做完", "Mark as not done") : L("标记为做完了", "Mark as done"));
       const nm = document.createElement("span"); nm.className = "tname"; nm.textContent = t.title;
       if (t.date < current) { const sm = document.createElement("small"); sm.textContent = L(`从 ${fmtMD(parse(t.date))} 带过来`, `Carried over from ${fmtMD(parse(t.date))}`); nm.append(sm); }
+      const tg = t.goalId && goals.find(g => g.id === t.goalId);
+      if (tg) { const gt = document.createElement("span"); gt.className = "g-tag"; gt.textContent = "◎ " + tg.title; nm.append(document.createElement("br"), gt); }
       const n = taskToms(t.id), tm = document.createElement("span"); tm.className = "ttoms";
       if (n) tm.innerHTML = n <= 4 ? tomSVG("full").repeat(n) : tomSVG("full") + `×${n}`;
       const end = document.createElement("span"); end.className = "tend";
@@ -1767,6 +1826,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       end.append(x);
       li.append(box, nm, tm, end); ul.append(li);
     });
+    // 加计划时可以挑一个目标（没有进行中的目标就不显示）
+    const ag = activeGoals(), gs = $("taskGoal"), keep = gs.value; gs.textContent = ""; gs.hidden = !ag.length;
+    const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不属于目标", "No goal"); gs.append(o0);
+    ag.forEach(g => { const o = document.createElement("option"); o.value = g.id; o.textContent = "◎ " + g.title; gs.append(o); });
+    gs.value = ag.some(g => g.id === keep) ? keep : "";
     // 今天专注了多少
     const box = $("todayFocus"); box.textContent = "";
     const fd = focusByDay()[current];
@@ -1783,20 +1847,21 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("taskForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const title = $("taskName").value.trim(); if (!title) { $("taskName").focus(); return; }
-    tasks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: current, title, done: false, created: Date.now() });
-    saveTasks(); renderPlan(); renderCal();
+    const gid = $("taskGoal").value;
+    tasks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: current, title, done: false, ...(gid ? { goalId: gid } : {}), created: Date.now() });
+    saveTasks(); renderPlan(); renderCal(); renderGoals();
     $("taskName").value = ""; $("taskName").focus();
   });
   function setTaskDone(t, done) {
     t.done = done; if (done) t.doneAt = Date.now(); else delete t.doneAt;
-    saveTasks(); renderPlan(); renderCal(); renderStats();
+    saveTasks(); renderPlan(); renderCal(); renderStats(); renderGoals();
     if (done) { buzz("success"); toast(L(`做完了「${t.title}」`, `Done: "${t.title}"`)); }
   }
   $("tasks").addEventListener("click", (e) => {
     const el = e.target.closest("[data-act]"); if (!el) return;
     const t = tasks.find(x => x.id === el.closest("li").dataset.id); if (!t) return;
     if (el.dataset.act === "done") setTaskDone(t, !t.done);
-    else if (el.dataset.act === "go") startFocus(t.id);
+    else if (el.dataset.act === "go") startFocus({ taskId: t.id });
     else if (el.dataset.act === "del") twoStep(el, "×", () => { tasks = tasks.filter(x => x.id !== t.id); saveTasks(); renderPlan(); renderCal(); });
   });
   let noteT;
@@ -1855,16 +1920,27 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const FOCUS_KEY = "overtime-focus-v1";
   let focusLog = [];   // {id, start, end, min, wishId?}
   const normFocus = (list) => (Array.isArray(list) ? list : []).filter(s => s && typeof s.id === "string" && Number(s.min) > 0 && Number(s.start) > 0)
-    .map(s => ({ id: s.id.slice(0, 40), start: Number(s.start), end: Number(s.end) || Number(s.start) + Number(s.min) * 60000, min: Math.min(600, Math.round(Number(s.min))), ...(typeof s.wishId === "string" && s.wishId ? { wishId: s.wishId.slice(0, 40) } : {}), ...(typeof s.taskId === "string" && s.taskId ? { taskId: s.taskId.slice(0, 40) } : {}) }));
+    .map(s => ({ id: s.id.slice(0, 40), start: Number(s.start), end: Number(s.end) || Number(s.start) + Number(s.min) * 60000, min: Math.min(600, Math.round(Number(s.min))), ...(typeof s.wishId === "string" && s.wishId ? { wishId: s.wishId.slice(0, 40) } : {}), ...(typeof s.taskId === "string" && s.taskId ? { taskId: s.taskId.slice(0, 40) } : {}), ...(typeof s.goalId === "string" && s.goalId ? { goalId: s.goalId.slice(0, 40) } : {}) }));
   try { focusLog = normFocus(JSON.parse(localStorage.getItem(FOCUS_KEY) || "[]")); } catch (e) { focusLog = []; }
   const saveFocus = () => { try { localStorage.setItem(FOCUS_KEY, JSON.stringify(focusLog)); } catch (e) {} };
   // 今日计划：{id, date, title, done, doneAt?, created}。没做完的会一直带到之后的「今天」
   const TASK_KEY = "overtime-tasks-v1";
   let tasks = [];
   const normTasks = (list) => (Array.isArray(list) ? list : []).filter(t => t && typeof t.id === "string" && typeof t.title === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.date || ""))
-    .map(t => ({ id: t.id.slice(0, 40), date: t.date, title: t.title.slice(0, 60), done: !!t.done, ...(t.done && Number(t.doneAt) ? { doneAt: Number(t.doneAt) } : {}), created: Number(t.created) || 0 }));
+    .map(t => ({ id: t.id.slice(0, 40), date: t.date, title: t.title.slice(0, 60), done: !!t.done, ...(t.done && Number(t.doneAt) ? { doneAt: Number(t.doneAt) } : {}), ...(typeof t.goalId === "string" && t.goalId ? { goalId: t.goalId.slice(0, 40) } : {}), created: Number(t.created) || 0 }));
   try { tasks = normTasks(JSON.parse(localStorage.getItem(TASK_KEY) || "[]")); } catch (e) { tasks = []; }
   const saveTasks = () => { try { localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); } catch (e) {} };
+  // 目标：{id, title, start, end?, closed, closedAt?, checks: [手动打卡的日期], created}
+  // 一段时间里的专注（番茄记 goalId）、打卡（专注过 / 做完了属于它的计划 / 手动打卡的日子）、这段时间的花销都按它统计
+  const GOAL_KEY = "overtime-goals-v1";
+  let goals = [];
+  const isDate = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const normGoals = (list) => (Array.isArray(list) ? list : []).filter(g => g && typeof g.id === "string" && typeof g.title === "string" && isDate(g.start))
+    .map(g => ({ id: g.id.slice(0, 40), title: g.title.slice(0, 40), start: g.start, ...(isDate(g.end) ? { end: g.end } : {}), closed: !!g.closed,
+      ...(g.closed && Number(g.closedAt) ? { closedAt: Number(g.closedAt) } : {}), checks: Array.isArray(g.checks) ? [...new Set(g.checks.filter(isDate))].sort() : [], created: Number(g.created) || 0 }));
+  try { goals = normGoals(JSON.parse(localStorage.getItem(GOAL_KEY) || "[]")); } catch (e) { goals = []; }
+  const saveGoals = () => { try { localStorage.setItem(GOAL_KEY, JSON.stringify(goals)); } catch (e) {} };
+  const activeGoals = () => goals.filter(g => !g.closed).sort((a, b) => a.created - b.created);
 
   let editingWish = null;
   function wishEditRow(w) {
@@ -2076,12 +2152,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
 
   // taskId：从「今日计划」点 ▶ 开的番茄记在那件事上；再来一个 / 重新开始时沿用上一个番茄的那件事
-  function startFocus(taskId) {
+  // o：{taskId} 从计划点 ▶、{goalId} 从目标点 ▶；不传（专注页的开始、再来一个、重新开始）就沿用上一个番茄的，没有再用专注页选的目标
+  function startFocus(o) {
     const f = clampInt(fpref.f, 1, 180, 25), w = fWishObj(fpref.wish);
     const cycle = frun && ["done", "breakdone", "break", "broken"].includes(frun.phase) ? frun.cycle || 0 : 0;
-    let tid = typeof taskId === "string" ? taskId : frun && frun.taskId || "";
+    const given = o && typeof o === "object" && !o.target ? o : null;
+    let tid = given ? given.taskId || "" : frun && frun.taskId || "";
     if (tid && !tasks.some(t => t.id === tid && !t.done)) tid = "";
-    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", taskId: tid, cycle, open: true };
+    const tk = tid && tasks.find(t => t.id === tid);
+    let gid = given ? given.goalId || (tk && tk.goalId) || "" : (frun && frun.goalId) || (tk && tk.goalId) || fpref.goal || "";
+    if (gid && !goals.some(g => g.id === gid && !g.closed)) gid = "";
+    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", taskId: tid, goalId: gid, cycle, open: true };
     unlockAudio(); askNotify(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
   function startBreak() {
@@ -2099,11 +2180,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const ms = Math.min(frun.dur, Math.max(0, endAt - frun.start - frun.paused)), min = Math.round(ms / 60000);
     if (min < 1) { frun = null; saveFrun(); scheduleFocusNote(); renderFocusAll(); toast(L("不到 1 分钟，这次就不记了", "Under a minute, so this one wasn't saved")); return; }
     const w = fWishObj(frun.wishId), wasLocked = !!w && isLocked(w);
-    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(w ? { wishId: w.id } : {}), ...(frun.taskId ? { taskId: frun.taskId } : {}) });
+    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(w ? { wishId: w.id } : {}), ...(frun.taskId ? { taskId: frun.taskId } : {}), ...(frun.goalId ? { goalId: frun.goalId } : {}) });
     saveFocus();
     frun = { ...frun, phase: "done", gained: min, unlocked: wasLocked && !isLocked(w), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
     saveFrun(); scheduleFocusNote(); chime(); buzz("success");
-    renderWishes(); renderFocus(); renderCal(); renderNight(); renderStats(); renderStage(true);
+    renderWishes(); renderFocus(); renderCal(); renderNight(); renderStats(); renderGoals(); renderStage(true);
     const ring = $("fsRing"); ring.classList.remove("pop"); void ring.offsetWidth; ring.classList.add("pop");
   }
   function endBreak() { frun = { ...frun, phase: "breakdone", pausedAt: 0, doneAt: Date.now() }; saveFrun(); chime(); buzz("success"); renderStage(true); }
@@ -2210,8 +2291,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       for (let i = 0; i < 4; i++) dots.insertAdjacentHTML("beforeend", tomSVG(i < filled ? "full" : ""));
       cyc.append(dots);
       const tk = frun.taskId && tasks.find(t => t.id === frun.taskId), ft = $("fsTask");
-      ft.hidden = !tk; ft.textContent = "";
+      const gk = !tk && frun.goalId && goals.find(g => g.id === frun.goalId);
+      ft.hidden = !tk && !gk; ft.textContent = "";
       if (tk) { const sm = document.createElement("small"); sm.textContent = L("在做", "Working on"); ft.append(sm, tk.title); }
+      else if (gk) { const sm = document.createElement("small"); sm.textContent = L("目标", "Goal"); ft.append(sm, gk.title); }
       $("fsPhase").textContent = ph === "focus" ? (frun.pausedAt ? L("暂停中", "Paused") : L("专注中", "Focusing"))
         : ph === "break" ? (frun.pausedAt ? L("暂停中", "Paused") : frun.long ? L("长休息", "Long break") : L("休息一下", "Break"))
         : ph === "done" ? L("番茄完成", "Session done") : L("休息好了", "Break's over");
@@ -2314,6 +2397,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const o0 = document.createElement("option"); o0.value = ""; o0.textContent = L("不选", "None"); sel.append(o0);
     gw.forEach(w => { const o = document.createElement("option"); o.value = w.id; o.textContent = `${w.name} · ` + L(`还差 ${fmtMin(goalLeft(w))}`, `${fmtMin(goalLeft(w))} to go`); sel.append(o); });
     sel.value = fpref.wish;
+    const gsel = $("fGoal"), ag = activeGoals(); gsel.textContent = "";
+    if (fpref.goal && !ag.some(g => g.id === fpref.goal)) fpref.goal = "";
+    const g0 = document.createElement("option"); g0.value = ""; g0.textContent = L("不选", "None"); gsel.append(g0);
+    ag.forEach(g => { const o = document.createElement("option"); o.value = g.id; o.textContent = g.title; gsel.append(o); });
+    gsel.value = fpref.goal || ""; $("fGoalFor").hidden = !ag.length;
+    renderGoals();
     $("fFor").hidden = !gw.length;   // 没有要攒专注的愿望，就不用选
 
     $("fSetup").hidden = fActive(); $("fRunning").hidden = !fActive();
@@ -2331,6 +2420,119 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("fCustF").addEventListener("change", (e) => { fpref.f = clampInt(e.target.value, 1, 180, 25); fpref.custom = true; savePref(); renderFocus(); });
   $("fCustB").addEventListener("change", (e) => { fpref.b = clampInt(e.target.value, 0, 60, 5); fpref.custom = true; savePref(); renderFocus(); });
   $("fWish").addEventListener("change", (e) => { fpref.wish = e.target.value; savePref(); renderFocus(); });
+  $("fGoal").addEventListener("change", (e) => { fpref.goal = e.target.value; savePref(); });
+
+  // ---------- 目标 ----------
+  // 一天在某个目标上的情况：专注分钟、有没有打卡（专注过 / 做完了属于它的计划 / 手动打卡）
+  function goalDays(g) {
+    const out = {}, day = (d) => out[d] || (out[d] = { min: 0, hit: false });
+    focusLog.forEach(f => { if (f.goalId === g.id) { const d = day(nightOf(new Date(f.start))); d.min += f.min; d.hit = true; } });
+    tasks.forEach(t => { if (t.goalId === g.id && t.done && t.doneAt) day(nightOf(new Date(t.doneAt))).hit = true; });
+    g.checks.forEach(c => (day(c).hit = true));
+    return out;
+  }
+  const goalLast = (g) => g.closed && g.closedAt ? nightOf(new Date(g.closedAt)) : nightOf();
+  function heatGrid(g, days) {
+    const today = nightOf(), last = g.closed ? goalLast(g) : (g.end && g.end > today ? g.end : today);
+    let first = shift(g.start, -((parse(g.start).getDay() + 6) % 7));
+    let lastSun = shift(last, (7 - parse(last).getDay()) % 7);
+    if ((parse(lastSun) - parse(first)) / 864e5 > 26 * 7) first = shift(lastSun, -26 * 7 + 1);   // 太长只看最近半年
+    let cols = Math.round((parse(lastSun) - parse(first)) / 864e5 + 1) / 7;
+    if (cols < 8) { lastSun = shift(first, 8 * 7 - 1); cols = 8; }   // 刚开始的目标也画 8 周，后面是空格子
+    const wrap = document.createElement("div"); wrap.className = "heat";
+    const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
+    // 格子尽量铺满卡片宽度：卡片内宽 ≈ 屏幕宽 − 页面边距 − 卡片内边距
+    const inner = Math.min(innerWidth, 660) - 32 - 36;
+    grid.style.setProperty("--c", Math.max(10, Math.min(22, Math.floor((inner - (cols - 1) * 3) / cols))) + "px");
+    for (let d = first; d <= lastSun; d = shift(d, 1)) {
+      const c = document.createElement("i"), v = days[d];
+      if (d < g.start || (g.closed && d > last)) c.className = "pad";
+      else if (d > today) c.className = "fut";
+      else if (v && v.hit) c.className = "lv" + (v.min >= 120 ? 4 : v.min >= 60 ? 3 : v.min >= 25 ? 2 : 1);
+      if (d === today) c.classList.add("today");
+      if (v && v.hit) c.title = `${fmtMD(parse(d))} ${v.min ? fmtMin(v.min) : L("打卡", "checked in")}`;
+      grid.append(c);
+    }
+    wrap.append(grid);
+    requestAnimationFrame(() => (wrap.scrollLeft = wrap.scrollWidth));
+    return wrap;
+  }
+  function goalCard(g) {
+    const today = nightOf(), days = goalDays(g), last = goalLast(g);
+    const li = document.createElement("li"); li.dataset.id = g.id;
+    const card = document.createElement("div"); card.className = "goal sketch" + (g.closed ? " closed" : "");
+    const head = document.createElement("div"); head.className = "g-head";
+    const nm = document.createElement("div"); nm.className = "g-name"; nm.textContent = g.title;
+    const span = Math.round((parse(last) - parse(g.start)) / 864e5) + 1;
+    const sm = document.createElement("small");
+    sm.textContent = g.closed ? L(`${fmtMD(parse(g.start))} – ${fmtMD(parse(last))} · 坚持了 ${span} 天`, `${fmtMD(parse(g.start))} – ${fmtMD(parse(last))} · ${span} days`)
+      : g.end ? (g.end >= today ? L(`${fmtMD(parse(g.start))} 开始 · 离截止还有 ${Math.round((parse(g.end) - parse(today)) / 864e5)} 天`, `Since ${fmtMD(parse(g.start))} · ${Math.round((parse(g.end) - parse(today)) / 864e5)} days left`) : L(`已经过了截止日 ${fmtMD(parse(g.end))}`, `Past the ${fmtMD(parse(g.end))} deadline`))
+      : L(`${fmtMD(parse(g.start))} 开始 · 第 ${span} 天`, `Since ${fmtMD(parse(g.start))} · day ${span}`);
+    nm.append(sm);
+    const acts = document.createElement("div"); acts.className = "g-acts";
+    if (!g.closed) {
+      const ck = document.createElement("button"); ck.type = "button"; ck.className = "g-check"; ck.dataset.act = "check";
+      const hitToday = !!(days[today] && days[today].hit), manual = g.checks.includes(today);
+      ck.setAttribute("aria-pressed", String(hitToday)); ck.textContent = hitToday ? L("今天 ✓", "Today ✓") : L("打卡", "Check in");
+      if (hitToday && !manual) ck.disabled = true;   // 专注过 / 做完计划已经算打卡了
+      const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = PLAY; go.disabled = fActive();
+      go.setAttribute("aria-label", L(`为「${g.title}」开一个番茄`, `Start a focus session for "${g.title}"`));
+      acts.append(ck, go);
+    }
+    head.append(nm, acts);
+    const from = g.start, to = last;
+    const fm = Object.values(days).reduce((a, v) => a + v.min, 0), hits = Object.entries(days).filter(([d, v]) => v.hit && d >= from && d <= to).length;
+    let spent = 0; Object.values(nights).forEach(n => { if (n.date >= from && n.date <= to) spent += sum(n); });
+    const st = document.createElement("div"); st.className = "g-stats";
+    const stat = (v, k) => { const e = document.createElement("span"); const b = document.createElement("b"); b.textContent = v; e.append(b, k); return e; };
+    st.append(stat(fmtMin(fm), L(" 专注", " focused")), stat(String(hits), L(" 天打卡", hits === 1 ? " day checked in" : " days checked in")), stat(money(spent), L(" 这段时间花的", " spent meanwhile")));
+    card.append(head, heatGrid(g, days), st);
+    const foot = document.createElement("div"); foot.className = "g-foot";
+    if (!g.closed) { const c = document.createElement("button"); c.type = "button"; c.className = "btn-ghost"; c.dataset.act = "close"; c.textContent = L("完成目标", "Complete goal"); foot.append(c); }
+    else {
+      const r = document.createElement("button"); r.type = "button"; r.className = "link"; r.dataset.act = "reopen"; r.textContent = L("重新打开", "Reopen");
+      const x = document.createElement("button"); x.type = "button"; x.className = "link"; x.dataset.act = "del"; x.textContent = L("删除", "Delete");
+      foot.append(r, x);
+    }
+    card.append(foot); li.append(card);
+    return li;
+  }
+  function renderGoals() {
+    const ul = $("goalList"); ul.textContent = "";
+    const ag = activeGoals();
+    if (!ag.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = L("给自己定一个目标，比如「三个月考过 N2」。之后为它专注、打卡，这段时间学了多少、花了多少都会记在这里。", "Set a goal, like \"Pass N2 in three months\". Focus and check in for it, and see how much you studied and spent along the way."); ul.append(li); }
+    ag.forEach(g => ul.append(goalCard(g)));
+    const done = goals.filter(g => g.closed).sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
+    $("goalsDone").hidden = !done.length;
+    $("goalsDoneSum").textContent = L(`已完成的目标（${done.length}）`, `Completed goals (${done.length})`);
+    const dl = $("goalDoneList"); dl.textContent = ""; done.forEach(g => dl.append(goalCard(g)));
+  }
+  $("goalForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = $("goalName").value.trim(); if (!title) { $("goalName").focus(); return; }
+    const end = $("goalEnd").value, start = nightOf();
+    if (end && end < start) { toast(L("截止日期要在今天之后", "The deadline has to be after today")); return; }
+    goals.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, start, ...(end ? { end } : {}), closed: false, checks: [], created: Date.now() });
+    saveGoals(); renderFocus(); renderPlan();
+    $("goalName").value = ""; $("goalEnd").value = "";
+    toast(L(`定好了：${title}`, `Goal set: ${title}`));
+  });
+  const onGoalClick = (e) => {
+    const el = e.target.closest("[data-act]"); if (!el) return;
+    const g = goals.find(x => x.id === el.closest("li").dataset.id); if (!g) return;
+    const act = el.dataset.act, today = nightOf();
+    if (act === "go") { startFocus({ goalId: g.id }); return; }
+    if (act === "check") {
+      if (g.checks.includes(today)) g.checks = g.checks.filter(d => d !== today);
+      else { g.checks.push(today); buzz("success"); toast(L(`「${g.title}」今天打卡了`, `Checked in for "${g.title}"`)); }
+      saveGoals(); renderGoals(); return;
+    }
+    if (act === "close") return twoStep(el, L("完成目标", "Complete goal"), () => { g.closed = true; g.closedAt = Date.now(); saveGoals(); renderFocus(); renderPlan(); buzz("success"); toast(L(`🎉 完成了「${g.title}」`, `🎉 Goal complete: "${g.title}"`)); });
+    if (act === "reopen") { g.closed = false; delete g.closedAt; saveGoals(); renderFocus(); renderPlan(); return; }
+    if (act === "del") return twoStep(el, L("删除", "Delete"), () => { goals = goals.filter(x => x.id !== g.id); saveGoals(); renderFocus(); renderPlan(); });
+  };
+  $("goalList").addEventListener("click", onGoalClick);
+  $("goalDoneList").addEventListener("click", onGoalClick);
   $("fStart").onclick = startFocus;
 
   // ---------- 月度加班账单分享图 ----------
@@ -2662,7 +2864,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("lastBackup").textContent = t ? L(`上次备份：${t}`, `Last backup: ${t}`) : L("还没有备份过。", "No backup yet.");
     checkBackupReminder();
   }
-  const backupJSON = () => JSON.stringify({ app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes, focus: focusLog, tasks }, null, 2);
+  const backupJSON = () => JSON.stringify({ app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes, focus: focusLog, tasks, goals }, null, 2);
   const backupName = () => `overtime-log-backup-${ymd(new Date())}.json`;
   function markBackedUp(how) {
     lsSet(BK_KEY, `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`);
@@ -2748,9 +2950,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const inc = normTasks(raw.tasks), ids = new Set(inc.map(t => t.id));
         tasks = tasks.filter(t => !ids.has(t.id)).concat(inc); tAdded = inc.length; saveTasks();
       }
-      if (!added && !wAdded && !fAdded && !tAdded) throw new Error();
+      let gAdded = 0;
+      if (Array.isArray(raw.goals)) {
+        const inc = normGoals(raw.goals), ids = new Set(inc.map(g => g.id));
+        goals = goals.filter(g => !ids.has(g.id)).concat(inc); gAdded = inc.length; saveGoals();
+      }
+      if (!added && !wAdded && !fAdded && !tAdded && !gAdded) throw new Error();
       try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {}
-      renderAll(); toast(L(`已导入 ${added} 天的花销` + (wAdded ? `、${wAdded} 个愿望` : "") + (fAdded ? `、${fAdded} 个番茄` : "") + (tAdded ? `、${tAdded} 条计划` : ""), `Imported ${added} days of spending` + (wAdded ? `, ${wAdded} wishes` : "") + (fAdded ? `, ${fAdded} focus sessions` : "") + (tAdded ? `, ${tAdded} plan items` : "")));
+      renderAll(); toast(L(`已导入 ${added} 天的花销` + (wAdded ? `、${wAdded} 个愿望` : "") + (fAdded ? `、${fAdded} 个番茄` : "") + (tAdded ? `、${tAdded} 条计划` : "") + (gAdded ? `、${gAdded} 个目标` : ""), `Imported ${added} days of spending` + (wAdded ? `, ${wAdded} wishes` : "") + (fAdded ? `, ${fAdded} focus sessions` : "") + (tAdded ? `, ${tAdded} plan items` : "") + (gAdded ? `, ${gAdded} goals` : "")));
     } catch (err) { toast(L("这个文件读不出来，请选择「导出备份」生成的 .json 文件", "Can't read this file. Choose a .json file made by Export backup.")); }
   });
 
@@ -2833,23 +3040,24 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         return;
       }
       const got = await ic.get({ key: IC_KEY });
-      let remote = { nights: {}, wishes: [], focus: [], tasks: [] };
+      let remote = { nights: {}, wishes: [], focus: [], tasks: [], goals: [] };
       if (got && got.value) { try { remote = JSON.parse(got.value) || remote; } catch (e) {} }
-      let base = { nights: {}, wishes: {}, focus: {}, tasks: {} };
+      let base = { nights: {}, wishes: {}, focus: {}, tasks: {}, goals: {} };
       try { base = JSON.parse(localStorage.getItem(IC_BASE) || "null") || base; } catch (e) {}
       const mN = merge3(base.nights || {}, nights, normFlags(remote.nights || {}));
       const mW = merge3(base.wishes || {}, wishMap(wishes), wishMap(remote.wishes));
       const mF = merge3(base.focus || {}, wishMap(focusLog), wishMap(normFocus(remote.focus)));
       const mT = merge3(base.tasks || {}, wishMap(tasks), wishMap(normTasks(remote.tasks)));
-      if (JSON.stringify(mN) !== JSON.stringify(nights) || JSON.stringify(mW) !== JSON.stringify(wishMap(wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(focusLog)) || JSON.stringify(mT) !== JSON.stringify(wishMap(tasks))) {
-        nights = mN; wishes = Object.values(mW); focusLog = Object.values(mF); tasks = Object.values(mT);
+      const mG = merge3(base.goals || {}, wishMap(goals), wishMap(normGoals(remote.goals)));
+      if (JSON.stringify(mN) !== JSON.stringify(nights) || JSON.stringify(mW) !== JSON.stringify(wishMap(wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(focusLog)) || JSON.stringify(mT) !== JSON.stringify(wishMap(tasks)) || JSON.stringify(mG) !== JSON.stringify(wishMap(goals))) {
+        nights = mN; wishes = Object.values(mW); focusLog = Object.values(mF); tasks = Object.values(mT); goals = Object.values(mG);
         try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {}
-        saveWishes(); saveFocus(); saveTasks(); renderAll();
+        saveWishes(); saveFocus(); saveTasks(); saveGoals(); renderAll();
       }
-      if (!got || !got.value || JSON.stringify(mN) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mW) !== JSON.stringify(wishMap(remote.wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(normFocus(remote.focus))) || JSON.stringify(mT) !== JSON.stringify(wishMap(normTasks(remote.tasks)))) {
-        await ic.set({ key: IC_KEY, value: JSON.stringify({ app: "overtime-night-log", version: 5, currency: "USD", updatedAt: new Date().toISOString(), nights: mN, wishes: Object.values(mW), focus: Object.values(mF), tasks: Object.values(mT) }) });
+      if (!got || !got.value || JSON.stringify(mN) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mW) !== JSON.stringify(wishMap(remote.wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(normFocus(remote.focus))) || JSON.stringify(mT) !== JSON.stringify(wishMap(normTasks(remote.tasks))) || JSON.stringify(mG) !== JSON.stringify(wishMap(normGoals(remote.goals)))) {
+        await ic.set({ key: IC_KEY, value: JSON.stringify({ app: "overtime-night-log", version: 6, currency: "USD", updatedAt: new Date().toISOString(), nights: mN, wishes: Object.values(mW), focus: Object.values(mF), tasks: Object.values(mT), goals: Object.values(mG) }) });
       }
-      try { localStorage.setItem(IC_BASE, JSON.stringify({ nights: mN, wishes: mW, focus: mF, tasks: mT })); } catch (e) {}
+      try { localStorage.setItem(IC_BASE, JSON.stringify({ nights: mN, wishes: mW, focus: mF, tasks: mT, goals: mG })); } catch (e) {}
       icloud = { on: true, last: new Date().toTimeString().slice(0, 5), msg: "" };
     } catch (e) {
       icloud.msg = (e && e.code === "TOO_LARGE")
@@ -2866,7 +3074,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (ic && ic.addListener) ic.addListener("change", () => icloudSync());
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") icloudSync(); else pushWidget(true); });
     // 本地有改动：3 秒内推到 iCloud
-    setInterval(() => { const now = JSON.stringify([nights, wishes, focusLog, tasks]); if (now !== icLastLocal) { icLastLocal = now; icloudSync(); } }, 3000);
+    setInterval(() => { const now = JSON.stringify([nights, wishes, focusLog, tasks, goals]); if (now !== icLastLocal) { icLastLocal = now; icloudSync(); } }, 3000);
   }
 
   // 每晚提醒：本地通知，不需要服务器。工作日是周一到周五（1 = 周日）。
@@ -2951,7 +3159,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (frun && frun.phase === "focus") checkLeft(frun.leftAt || frun.seen || frun.start);
   if (NATIVE) {
     renderReminder(); renderICloud(); syncStatusBar();
-    icLastLocal = JSON.stringify([nights, wishes, focusLog, tasks]); icloudSync();
+    icLastLocal = JSON.stringify([nights, wishes, focusLog, tasks, goals]); icloudSync();
     if (rem.on) applyReminder();   // 每次启动重新排一次，防止系统清掉
   }
   // 请求持久存储，降低浏览器自动清理数据的概率
