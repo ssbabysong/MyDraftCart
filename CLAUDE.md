@@ -55,7 +55,7 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 只有用户能做的事（登录 Apple ID、在 Xcode 里选 Team、信任开发者、App Store Connect 里点提交）要写清楚步骤让用户操作。
 - 不要把任何密钥、Token、Apple 账号信息写进仓库。
 - 改了 `index.html` 后：`sw.js` 的 `VERSION` 加一，并运行 `npm run build && npx cap sync ios`。
-- 底部菜单 4 个：今天 / 目标（tab id 还是 `focus`）/ 愿望 / 日历（日历页标题处切换日历、统计；月历格子里有几个番茄画几个）。设置和历史记录、备份（tab `records`）不占菜单，从右上角时钟上方的小齿轮 `.gear` 进去；该备份时齿轮上有红点，备份提示 `#bkRemind` 只在设置页显示。分组在 `GROUPS`，再点底部按钮回到上次看的子页（`overtime-sub-<组>`）。
+- 底部菜单 4 个：今天（顶上是日历，默认只显示一周 `.cal.wk-mode`，「展开月历」看整月，`overtime-cal-open` 记住；点哪天下面的计划和花销就切到哪天；标题处切到「统计」，商品墙也在统计页）/ 目标（tab id `focus`，只有目标）/ 番茄（tab id `timer`，大番茄表盘 + 时长）/ 愿望。设置和历史记录、备份（tab `records`）从右上角时钟上方的小齿轮 `.gear` 进去。旧的 `#calendar` 链接落到今天。
 - 番茄专注：专注记录存 `overtime-focus-v1`（`{id, start, end, min, wishId?}`），和每晚记录、愿望一样进备份和 iCloud 三方合并；进行中的番茄 `overtime-focus-run` 只存在本机，按时间戳算剩余时间。愿望可设 `focusGoal`（分钟），绑定它的专注攒够了才解锁。专注时不能离开：不能收起，切出 App / 锁屏 / 关掉 App 超过 10 秒（`GRACE`）番茄就坏掉（phase `broken`，不计入）；休息结束用本地通知 id 900。App 里专注时用 `MainViewController.swift` 里的 KeepAwake 插件：关掉自动锁屏、回桌面和下拉要滑两次（`preferredScreenEdgesDeferringSystemGestures`）、进后台那一刻由原生端发「番茄要坏掉了」通知（回来自动撤掉）。网页版离开时用 beforeunload 确认，装到桌面且允许通知时用 Service Worker 弹通知。还没在真机上测过。
 - 「身体不行」已并进 burnout：旧数据里有 `body` 的晚上读进来时算 burnout（`normFlags`），统计里那一格换成「专注番茄」，分享图第二行是 Burnout + 专注，小组件只显示 burnout。今晚的「从愿望清单里买」点一下记一笔（item 带 `wishId`）并把愿望勾成买到了，删掉这一笔愿望会回到清单。
 - 今天页的花销卡片：Burnout 是「备注」旁边的小标签（`.burn-chip`）。记账是一行「买了什么 / 金额 / +」，下面两行横向滑动的快捷项：「常买」（`quickList`：按自己记过的次数排前 8 个，金额取最近一次，不够用默认补）和「愿望」，点一下直接记一笔。
@@ -65,3 +65,4 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 主题「铅笔」（`data-skin="pencil"`）是新用户的默认主题：手绘但极简——米白纸、细浅线（`--bc`）、卡片保留手绘的不规则边，小控件用胶囊 / 圆形；没有阴影、胶带、倾斜和方格纸；主按钮深色实心，强调色只有番茄红；正文黑体，标题和数字手写。之前选过主题的用户保持原样，「方格本」等还在设置里。
 - 2026-10-24 简化：番茄只归属目标（从计划或目标卡片的「专注」开；番茄钟本身没有下拉框）。愿望不再绑定番茄，`focusFor(w)` = 许愿之后所有专注分钟（旧数据里绑定过 `wishId` 的也算），完成页顺带显示解锁了哪个愿望或离最近的还差多少。今天页的花销卡片默认收起成一行（`overtime-spend-open` 记住展开状态），计划的目标下拉框只在输入时出现。
 - 今日计划按目标分组（`renderPlan`）：每个进行中的目标一组，组头显示今天为它开的番茄数和是否已打卡，组里「+ 加一件事」直接加到这个目标；没目标的事在「其他」，底部输入框加的就是「其他」。目标页：目标卡片（打卡点点、专注、打卡天数、这段时间花销、最近做完的 3 件事）在上，番茄钟（只调时长 + 随便专注一下）在下。
+- 开番茄（计划 / 目标 / 番茄页）前会弹「这个番茄攒给…」面板（`startWithWish`），列出还锁着的愿望和进度，上次选的排第一；选了的番茄记 `wishId`，愿望进度只算这些（`focusFor`）。再来一个 / 重新开始沿用上一个番茄的愿望（解锁了就不再沿用）。没有锁着的愿望就直接开始。

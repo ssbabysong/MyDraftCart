@@ -470,9 +470,7 @@ ul.wishes li:nth-child(even) { border-radius: var(--rad, var(--wob2)); transform
 .tom .ts { fill: none; stroke: var(--bc, var(--ink)); stroke-width: 3; stroke-linecap: round; }
 .tom .tg { fill: none; stroke: var(--card); stroke-width: 4; stroke-linecap: round; opacity: .85; }
 .tom.full .tb { fill: var(--burn); }
-.f-setup { padding: 18px 18px 18px; gap: 14px; }
-.f-setup::before { display: none; }
-.f-setup .f-start { font-size: 18px; padding: 10px; }
+.f-setup { padding: 26px 18px 20px; gap: 16px; }
 .f-dial { align-self: center; position: relative; width: 196px; height: 196px; display: grid; place-items: center; margin: -6px 0 -4px; transform: rotate(calc(-3deg * var(--tilt, 1))); }
 .f-dial svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .f-dial .val { position: relative; display: flex; flex-direction: column; align-items: center; line-height: 1; margin-top: 30px; }
@@ -611,7 +609,7 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 .f-pill svg { width: 26px; height: 26px; overflow: visible; }
 .f-pill.brk { background: var(--body-hi); }
 .f-pill.paused span { opacity: .5; }
-.tabbar button[data-go="focus"][aria-current="page"] svg { fill: var(--burn-hi); }
+.tabbar button[data-go="timer"][aria-current="page"] svg { fill: var(--burn-hi); }
 .tabbar button[data-go="wishes"][aria-current="page"] svg { fill: var(--body-hi); }
 @media (max-width: 480px) {
 }
@@ -765,6 +763,16 @@ html[lang="en"] header > div:first-child { min-width: 0; }
   border-radius: var(--rad-top, 22px 26px 0 0 / 14px 16px 0 0); padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column; gap: 12px;
 }
+.wish-sheet { gap: 10px; }
+.ws-head { display: flex; justify-content: space-between; align-items: center; }
+.ws-head h3 { margin: 0; font-weight: 400; font-family: var(--f-title); font-size: 20px; }
+.ws-head .close { border: 0; background: none; font-size: 26px; color: var(--pencil); }
+ul.ws-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+ul.ws-list button { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; background: var(--card); color: var(--ink); border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob1)); }
+ul.ws-list button.last { border-color: var(--burn); background: var(--burn-hi); }
+ul.ws-list .ws-top { display: flex; justify-content: space-between; gap: 10px; font-size: 16px; }
+ul.ws-list .ws-top b { font-family: var(--f-num); font-weight: 400; color: var(--pencil); white-space: nowrap; }
+.ws-none { border: 0; background: none; color: var(--pencil); text-decoration: underline; text-underline-offset: 4px; padding: 8px; font-size: 15px; }
 .share-head { display: grid; grid-template-columns: 40px 1fr 40px 40px; align-items: center; gap: 6px; }
 .share-head h3 { margin: 0; text-align: center; font-weight: 400; font-size: 20px; }
 .share-head button { height: 36px; border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob2)); background: var(--card); font-size: 18px; line-height: 1; }
@@ -834,6 +842,11 @@ html[lang="en"] header > div:first-child { min-width: 0; }
 .day.today .d { display: inline-block; align-self: flex-start; border: 1.5px solid var(--burn); border-radius: var(--round, 50% 45% 55% 48% / 48% 55% 45% 52%); padding: 1px 3px; color: var(--burn); }
 .day.sel { box-shadow: var(--sh-hard, 2px 3px 0 var(--ink)); border-width: 2px; border-color: var(--ink); }
 .day:not(.future):hover { border-color: var(--ink); }
+.cal.wk-mode .day:not(.wk), .cal.wk-mode .cal-key, .cal.wk-mode .cal-sum { display: none; }
+.cal.wk-mode { gap: 10px; padding-bottom: 8px; }
+.cal-toggle { align-self: center; border: 0; background: none; color: var(--pencil); font-size: 13px; padding: 2px 10px; }
+.cal-toggle::after { content: " ⌄"; }
+.cal-toggle[aria-expanded="true"]::after { content: " ⌃"; }
 .cal-key { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--pencil); }
 .cal-key .ramp { display: inline-flex; gap: 2px; vertical-align: middle; margin: 0 4px; }
 .cal-key .ramp i { width: 14px; height: 12px; border: var(--bw, 1px) solid var(--bc, var(--ink)); border-radius: 3px; }
@@ -912,16 +925,34 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
 
   <main class="tab" id="tab-tonight" data-tab="tonight">
+    <div class="stats-head">
+      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="tonight" aria-current="page" id="todayTitle">今天</button><button type="button" data-go="stats">统计</button></nav>
+    </div>
+    <div class="cal sketch wk-mode" id="calCard">
+      <div class="cal-head">
+        <div class="month" id="calMonth">—</div>
+        <div class="cal-nav">
+          <button type="button" id="calPrev" aria-label="上个月">‹</button>
+          <button type="button" id="calToday" style="width:auto;padding:0 10px;font-size:14px">今天</button>
+          <button type="button" id="calNext" aria-label="下个月">›</button>
+        </div>
+      </div>
+      <div class="cal-sum" id="calSum"></div>
+      <div id="calMonthView" style="display:contents">
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-key">
+        <span>花得越多颜色越深<span class="ramp"><i style="background:var(--card)"></i><i style="background:color-mix(in srgb, var(--money) 30%, var(--card))"></i><i style="background:color-mix(in srgb, var(--money) 60%, var(--card))"></i><i style="background:var(--money)"></i></span></span>
+        <span><span style="color:var(--burn)">×</span> burnout</span>
+        <span><svg viewBox="0 0 100 100" class="tom full" id="calKeyTom" aria-hidden="true"></svg> 一个番茄</span>
+      </div>
+      </div>
+      <button type="button" class="cal-toggle" id="calExpand" aria-expanded="false">展开月历</button>
+    </div>
   <section class="card sketch plan-card" aria-labelledby="nightTitle">
     <div class="card-head">
       <div>
         <div class="eyebrow" id="nightEyebrow">今天</div>
         <h2 id="nightTitle">—</h2>
-      </div>
-      <div class="datepick">
-        <button type="button" id="prevDay" aria-label="前一天">‹</button>
-        <input type="date" id="datePick" aria-label="选择日期">
-        <button type="button" id="nextDay" aria-label="后一天">›</button>
       </div>
     </div>
 
@@ -975,48 +1006,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   </section>
   </main>
 
-  <main class="tab" id="tab-calendar" data-tab="calendar" hidden>
-  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="calTitle">
-    <div class="stats-head">
-      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="calendar" aria-current="page" id="calTitle">日历</button><button type="button" data-go="stats">统计</button></nav>
-      <div class="seg" role="group" id="calViewSeg" aria-label="日历视图">
-        <button type="button" data-v="month" aria-pressed="true">月历</button>
-        <button type="button" data-v="items" aria-pressed="false">商品</button>
-      </div>
-    </div>
-    <div class="cal sketch">
-      <div class="cal-head">
-        <div class="month" id="calMonth">—</div>
-        <div class="cal-nav">
-          <button type="button" id="calPrev" aria-label="上个月">‹</button>
-          <button type="button" id="calToday" style="width:auto;padding:0 10px;font-size:14px">本月</button>
-          <button type="button" id="calNext" aria-label="下个月">›</button>
-        </div>
-      </div>
-      <div class="cal-sum" id="calSum"></div>
-      <div id="calMonthView" style="display:contents">
-      <div class="cal-grid" id="calGrid"></div>
-      <div class="cal-key">
-        <span>花得越多颜色越深<span class="ramp"><i style="background:var(--card)"></i><i style="background:color-mix(in srgb, var(--money) 30%, var(--card))"></i><i style="background:color-mix(in srgb, var(--money) 60%, var(--card))"></i><i style="background:var(--money)"></i></span></span>
-        <span><span style="color:var(--burn)">×</span> burnout</span>
-        <span><svg viewBox="0 0 100 100" class="tom full" id="calKeyTom" aria-hidden="true"></svg> 一个番茄</span>
-      </div>
-      </div>
-      <div id="calItemsView" class="items-view" hidden>
-        <div class="eyebrow">这个月买过的东西</div>
-        <div class="item-wall" id="itemWall"></div>
-        <div class="eyebrow">每天买了什么</div>
-        <ol class="night-list" id="nightList"></ol>
-      </div>
-    </div>
-    <div class="day-detail sketch" id="calDetail" aria-live="polite"></div>
-  </section>
-  </main>
-
   <main class="tab" id="tab-stats" data-tab="stats" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="statsTitle">
     <div class="stats-head">
-      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="calendar">日历</button><button type="button" data-go="stats" aria-current="page" id="statsTitle">统计</button></nav>
+      <nav class="pg-switch" aria-label="页面"><button type="button" data-go="tonight">今天</button><button type="button" data-go="stats" aria-current="page" id="statsTitle">统计</button></nav>
       <div class="seg" role="group" id="statsSeg" aria-label="统计范围">
         <button type="button" data-p="week" aria-pressed="false">本周</button>
         <button type="button" data-p="month" aria-pressed="true">本月</button>
@@ -1043,6 +1036,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="plot" id="plot"></div>
       <div class="marks" id="marks"></div>
     </div>
+    <div id="calItemsView" class="items-view">
+      <div class="eyebrow">这个月买过的东西</div>
+      <div class="item-wall" id="itemWall"></div>
+      <div class="eyebrow">每天买了什么</div>
+      <ol class="night-list" id="nightList"></ol>
+    </div>
     <button type="button" class="share-cta" id="shareOpen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
       <span>生成我的月度学习账单<small>专注、做完的事和花销，一张手绘风长图</small></span>
@@ -1052,13 +1051,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
   <main class="tab" id="tab-focus" data-tab="focus" hidden>
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="focusTitle">
-    <div class="f-running sketch" id="fRunning" hidden>
-      <svg viewBox="0 0 100 100" class="tom" id="fRunTom"></svg>
-      <span class="eyebrow" id="fRunPhase"></span>
-      <button type="button" class="btn-ghost" id="fRunOpen">回到专注</button>
-      <b class="f-run-time" id="fRunTime"></b>
-    </div>
-
     <h2 class="underlined" id="focusTitle">我的目标</h2>
     <ul class="goals" id="goalList"></ul>
     <form class="goal-add" id="goalForm" autocomplete="off">
@@ -1071,15 +1063,29 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <ul class="goals" id="goalDoneList"></ul>
     </details>
 
-    <h2 class="underlined" id="timerTitle">番茄钟</h2>
+  </section>
+  </main>
+
+  <main class="tab" id="tab-timer" data-tab="timer" hidden>
+  <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="timerTitle">
+    <h2 class="underlined" id="timerTitle">番茄专注</h2>
+    <div class="f-running sketch" id="fRunning" hidden>
+      <svg viewBox="0 0 100 100" class="tom" id="fRunTom"></svg>
+      <span class="eyebrow" id="fRunPhase"></span>
+      <button type="button" class="btn-ghost" id="fRunOpen">回到专注</button>
+      <b class="f-run-time" id="fRunTime"></b>
+    </div>
     <div class="card sketch f-setup" id="fSetup">
-      <div class="eyebrow">番茄时长</div>
+      <div class="f-dial" aria-hidden="true">
+        <svg viewBox="0 0 100 100" class="tom" id="fDialTom"></svg>
+        <span class="val"><b id="fDialMin">25</b><small>分钟</small></span>
+      </div>
       <div class="f-presets" id="fPresets" role="group" aria-label="专注时长"></div>
       <div class="cur-row f-custom" id="fCustom" hidden>
         <label>专注 <input type="number" id="fCustF" min="1" max="180" step="1" inputmode="numeric" aria-label="专注分钟"> 分钟</label>
         <label>休息 <input type="number" id="fCustB" min="0" max="60" step="1" inputmode="numeric" aria-label="休息分钟"> 分钟</label>
       </div>
-      <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>随便专注一下</span></button>
+      <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
     </div>
   </section>
   </main>
@@ -1098,7 +1104,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <input type="number" id="wishGoal" placeholder="专注分钟" min="0" max="100000" step="1" inputmode="numeric" aria-label="专注多少分钟后解锁">
       <button type="submit" class="add">许个愿</button>
     </form>
-    <p class="wish-hint">专注分钟可以不填；填了，从现在起累计专注够这么久，愿望才会解锁。</p>
+    <p class="wish-hint">专注分钟可以不填；填了，开番茄时选它，攒够这么久才解锁。</p>
     <ul class="wishes" id="wishList"></ul>
     <div class="empty" id="wishEmpty" hidden></div>
     <div class="got-head" id="gotHead" hidden></div>
@@ -1185,20 +1191,20 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 </div>
 <nav class="tabbar" aria-label="主菜单">
   <button type="button" data-go="tonight" aria-current="page">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 5 A11 11 0 1 0 27 21 A9 9 0 1 1 21 5Z"/></svg>
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8 Q16 7 27 8.5 Q27.5 18 26.5 27 Q16 27.8 5.5 26.8 Q4.5 18 5 8Z"/><path d="M5.2 13.5 Q16 12.8 27 13.8"/><path d="M11 4.5 L11 10"/><path d="M21 4.5 L21 10"/><path d="M10 19 L10.5 19M16 19 L16.5 19M22 19 L22.5 19M10 23 L10.5 23M16 23 L16.5 23"/></svg>
     <span>今天</span>
   </button>
   <button type="button" data-go="focus">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4.6 C22.6 4.4 27.5 9.6 27.4 16.2 C27.3 22.6 22.3 27.5 15.8 27.4 C9.4 27.3 4.5 22.4 4.6 15.9 C4.7 9.6 9.6 4.8 16 4.6Z"/><path d="M16.1 10 C19.6 10 22.1 12.6 22 16.1 C21.9 19.5 19.4 22.1 15.9 22 C12.5 21.9 10 19.4 10.1 15.9 C10.2 12.5 12.7 10 16.1 10Z"/><circle cx="16" cy="16" r="1.6"/></svg>
     <span>目标</span>
   </button>
+  <button type="button" data-go="timer">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 9.5 C8.5 9.3 4.6 14.2 5 19.6 C5.5 25.4 10.4 28.2 16 28.2 C21.7 28.2 26.6 25.3 27 19.6 C27.4 14 23.4 9.4 16 9.5Z"/><path d="M16 10 L12 7.4 M16 10 L20 7.4 M16 10 L16 6.5 Q16.4 4.2 19 3.6"/></svg>
+    <span>番茄</span>
+  </button>
   <button type="button" data-go="wishes">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 L19.6 11.2 L28 12.2 L21.8 17.9 L23.4 26.3 L16 22.2 L8.6 26.4 L10.2 17.9 L4 12.3 L12.4 11.1Z"/></svg>
     <span>愿望</span>
-  </button>
-  <button type="button" data-go="calendar">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8 Q16 7 27 8.5 Q27.5 18 26.5 27 Q16 27.8 5.5 26.8 Q4.5 18 5 8Z"/><path d="M5.2 13.5 Q16 12.8 27 13.8"/><path d="M11 4.5 L11 10"/><path d="M21 4.5 L21 10"/><path d="M10 19 L10.5 19M16 19 L16.5 19M22 19 L22.5 19M10 23 L10.5 23M16 23 L16.5 23"/></svg>
-    <span>日历</span>
   </button>
 </nav>
 <div class="focus-stage" id="fStage" role="dialog" aria-modal="true" aria-labelledby="fsPhase" hidden>
@@ -1224,6 +1230,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 <div class="update-bar" id="updateBar" role="status" hidden>
   <span>有新版本了，你的记录不会受影响</span>
   <button type="button" id="updateBtn">点这里更新</button>
+</div>
+<div class="share-modal" id="wishSheet" role="dialog" aria-modal="true" aria-labelledby="wishSheetTitle" hidden>
+  <div class="share-sheet wish-sheet">
+    <div class="ws-head"><h3 id="wishSheetTitle">这个番茄攒给…</h3><button type="button" class="close" id="wishSheetClose" aria-label="关闭">×</button></div>
+    <ul class="ws-list" id="wishSheetList"></ul>
+    <button type="button" class="ws-none" id="wishSheetNone">不攒，直接开始</button>
+  </div>
 </div>
 <div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareTitle" hidden>
   <div class="share-sheet">
@@ -1291,9 +1304,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "随便专注一下": "Just focus", "回到专注": "Back to focus",
     "收起": "Minimize",
     "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
-    "专注分钟可以不填；填了，从现在起累计专注够这么久，愿望才会解锁。": "Focus minutes are optional. If set, the wish unlocks once you've focused that long in total from now on.",
+    "专注分钟可以不填；填了，开番茄时选它，攒够这么久才解锁。": "Focus minutes are optional. If set, pick this wish when you start a session; it unlocks once you've saved up that long.",
     "别离开这一页": "Stay on this page",
-    "一个番茄": "one focus session", "我的目标": "My goals", "为了哪个目标": "Goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "这个番茄攒给…": "Save this session toward…", "不攒，直接开始": "Nothing, just start", "番茄": "Timer", "展开月历": "Show month", "我的目标": "My goals", "为了哪个目标": "Goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1406,8 +1419,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const n = get(current), d = parse(current), isTonight = current === nightOf();
     $("nightEyebrow").textContent = isTonight ? L("今天", "Today") : current < nightOf() ? L("补记", "Catching up") : L("未来", "Future");
     $("nightTitle").textContent = fmtDay(d);
-    $("datePick").value = current;
-    $("nextDay").disabled = current >= nightOf();
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
     $("burnToggle").setAttribute("aria-pressed", String(!!n.burnout));
     $("burnToggle").setAttribute("aria-label", n.burnout ? L("今天 burnout 了，点一下取消", "Burnout today. Tap to undo.") : L("今天 burnout 了吗？点一下标记", "Burnout today? Tap to mark."));
@@ -1567,8 +1578,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const [y, m] = calMonth.split("-").map(Number), fd = focusByDay();
     const today = nightOf(), thisMonth = today.slice(0, 7);
     $("calMonth").innerHTML = L(`<span class="num">${y}</span> 年 <span class="num">${m}</span> 月`, `${MONTH_EN[m - 1]} <span class="num">${y}</span>`);
-    $("calNext").disabled = calMonth >= thisMonth;
-    $("calToday").hidden = calMonth === thisMonth;
+    const wk = $("calCard").classList.contains("wk-mode");
+    $("calNext").disabled = wk ? weekOf(calSel) >= weekOf(today) : calMonth >= thisMonth;
+    $("calToday").hidden = calSel === today && calMonth === thisMonth;
+    $("calPrev").setAttribute("aria-label", wk ? L("上一周", "Previous week") : L("上个月", "Previous month"));
+    $("calNext").setAttribute("aria-label", wk ? L("下一周", "Next week") : L("下个月", "Next month"));
     const days = new Date(y, m, 0).getDate();
     const recs = Object.values(nights).filter(n => n.date.slice(0, 7) === calMonth);
     const spend = recs.reduce((a, n) => a + sum(n), 0);
@@ -1585,11 +1599,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const g = $("calGrid"); g.textContent = "";
     weekHead().forEach((w, i) => { const e = document.createElement("div"); e.className = "cal-wd" + (i > 4 ? " we" : ""); e.textContent = w; g.append(e); });
     const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
-    for (let i = 0; i < lead; i++) { const e = document.createElement("div"); e.className = "day blank"; g.append(e); }
+    for (let i = 0; i < lead; i++) { const e = document.createElement("div"); e.className = "day blank" + (weekOf(`${calMonth}-01`) === weekOf(calSel) ? " wk" : ""); g.append(e); }
     for (let d = 1; d <= days; d++) {
       const date = `${calMonth}-${pad(d)}`, n = nights[date], v = n ? sum(n) : 0;
       const b = document.createElement("button"); b.type = "button"; b.dataset.date = date;
-      b.className = "day" + (n || fd[date] ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
+      b.className = "day" + (weekOf(date) === weekOf(calSel) ? " wk" : "") + (n || fd[date] ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
       if (date > today) b.disabled = true;
       const heat = Math.round(20 + 80 * v / (maxN || 1));
       if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${heat}%, var(--card))`;
@@ -1614,9 +1628,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       b.setAttribute("aria-label", label); b.title = label;
       g.append(b);
     }
-    renderDayDetail();
     renderItemsView();
-    applyCalView();
   }
 
   // ---------- 商品 logo：按名字自动配一个手绘小图标 ----------
@@ -1666,8 +1678,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
 
   // 日历「商品」视图：本月商品墙 + 每晚明细，不用点就能全部看到
-  let calView = "month";
-  try { calView = localStorage.getItem("overtime-calview") || "month"; } catch (e) {}
   function renderItemsView() {
     const recs = Object.values(nights).filter(n => n.date.slice(0, 7) === calMonth).sort((a, b) => b.date.localeCompare(a.date));
     const wall = $("itemWall"); wall.textContent = "";
@@ -1710,68 +1720,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       li.append(db, box); ol.append(li);
     });
   }
-  function applyCalView() {
-    document.querySelectorAll('[data-v]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === calView)));
-    $("calMonthView").hidden = calView !== "month";
-    $("calMonthView").style.display = calView === "month" ? "contents" : "none";
-    $("calItemsView").hidden = calView !== "items";
-    $("calDetail").hidden = calView !== "month";
-  }
 
   // 日历下方的当晚详情：买了什么、花了多少、状态
-  function renderDayDetail() {
-    const box = $("calDetail"); box.textContent = "";
-    const date = calSel, n = nights[date], d = parse(date), today = nightOf();
-    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-    const head = el("div", "dd-head");
-    head.append(el("h3", null, fmtDay(d)));
-    if (n) head.append(el("span", "total", money(sum(n))));
-    box.append(head);
-    const tf = focusByDay()[date];
-    if (tf) {
-      const t = el("div", "dd-toms"); t.innerHTML = tomSVG("full").repeat(tf.n);
-      t.append(el("span", null, L(`专注 ${tf.n} 个番茄，${fmtMin(tf.min)}`, `${tf.n} focus ${tf.n === 1 ? "session" : "sessions"}, ${fmtMin(tf.min)}`)));
-      box.append(t);
-    }
-    const dt = tasks.filter(t => t.done ? nightOf(new Date(t.doneAt || 0)) === date : t.date === date);
-    if (dt.length) {
-      const ul = el("ul", "dd-tasks");
-      dt.forEach(t => ul.append(el("li", t.done ? "ok" : null, (t.done ? "✓ " : "○ ") + t.title)));
-      box.append(ul);
-    }
-    if (n) {
-      const meta = el("div", "dd-meta");
-      if (n.end) meta.append(el("span", null, L(`${n.end} 收工`, `done at ${n.end}`)));
-      if (n.burnout) meta.append(el("span", "pill b", "burnout"));
-      if (n.sample) meta.append(el("span", "sample-tag", L("示例", "sample")));
-      if (meta.childNodes.length) box.append(meta);
-      if (n.items.length) {
-        const ul = el("ul", "dd-items");
-        n.items.forEach(it => { const li = el("li"); li.append(el("span", null, it.name), el("span", null, money(Number(it.amount) || 0))); ul.append(li); });
-        box.append(ul);
-      } else box.append(el("p", "dd-empty", L("这天没买东西。", "Bought nothing this day.")));
-      if (n.note && !n.sample) box.append(el("p", "dd-note", L("备注：", "Note: ") + n.note));
-    } else box.append(el("p", "dd-empty", date === today ? L("今天还没有花销。", "No spending today.") : L("这天没有花销记录。", "No spending this day.")));
-    const act = el("div", "dd-actions");
-    const nav = el("div", "dd-nav");
-    const prev = el("button", null, "‹"); prev.type = "button"; prev.setAttribute("aria-label", L("前一天", "Previous day"));
-    const next = el("button", null, "›"); next.type = "button"; next.setAttribute("aria-label", L("后一天", "Next day")); next.disabled = date >= today;
-    prev.onclick = () => pickDay(shift(date, -1)); next.onclick = () => pickDay(shift(date, 1));
-    nav.append(prev, next);
-    const edit = el("button", "btn-ghost", n ? L("打开这一天", "Open this day") : L("补记这一天", "Add to this day")); edit.type = "button";
-    edit.onclick = () => { go(date); showTab("tonight"); };
-    act.append(nav, edit); box.append(act);
-  }
-  function pickDay(date, reveal) {
-    if (date > nightOf()) return;
-    calSel = date;
-    if (date.slice(0, 7) !== calMonth) calMonth = date.slice(0, 7);
-    renderCal();
-    if (reveal) {
-      const r = $("calDetail").getBoundingClientRect();
-      if (r.bottom > innerHeight - 90) $("calDetail").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "end" });
-    }
-  }
 
   function renderAll() { renderNight(); renderStats(); renderCal(); renderChart(); renderHistory(); renderWishes(); renderFocus(); pushWidget(); }
 
@@ -1984,7 +1934,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const el = e.target.closest("li [data-act]"); if (!el) return;
     const t = tasks.find(x => x.id === el.closest("li").dataset.id); if (!t) return;
     if (el.dataset.act === "done") setTaskDone(t, !t.done);
-    else if (el.dataset.act === "go") startFocus({ taskId: t.id });
+    else if (el.dataset.act === "go") startWithWish({ taskId: t.id });
     else if (el.dataset.act === "del") twoStep(el, "×", () => { tasks = tasks.filter(x => x.id !== t.id); saveTasks(); renderPlan(); renderCal(); });
   });
   let noteT;
@@ -1992,20 +1942,24 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("note").addEventListener("blur", () => { clearTimeout(noteT); if ($("note").value !== (get(current).note || "")) update(n => n.note = $("note").value); });
 
   const go = (date) => { if (!date) return; current = date > nightOf() ? nightOf() : date; calMonth = current.slice(0, 7); calSel = current; renderAll(); };
+  // 今天页顶上的日历：默认只显示选中那天所在的一周，点「展开月历」看整月；点哪天，下面的计划和花销就切到哪天
+  const weekOf = (d) => shift(d, -((parse(d).getDay() + 6) % 7));
+  const CALOPEN_KEY = "overtime-cal-open";
+  function setCalOpen(open) {
+    $("calCard").classList.toggle("wk-mode", !open);
+    $("calExpand").setAttribute("aria-expanded", String(open)); $("calExpand").textContent = open ? L("收起", "Collapse") : L("展开月历", "Show month");
+    try { localStorage.setItem(CALOPEN_KEY, open ? "1" : ""); } catch (e) {}
+    renderCal();
+  }
+  $("calExpand").addEventListener("click", () => setCalOpen($("calCard").classList.contains("wk-mode")));
+  try { if (localStorage.getItem(CALOPEN_KEY)) $("calCard").classList.remove("wk-mode"); } catch (e) {}
   const monthShift = (k) => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m - 1 + k, 1); calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; renderCal(); };
-  $("calPrev").onclick = () => monthShift(-1);
-  $("calNext").onclick = () => monthShift(1);
-  $("calToday").onclick = () => { calMonth = nightOf().slice(0, 7); renderCal(); };
-  $("calViewSeg").addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-v]"); if (!b) return;
-    calView = b.dataset.v; try { localStorage.setItem("overtime-calview", calView); } catch (err) {}
-    applyCalView();
-  });
+  const wkMode = () => $("calCard").classList.contains("wk-mode");
+  $("calPrev").onclick = () => wkMode() ? go(shift(current, -7)) : monthShift(-1);
+  $("calNext").onclick = () => wkMode() ? go(shift(current, 7)) : monthShift(1);
+  $("calToday").onclick = () => go(nightOf());
   $("nightList").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b) { go(b.dataset.date); showTab("tonight"); } });
-  $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) pickDay(b.dataset.date, true); });
-  $("prevDay").onclick = () => go(shift(current, -1));
-  $("nextDay").onclick = () => go(shift(current, 1));
-  $("datePick").addEventListener("change", (e) => go(e.target.value));
+  $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) go(b.dataset.date); });
   $("history").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b) { go(b.dataset.date); showTab("tonight"); } });
 
   $("statsSeg").addEventListener("click", (e) => {
@@ -2176,7 +2130,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const el = e.target.closest("[data-act]"); if (!el) return;
     const id = el.closest("li").dataset.id, w = wishes.find(x => x.id === id); if (!w) return;
     if (el.dataset.act === "edit") { editingWish = id; renderWishes(); return; }
-    if (el.dataset.act === "focus") { showTab("focus"); return; }
+    if (el.dataset.act === "focus") { fpref.wish = id; savePref(); showTab("timer"); return; }
     if (el.dataset.act === "got" && isLocked(w) && lockArmed !== id) {
       lockArmed = id; clearTimeout(onWishClick.t); onWishClick.t = setTimeout(() => (lockArmed = null), 3000);
       toast(L(`还差 ${fmtMin(goalLeft(w))} 专注才解锁。忍不住了？再点一下也能勾掉`, `${fmtMin(goalLeft(w))} of focus to go. Can't wait? Tap again to tick it off anyway.`)); return;
@@ -2199,7 +2153,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function renderFocusAll() { renderFocus(); renderStage(true); if (typeof renderPlan === "function") renderPlan(); }
   const TOMATO = '<path class="tb" d="M50 24 C25 23 9 40 11 60 C13 81 31 93 50 93 C70 93 88 81 89 60 C91 40 75 23 50 24Z"/><path class="tg" d="M27 52 Q28 41 37 35"/><path class="tl" d="M50 31 L39 21 L47 23 L45 12 L53 21 L62 13 L58 24 L69 24 L56 30 L52 37Z"/><path class="ts" d="M51 22 Q51 13 57 8"/>';
   const tomSVG = (cls = "") => `<svg viewBox="0 0 100 100" class="tom ${cls}" aria-hidden="true">${TOMATO}</svg>`;
-  ["fStartTom", "fRunTom", "fPillTom", "calKeyTom", "chartKeyTom"].forEach(id => ($(id).innerHTML = TOMATO));
+  ["fDialTom", "fStartTom", "fRunTom", "fPillTom", "calKeyTom", "chartKeyTom"].forEach(id => ($(id).innerHTML = TOMATO));
   const clampInt = (v, lo, hi, d) => { v = Math.round(Number(v)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
   const PRESETS = [[25, 5], [50, 10], [15, 3]];
   const FPREF_KEY = "overtime-focus-pref", FRUN_KEY = "overtime-focus-run";
@@ -2212,8 +2166,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (frun && frun.phase === "focus") frun.open = true;   // 专注中不能收起（旧版本可能存了收起状态）
   const saveFrun = () => { try { frun ? localStorage.setItem(FRUN_KEY, JSON.stringify(frun)) : localStorage.removeItem(FRUN_KEY); } catch (e) {} };
 
-  // 愿望不用绑定：许愿之后所有的专注都算数（旧版本绑定过这个愿望的番茄也算）
-  const focusFor = (w) => focusLog.reduce((a, s) => a + (s.wishId === w.id || s.start >= (w.created || 0) ? s.min : 0), 0);
+  // 愿望只算开番茄时选了它的那些专注
+  const focusFor = (w) => focusLog.reduce((a, s) => a + (s.wishId === w.id ? s.min : 0), 0);
   const goalLeft = (w) => Math.max(0, (w.focusGoal || 0) - focusFor(w));
   const isLocked = (w) => !w.got && w.focusGoal > 0 && goalLeft(w) > 0;
   const fmtMin = (m) => m >= 60 ? L(`${Math.floor(m / 60)} 小时${m % 60 ? ` ${m % 60} 分钟` : ""}`, `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}`) : L(`${m} 分钟`, `${m} min`);
@@ -2284,7 +2238,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const tk = tid && tasks.find(t => t.id === tid);
     let gid = given ? given.goalId || (tk && tk.goalId) || "" : (frun && frun.goalId) || (tk && tk.goalId) || "";
     if (gid && !goals.some(g => g.id === gid && !g.closed)) gid = "";
-    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), taskId: tid, goalId: gid, cycle, open: true };
+    let wid = given && "wishId" in given ? given.wishId || "" : frun && frun.wishId || "";
+    if (wid && !wishes.some(w => w.id === wid && isLocked(w))) wid = "";
+    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), taskId: tid, goalId: gid, wishId: wid, cycle, open: true };
     unlockAudio(); askNotify(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
   function startBreak() {
@@ -2301,10 +2257,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function finishFocus(endAt) {
     const ms = Math.min(frun.dur, Math.max(0, endAt - frun.start - frun.paused)), min = Math.round(ms / 60000);
     if (min < 1) { frun = null; saveFrun(); scheduleFocusNote(); renderFocusAll(); toast(L("不到 1 分钟，这次就不记了", "Under a minute, so this one wasn't saved")); return; }
-    const lockedBefore = goalWishes().filter(isLocked);
-    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(frun.taskId ? { taskId: frun.taskId } : {}), ...(frun.goalId ? { goalId: frun.goalId } : {}) });
+    const bw = frun.wishId && wishes.find(w => w.id === frun.wishId), wasLocked = !!bw && isLocked(bw);
+    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(frun.wishId ? { wishId: frun.wishId } : {}), ...(frun.taskId ? { taskId: frun.taskId } : {}), ...(frun.goalId ? { goalId: frun.goalId } : {}) });
     saveFocus();
-    frun = { ...frun, phase: "done", gained: min, unlocked: lockedBefore.filter(w => !isLocked(w)).map(w => w.name), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
+    frun = { ...frun, phase: "done", gained: min, unlocked: wasLocked && !isLocked(bw) ? [bw.name] : [], cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
     saveFrun(); scheduleFocusNote(); chime(); buzz("success");
     renderWishes(); renderFocus(); renderCal(); renderNight(); renderStats(); renderGoals(); renderStage(true);
     const ring = $("fsRing"); ring.classList.remove("pop"); void ring.offsetWidth; ring.classList.add("pop");
@@ -2464,19 +2420,21 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("fsSub").textContent = act ? (frun.pausedAt ? L("点下面的按钮继续", "Tap below to resume") : L(`${hhmm(Date.now() + fLeft())} 结束`, `Ends at ${hhmm(Date.now() + fLeft())}`))
       : ph === "done" ? L("分钟，已经记下", "minutes saved") : ph === "broken" ? L(`离开太久，这 ${Math.floor(el / 60000)} 分钟没有记下`, `You left too long. ${Math.floor(el / 60000)} min not saved`)
       : L("准备好就开始下一个", "Start the next one when ready");
-    // 完成页顺带说一句愿望：这个番茄解锁了哪个，或者离最近的那个还差多少
+    // 这个番茄攒给的愿望：已攒的 + 正在攒的；完成后解锁了就庆祝一下
     const box = $("fsWish"), un = ph === "done" && frun.unlocked && frun.unlocked.length ? frun.unlocked : null;
-    const near = ph === "done" && !un ? goalWishes().filter(isLocked).sort((a, b) => goalLeft(a) - goalLeft(b))[0] : null;
+    const near = !un && frun.wishId && ph !== "broken" ? wishes.find(w => w.id === frun.wishId) : null;
+    const live = near && ph === "focus" ? Math.floor(el / 60000) : 0;
     box.hidden = !un && !near;
-    const key = un ? "u" + un.join() : near ? near.id + goalLeft(near) : "";
+    const key = un ? "u" + un.join() : near ? near.id + focusFor(near) + "|" + live : "";
     if (!box.hidden && box.dataset.k !== key) {
       box.dataset.k = key; box.textContent = ""; box.className = "fs-wish sketch" + (un ? " unlocked" : "");
       const top = document.createElement("div"); top.className = "fw-top";
       const nm = document.createElement("span");
       if (un) nm.textContent = L(`🎉 解锁了「${un.join("」「")}」`, `🎉 Unlocked "${un.join('", "')}"`);
       else {
-        nm.textContent = L(`离「${near.name}」还差 ${fmtMin(goalLeft(near))}`, `${fmtMin(goalLeft(near))} to go for "${near.name}"`);
-        top.append(nm); box.append(top, pbar(focusFor(near), 0, near.focusGoal)); return;
+        const sm = document.createElement("small"); sm.textContent = L("攒给", "For"); nm.append(sm, near.name);
+        const b = document.createElement("b"); b.textContent = `${Math.min(near.focusGoal, focusFor(near) + live)} / ${near.focusGoal}`;
+        top.append(nm, b); box.append(top, pbar(focusFor(near), live, near.focusGoal)); return;
       }
       top.append(nm); box.append(top);
     }
@@ -2512,6 +2470,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (document.activeElement !== $("fCustF")) $("fCustF").value = fpref.f;
     if (document.activeElement !== $("fCustB")) $("fCustB").value = fpref.b;
 
+    $("fDialMin").textContent = fpref.f;
     renderGoals();
 
     $("fSetup").hidden = fActive(); $("fRunning").hidden = !fActive();
@@ -2632,7 +2591,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const el = e.target.closest("[data-act]"); if (!el) return;
     const g = goals.find(x => x.id === el.closest("li").dataset.id); if (!g) return;
     const act = el.dataset.act, today = nightOf();
-    if (act === "go") { startFocus({ goalId: g.id }); return; }
+    if (act === "go") { startWithWish({ goalId: g.id }); return; }
     if (act === "check") {
       if (g.checks.includes(today)) g.checks = g.checks.filter(d => d !== today);
       else { g.checks.push(today); buzz("success"); toast(L(`「${g.title}」今天打卡了`, `Checked in for "${g.title}"`)); }
@@ -2644,7 +2603,31 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   };
   $("goalList").addEventListener("click", onGoalClick);
   $("goalDoneList").addEventListener("click", onGoalClick);
-  $("fStart").onclick = startFocus;
+  // 开番茄前问一句「这个番茄攒给哪个愿望」；没有还锁着的愿望就直接开始。上次选的那个排第一
+  let sheetFor = null;
+  function startWithWish(o) {
+    const list = goalWishes().filter(isLocked).sort((a, b) => (b.id === fpref.wish) - (a.id === fpref.wish) || goalLeft(a) - goalLeft(b));
+    if (!list.length || fActive()) return startFocus({ ...(o || {}), wishId: "" });
+    sheetFor = o || {};
+    const ul = $("wishSheetList"); ul.textContent = "";
+    list.forEach(w => {
+      const li = document.createElement("li"), b = document.createElement("button"); b.type = "button"; b.dataset.wish = w.id; if (w.id === fpref.wish) b.className = "last";
+      const top = document.createElement("span"); top.className = "ws-top";
+      const nm = document.createElement("span"); nm.textContent = w.name;
+      const n = document.createElement("b"); n.textContent = L(`还差 ${fmtMin(goalLeft(w))}`, `${fmtMin(goalLeft(w))} to go`);
+      top.append(nm, n); b.append(top, pbar(focusFor(w), 0, w.focusGoal)); li.append(b); ul.append(li);
+    });
+    $("wishSheet").hidden = false;
+  }
+  const closeSheet = () => { $("wishSheet").hidden = true; sheetFor = null; };
+  $("wishSheetList").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-wish]"); if (!b || !sheetFor) return;
+    const o = sheetFor; closeSheet(); fpref.wish = b.dataset.wish; savePref(); startFocus({ ...o, wishId: b.dataset.wish });
+  });
+  $("wishSheetNone").onclick = () => { if (!sheetFor) return; const o = sheetFor; closeSheet(); startFocus({ ...o, wishId: "" }); };
+  $("wishSheetClose").onclick = closeSheet;
+  $("wishSheet").addEventListener("click", (e) => { if (e.target === $("wishSheet")) closeSheet(); });
+  $("fStart").onclick = () => startWithWish({});
 
   // ---------- 月度加班账单分享图 ----------
   // 用 Canvas 画一张 1080×1440（3:4，适合小红书）的手绘风账单。字体按需加载：先「空跑」一遍收集要画的字，加载好再正式画。
@@ -2934,7 +2917,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   }
 
   // ---------- tabs ----------
-  const TABS = ["tonight", "calendar", "stats", "focus", "wishes", "records"];
+  const TABS = ["tonight", "stats", "focus", "timer", "wishes", "records"];
   function showTab(name, save = true) {
     if (!TABS.includes(name)) name = "tonight";
     document.querySelectorAll(".tab").forEach(t => (t.hidden = t.dataset.tab !== name));
@@ -2942,24 +2925,22 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     document.querySelectorAll(".tabbar button, .gear").forEach(b => b.dataset.go === g ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
     window.scrollTo(0, 0);
     if (save) {
-      try { localStorage.setItem("overtime-tab", name); if (GROUPS[g]) localStorage.setItem("overtime-sub-" + g, name); } catch (e) {}
+      try { localStorage.setItem("overtime-tab", name); } catch (e) {}
       if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
     }
   }
   // 底部菜单 4 个按钮：今晚 / 专注 / 愿望 / 日历（日历里含日历 / 统计，在页面标题处切换；再点底部按钮回到上次看的那一页）。
   // 设置和历史记录（records）不占菜单，从右上角的齿轮进去
-  const GROUPS = { calendar: ["calendar", "stats"] };
+  const GROUPS = { tonight: ["tonight", "stats"] };
   function groupOf(name) { for (const [g, list] of Object.entries(GROUPS)) if (list.includes(name)) return g; return name; }
   document.querySelector(".tabbar").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-go]"); if (!b) return;
-    const g = b.dataset.go; let t = g;
-    if (GROUPS[g]) { try { t = localStorage.getItem("overtime-sub-" + g) || g; } catch (err) {} if (!GROUPS[g].includes(t)) t = g; }
-    showTab(t);
+    showTab(b.dataset.go);   // 「今天」永远回到今天这一页，统计从页面标题切过去
   });
   window.addEventListener("hashchange", () => { const t = location.hash.slice(1); if (TABS.includes(t)) showTab(t); });
   document.querySelector(".gear").addEventListener("click", () => showTab("records"));
   document.addEventListener("click", (e) => { const b = e.target.closest(".pg-switch button[data-go]"); if (b && b.getAttribute("aria-current") !== "page") showTab(b.dataset.go); });
-  { let t = location.hash.slice(1); if (!TABS.includes(t)) { try { t = localStorage.getItem("overtime-tab") || "tonight"; } catch (e) { t = "tonight"; } } showTab(t, false); }
+  { let t = location.hash.slice(1); if (t === "calendar") t = "tonight"; if (!TABS.includes(t)) { try { t = localStorage.getItem("overtime-tab") || "tonight"; } catch (e) { t = "tonight"; } } showTab(t, false); }
 
   // ---------- backup ----------
   const BK_KEY = "overtime-last-backup", BK_AT = "overtime-last-backup-at", BK_SNOOZE = "overtime-backup-snooze";
