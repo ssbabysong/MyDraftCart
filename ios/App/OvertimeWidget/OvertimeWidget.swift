@@ -17,7 +17,7 @@ struct Summary: Codable {
     var appName = T("加班夜记", "Overtime")
     var monthTitle = T("10 月", "October")
     var nights = 0
-    var nightsLabel = T("晚", "nights")
+    var nightsLabel = T("个番茄", "sessions")
     var spent = "$0"
     var spentLabel = T("花了", "spent")
     var burnout = 0
@@ -25,10 +25,10 @@ struct Summary: Codable {
     var burnoutLabel = "Burnout"
     var bodyLabel = T("身体不行", "Unwell")
     var tonight = ""
-    var tonightLabel = T("今晚", "Tonight")
-    var emptyText = T("打开 App 记第一晚", "Open the app to log tonight")
+    var tonightLabel = T("今天专注", "Today")
+    var emptyText = T("打开 App 开始专注", "Open the app to start focusing")
     var dayStartHour = 4
-    var trendTitle = T("近 14 晚", "Last 14 nights")
+    var trendTitle = T("近 14 天花费", "Spent, last 14 days")
     var trend: [TrendPoint] = []
     var heatStart = ""          // heat[0] 对应的日期（周一），yyyy-MM-dd
     var heat: [Int] = []        // 每天一个等级：0 没花钱，1–4 越大花得越多
@@ -353,7 +353,7 @@ struct OvertimeWidget: Widget {
             WidgetView(entry: entry)
         }
         .configurationDisplayName(T("加班夜记", "Overtime"))
-        .description(T("本月加班几晚、花了多少、最近 14 晚花费趋势", "This month's overtime nights, spending and a 14-night trend"))
+        .description(T("本月专注了几个番茄、花了多少、最近的学习日历", "This month's focus sessions, spending and study calendar"))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

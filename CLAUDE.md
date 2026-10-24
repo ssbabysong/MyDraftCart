@@ -55,8 +55,9 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 只有用户能做的事（登录 Apple ID、在 Xcode 里选 Team、信任开发者、App Store Connect 里点提交）要写清楚步骤让用户操作。
 - 不要把任何密钥、Token、Apple 账号信息写进仓库。
 - 改了 `index.html` 后：`sw.js` 的 `VERSION` 加一，并运行 `npm run build && npx cap sync ios`。
-- 底部菜单 4 个：今晚 / 专注 / 愿望 / 日历（日历页标题处切换日历、统计；月历格子里有几个番茄画几个）。设置和历史记录、备份（tab `records`）不占菜单，从右上角时钟上方的小齿轮 `.gear` 进去；该备份时齿轮上有红点，备份提示 `#bkRemind` 只在设置页显示。分组在 `GROUPS`，再点底部按钮回到上次看的子页（`overtime-sub-<组>`）。
+- 底部菜单 4 个：今天 / 专注 / 愿望 / 日历（日历页标题处切换日历、统计；月历格子里有几个番茄画几个）。设置和历史记录、备份（tab `records`）不占菜单，从右上角时钟上方的小齿轮 `.gear` 进去；该备份时齿轮上有红点，备份提示 `#bkRemind` 只在设置页显示。分组在 `GROUPS`，再点底部按钮回到上次看的子页（`overtime-sub-<组>`）。
 - 番茄专注：专注记录存 `overtime-focus-v1`（`{id, start, end, min, wishId?}`），和每晚记录、愿望一样进备份和 iCloud 三方合并；进行中的番茄 `overtime-focus-run` 只存在本机，按时间戳算剩余时间。愿望可设 `focusGoal`（分钟），绑定它的专注攒够了才解锁。专注时不能离开：不能收起，切出 App / 锁屏 / 关掉 App 超过 10 秒（`GRACE`）番茄就坏掉（phase `broken`，不计入）；休息结束用本地通知 id 900。App 里专注时用 `MainViewController.swift` 里的 KeepAwake 插件：关掉自动锁屏、回桌面和下拉要滑两次（`preferredScreenEdgesDeferringSystemGestures`）、进后台那一刻由原生端发「番茄要坏掉了」通知（回来自动撤掉）。网页版离开时用 beforeunload 确认，装到桌面且允许通知时用 Service Worker 弹通知。还没在真机上测过。
 - 「身体不行」已并进 burnout：旧数据里有 `body` 的晚上读进来时算 burnout（`normFlags`），统计里那一格换成「专注番茄」，分享图第二行是 Burnout + 专注，小组件只显示 burnout。今晚的「从愿望清单里买」点一下记一笔（item 带 `wishId`）并把愿望勾成买到了，删掉这一笔愿望会回到清单。
-- 今晚卡片：Burnout 是下班时间旁边的小标签（`.burn-chip`）。记账是一行「买了什么 / 金额 / +」，下面两行横向滑动的快捷项：「常买」（`quickList`：按自己记过的次数排前 8 个，金额取最近一次，不够用默认补）和「愿望」，点一下直接记一笔。
+- 今天页的花销卡片：Burnout 是「备注」旁边的小标签（`.burn-chip`）。记账是一行「买了什么 / 金额 / +」，下面两行横向滑动的快捷项：「常买」（`quickList`：按自己记过的次数排前 8 个，金额取最近一次，不够用默认补）和「愿望」，点一下直接记一笔。
 - 番茄页只留：表盘、时长、为了哪个愿望（没有带专注目标的愿望时隐藏）、开始按钮。统计和番茄记录不在这页（日历里能看到每天的番茄）。
+- 2026-10-24 起定位改成面向「上班族自学」的学习 App（名字还没改，`APP_ZH` / `APP_EN` 一处改）。今天页 = 今日计划（`overtime-tasks-v1`：`{id, date, title, done, doneAt?, created}`，没做完的自动带到之后的今天；点 ▶ 开番茄，番茄记 `taskId`，完成页可以顺手把那件事勾掉）+ 今天专注了多少 + 花销卡片。计划同样进备份和 iCloud 合并。下班时间不再输入（旧数据保留）。统计：专注时长 / 番茄 / 做完的事 / 总花费 / 平均每天花 / Burnout 天数，外加「专注过的日子 vs 没专注的日子平均花多少」。分享图叫「学习账单」。小组件：本月番茄数、今天专注时长、学习日历（按专注分钟分档）、近 14 天花费。

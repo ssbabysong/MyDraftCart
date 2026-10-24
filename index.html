@@ -12,7 +12,7 @@
     document.documentElement.lang = lg === "en" ? "en" : "zh-CN";
   } catch (e) {}
 </script>
-<meta name="description" content="记录每晚加班买了什么、花了多少钱、有没有 burnout 和身体不适的手绘风小本子。数据只存在你自己的设备上。">
+<meta name="description" content="手绘风的自学小本子：写下今天的计划，用番茄专注攒时间换愿望，顺手记下花销。数据只存在你自己的设备上。">
 <meta name="theme-color" content="#FAFAF4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1E2926" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -156,6 +156,36 @@ button.counter:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) { .mark .x { transition: none !important; } }
 .counter .hint { font-size: 13px; color: var(--pencil); }
 
+/* 今日计划 */
+.plan { display: flex; flex-direction: column; gap: 8px; }
+ul.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ul.tasks li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 2px dashed var(--grid); }
+ul.tasks .tname { min-width: 0; overflow-wrap: anywhere; font-size: 17px; line-height: 1.35; }
+ul.tasks .tname small { display: block; font-size: 12px; color: var(--pencil); }
+ul.tasks .done .tname { text-decoration: line-through; text-decoration-color: var(--burn); text-decoration-thickness: 2px; color: var(--pencil); }
+ul.tasks .done .wbox { color: var(--burn); }
+ul.tasks .ttoms { display: inline-flex; align-items: center; gap: 1px; font-family: var(--f-num); font-size: 14px; color: var(--pencil); }
+ul.tasks .ttoms svg { width: 15px; height: 15px; overflow: visible; }
+ul.tasks .tgo { width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--burn-hi); color: var(--ink); }
+ul.tasks .tgo svg { width: 16px; height: 16px; fill: currentColor; }
+ul.tasks .tgo:disabled { opacity: .3; }
+ul.tasks .tend { display: inline-flex; align-items: center; gap: 2px; }
+.no-tasks { font-size: 14px; color: var(--pencil); padding: 6px 2px; list-style: none; }
+form.task-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 10px; align-items: end; }
+form.task-add input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
+form.task-add .add, form.buy .add {
+  width: 46px; height: 46px; padding: 0; display: grid; place-items: center; font-family: var(--f-num); font-size: 30px; line-height: 1;
+  border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--round, 50% 45% 52% 47% / 47% 53% 46% 52%); background: var(--money); color: var(--on-money, #26354D); box-shadow: var(--sh-hard, 2px 3px 0 var(--ink));
+}
+form.task-add .add:active { transform: translate(2px, 2px); box-shadow: 0 1px 0 var(--ink); }
+.today-focus { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; color: var(--pencil); padding-top: 2px; }
+.today-focus .toms { display: inline-flex; flex-wrap: wrap; gap: 2px; }
+.today-focus .toms svg { width: 20px; height: 20px; overflow: visible; }
+.today-focus b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); }
+.today-focus .go { margin-left: auto; }
+.spend-card { gap: 16px; border-radius: var(--rad, var(--wob2)); }
+.spend-card::before { display: none; }
+.spend-card .night-row { margin-bottom: 2px; }
 /* receipt */
 .receipt { display: flex; flex-direction: column; gap: 10px; }
 .receipt-head { display: flex; justify-content: space-between; align-items: baseline; }
@@ -225,11 +255,15 @@ textarea#note {
 .tile.burn .v { color: var(--burn); }
 .tile.body .v { color: var(--body); }
 .top-buys { font-size: 15px; color: var(--pencil); }
+.insight { margin: 0; padding: 12px 14px; font-size: 15px; line-height: 1.5; background: var(--money-hi); border: var(--bw, 2px) solid var(--bc, var(--ink)); border-radius: var(--rad, var(--wob3)); transform: rotate(calc(-.4deg * var(--tilt, 1))); }
+.insight b { font-family: var(--f-num); font-weight: 400; font-size: 18px; }
 .top-buys b { color: var(--ink); font-weight: 400; }
 
 /* chart */
 .chart { padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--rad, var(--wob3)); }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--pencil); }
+.legend .tom { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; overflow: visible; }
+.dots.t { color: var(--burn); font-size: 12px; }
 .legend i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; border: var(--bw, 1.5px) solid var(--bc, var(--ink)); border-radius: 3px; }
 .plot { position: relative; height: 150px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; align-items: end; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); }
 .gridline { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--grid); pointer-events: none; }
@@ -313,6 +347,8 @@ ol.night-list > li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; 
 .dd-items li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 2px; border-bottom: 2px dashed var(--grid); }
 .dd-items li span:first-child { min-width: 0; overflow-wrap: anywhere; }
 .dd-items li span:last-child { font-family: var(--f-num); font-size: 19px; white-space: nowrap; }
+.dd-tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: 15px; color: var(--pencil); }
+.dd-tasks .ok { color: var(--ink); }
 .dd-note { margin: 0; font-size: 14px; color: var(--pencil); overflow-wrap: anywhere; }
 .dd-empty { margin: 0; color: var(--pencil); font-size: 15px; }
 .dd-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
@@ -442,6 +478,8 @@ html.staged .toast { z-index: 60; bottom: calc(24px + env(safe-area-inset-bottom
 .tom.rot .tl { fill: color-mix(in srgb, var(--leaf) 50%, var(--pencil)); }
 .tom.rot .crack { fill: none; stroke: var(--bc, var(--ink)); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .tom.rot .drip { fill: color-mix(in srgb, var(--burn-hi) 55%, var(--pencil)); stroke: var(--bc, var(--ink)); stroke-width: 1.6; }
+.fs-task { margin: -4px 0 0; font-size: 18px; text-align: center; max-width: min(440px, 100%); overflow-wrap: anywhere; }
+.fs-task small { color: var(--pencil); font-size: 14px; margin-right: 6px; }
 .fs-ring { position: relative; width: min(84vw, 46vh, 350px); aspect-ratio: 1; flex: none; margin-top: 4px; }
 .fs-ring svg { width: 100%; height: 100%; overflow: visible; display: block; }
 .fs-ring .tk { stroke: var(--pencil); stroke-width: 1.6; stroke-linecap: round; opacity: .55; }
@@ -746,10 +784,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 
 
   <main class="tab" id="tab-tonight" data-tab="tonight">
-  <section class="card sketch" aria-labelledby="nightTitle">
+  <section class="card sketch plan-card" aria-labelledby="nightTitle">
     <div class="card-head">
       <div>
-        <div class="eyebrow" id="nightEyebrow">今晚</div>
+        <div class="eyebrow" id="nightEyebrow">今天</div>
         <h2 id="nightTitle">—</h2>
       </div>
       <div class="datepick">
@@ -759,16 +797,20 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       </div>
     </div>
 
-    <div class="night-row">
-      <label class="field-inline" for="endTime">下班时间 <input type="time" id="endTime"></label>
-      <button type="button" class="burn-chip" id="burnToggle" aria-pressed="false" title="崩溃、想摆烂、脑子转不动、身体不舒服">
-        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg>
-        <span>Burnout</span>
-      </button>
+    <div class="plan">
+      <div class="eyebrow">今日计划</div>
+      <ul class="tasks" id="tasks"></ul>
+      <form class="task-add" id="taskForm" autocomplete="off">
+        <input type="text" id="taskName" placeholder="今天想学点什么？" maxlength="60" aria-label="新的计划">
+        <button type="submit" class="add" aria-label="加到计划">+</button>
+      </form>
     </div>
+    <div class="today-focus" id="todayFocus"></div>
+  </section>
 
+  <section class="card sketch spend-card" aria-labelledby="spendTitle">
     <div class="receipt">
-      <div class="receipt-head"><span class="eyebrow">今晚买了</span><span class="total" id="nightTotal">$0</span></div>
+      <div class="receipt-head"><span class="eyebrow" id="spendTitle">今天花了</span><span class="total" id="nightTotal">$0</span></div>
       <ul class="items" id="items"></ul>
       <form class="buy" id="buyForm" autocomplete="off">
         <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
@@ -786,11 +828,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     </div>
 
     <div>
-      <label class="eyebrow" for="note">备注</label>
-      <textarea id="note" maxlength="500" placeholder="今晚在忙什么？为什么加班？"></textarea>
+      <div class="night-row">
+        <label class="eyebrow" for="note">备注</label>
+        <button type="button" class="burn-chip" id="burnToggle" aria-pressed="false" title="崩溃、想摆烂、脑子转不动、身体不舒服">
+          <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><path class="box" d="M7 8 Q24 6.5 41 7.6 Q42 24 40.8 41 Q24 42 7.4 40.8 Q6 24 7 8Z"/><path class="x" d="M12 12 Q24 23 36.5 36"/><path class="x x2" d="M36 11.5 Q23 24.5 12.5 36.5"/></svg>
+          <span>Burnout</span>
+        </button>
+      </div>
+      <textarea id="note" maxlength="500" placeholder="今天学得怎么样？有什么想记下的？"></textarea>
       <div class="saved" id="saved"></div>
     </div>
-    <div style="text-align:right"><button type="button" class="link" id="deleteNight" hidden>删除这一晚</button></div>
+    <div style="text-align:right"><button type="button" class="link" id="deleteNight" hidden>清空这天的花销和备注</button></div>
   </section>
   </main>
 
@@ -824,7 +872,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div id="calItemsView" class="items-view" hidden>
         <div class="eyebrow">这个月买过的东西</div>
         <div class="item-wall" id="itemWall"></div>
-        <div class="eyebrow">每晚买了什么</div>
+        <div class="eyebrow">每天买了什么</div>
         <ol class="night-list" id="nightList"></ol>
       </div>
     </div>
@@ -843,18 +891,20 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       </div>
     </div>
     <div class="tiles">
-      <div class="tile"><span class="v" id="sNights">0</span><span class="k">加班晚数</span></div>
+      <div class="tile"><span class="v" id="sFocusMin">0</span><span class="k">专注时长</span></div>
+      <div class="tile"><span class="v" id="sFocus">0</span><span class="k">专注番茄</span></div>
+      <div class="tile"><span class="v" id="sTasks">0</span><span class="k">做完的事</span></div>
       <div class="tile money"><span class="v" id="sSpend">$0</span><span class="k">总花费</span></div>
-      <div class="tile money"><span class="v" id="sAvg">$0</span><span class="k">平均每晚</span></div>
-      <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 晚数</span></div>
-      <div class="tile focus"><span class="v" id="sFocus">0</span><span class="k">专注番茄</span></div>
-      <div class="tile"><span class="v" id="sLate">—</span><span class="k">最晚下班</span></div>
+      <div class="tile money"><span class="v" id="sAvg">$0</span><span class="k">平均每天花</span></div>
+      <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 天数</span></div>
     </div>
+    <p class="insight" id="insight" hidden></p>
     <div class="top-buys" id="topBuys"></div>
 
-    <div class="chart sketch" aria-label="最近 14 晚">
+    <div class="chart sketch" aria-label="最近 14 天">
       <div class="legend">
-        <span><i style="background:var(--money)"></i>每晚花费</span>
+        <span><i style="background:var(--money)"></i>每天花费</span>
+        <span><svg viewBox="0 0 100 100" class="tom full" id="chartKeyTom" aria-hidden="true"></svg>番茄</span>
         <span><i style="background:var(--burn-hi);border-color:var(--burn)"></i>Burnout ×</span>
       </div>
       <div class="plot" id="plot"></div>
@@ -862,7 +912,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     </div>
     <button type="button" class="share-cta" id="shareOpen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
-      <span>生成我的月度加班账单<small>一张手绘风长图，可以直接发小红书</small></span>
+      <span>生成我的月度学习账单<small>专注、做完的事和花销，一张手绘风长图</small></span>
     </button>
   </section>
   </main>
@@ -943,9 +993,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       </div>
       <span class="cur-hint" id="curHint">参考汇率，请按实际修改。只改变显示，已记录的数据不会被改动。</span>
       <div class="set-row remind-row native-only" hidden>
-        <label class="set-k" for="remindOn">每晚提醒</label>
+        <label class="set-k" for="remindOn">学习提醒</label>
         <div class="cur-row">
-          <input type="checkbox" id="remindOn" class="toggle" aria-label="每晚提醒">
+          <input type="checkbox" id="remindOn" class="toggle" aria-label="学习提醒">
           <input type="time" id="remindTime" value="21:30" aria-label="提醒时间">
           <select id="remindDays" aria-label="提醒日期"><option value="work">工作日</option><option value="all">每天</option></select>
         </div>
@@ -994,7 +1044,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
 <nav class="tabbar" aria-label="主菜单">
   <button type="button" data-go="tonight" aria-current="page">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 5 A11 11 0 1 0 27 21 A9 9 0 1 1 21 5Z"/></svg>
-    <span>今晚</span>
+    <span>今天</span>
   </button>
   <button type="button" data-go="focus">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 9.5 C8.5 9.3 4.6 14.2 5 19.6 C5.5 25.4 10.4 28.2 16 28.2 C21.7 28.2 26.6 25.3 27 19.6 C27.4 14 23.4 9.4 16 9.5Z"/><path d="M16 10 L12 7.4 M16 10 L20 7.4 M16 10 L16 6.5 Q16.4 4.2 19 3.6"/></svg>
@@ -1015,6 +1065,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <button type="button" class="fs-close" id="fsClose">收起</button>
     <span class="fs-stay" id="fsStay" hidden>别离开这一页</span>
   </div>
+  <p class="fs-task" id="fsTask" hidden></p>
   <div class="fs-ring" id="fsRing">
     <div id="fsSvg"></div>
     <div class="fs-center">
@@ -1040,7 +1091,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <button type="button" id="shareNext" aria-label="下个月">›</button>
       <button type="button" class="close" id="shareClose" aria-label="关闭">×</button>
     </div>
-    <div class="share-img"><img id="sharePreview" alt="月度加班账单预览"></div>
+    <div class="share-img"><img id="sharePreview" alt="月度学习账单预览"></div>
     <button type="button" class="share-go" id="shareGo">分享 / 存到相册</button>
     <p class="share-hint">iPhone：点上面的按钮 →「存储图像」就进相册了，也可以直接选小红书。</p>
   </div>
@@ -1068,16 +1119,16 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const fmtMonth = (y, m) => L(`${y} 年 ${m} 月`, `${MONTH_EN[m - 1]} ${y}`);
   const weekHead = () => L(["一", "二", "三", "四", "五", "六", "日"], ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]);
   const EN_TEXT = {
-    "加班": "Overtime ", "夜记": "Night Log", "今晚": "Tonight", "下班时间": "Left work at", "身体不行": "Unwell",
+    "加班": "Overtime ", "夜记": "Night Log", "今天": "Today", "今日计划": "Today's plan", "今天想学点什么？": "What to learn today?", "新的计划": "New plan item", "加到计划": "Add to plan", "今天花了": "Spent today",
     "崩溃、想摆烂、脑子转不动、身体不舒服": "Melting down, brain fried, or feeling unwell",
-    "今晚买了": "Bought tonight", "记一笔": "Add", "备注": "Note", "删除这一晚": "Delete this night",
+    "记一笔": "Add", "备注": "Note", "清空这天的花销和备注": "Clear this day's spending and note",
     "日历": "Calendar", "月历": "Month", "商品": "Items", "本月": "This month", "本周": "This week", "全部": "All time",
-    "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每晚买了什么": "What I bought each night",
-    "统计": "Stats", "加班晚数": "Overtime nights", "总花费": "Total spent", "平均每晚": "Per night", "Burnout 晚数": "Burnout nights",
-    "专注番茄": "Focus sessions", "最晚下班": "Latest finish", "每晚花费": "Spent per night",
-    "生成我的月度加班账单": "Make my monthly overtime bill", "一张手绘风长图，可以直接发小红书": "A hand-drawn image, ready to post",
+    "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每天买了什么": "What I bought each day",
+    "统计": "Stats", "专注时长": "Focus time", "做完的事": "Tasks done", "总花费": "Total spent", "平均每天花": "Per day", "Burnout 天数": "Burnout days",
+    "专注番茄": "Focus sessions", "每天花费": "Spent per day", "番茄": "Focus sessions",
+    "生成我的月度学习账单": "Make my monthly recap", "专注、做完的事和花销，一张手绘风长图": "Focus, finished tasks and spending in one hand-drawn image",
     "愿望": "Wishes", "愿望清单": "Wishlist", "还想买的，一共": "Still on my list", "许个愿": "Make a wish",
-    "每晚提醒": "Nightly reminder", "提醒时间": "Reminder time", "提醒日期": "Reminder days", "工作日": "Weekdays", "每天": "Every day",
+    "学习提醒": "Study reminder", "提醒时间": "Reminder time", "提醒日期": "Reminder days", "工作日": "Weekdays", "每天": "Every day",
     "记录会自动同步到你的 iCloud。换手机时登录同一个 Apple ID，打开 App 记录就回来了。": "Your records sync to your iCloud automatically. On a new phone, sign in with the same Apple ID and open the app.",
     "隐私政策": "Privacy", "技术支持": "Support",
     "记录": "Log", "设置": "Settings", "语言": "Language", "主题": "Theme", "货币": "Currency", "汇率": "Exchange rate",
@@ -1093,14 +1144,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     "分享 / 存到相册": "Share / Save to Photos", "iPhone：点上面的按钮 →「存储图像」就进相册了，也可以直接选小红书。": "iPhone: tap the button above, then Save Image to put it in Photos, or share it straight to an app.",
     // 属性：placeholder / aria-label / title / alt
     "上个月": "Previous month", "下个月": "Next month", "主菜单": "Main menu", "买了什么": "What did you buy", "物品": "Item",
-    "今晚在忙什么？为什么加班？": "What kept you late tonight?", "价格": "Price", "价格 $": "Price $", "金额": "Amount", "金额 $": "Amount $",
+    "今天学得怎么样？有什么想记下的？": "How did studying go today? Anything to note?", "价格": "Price", "价格 $": "Price $", "金额": "Amount", "金额 $": "Amount $",
     "设置和记录": "Settings and history", "关闭": "Close", "前一天": "Previous day", "后一天": "Next day", "常买": "Usual", "想买什么": "What do you want", "想买的东西": "Wish item",
     "专注": "Focus", "番茄专注": "Focus timer", "分钟": "min", "休息": "Break", "为了哪个愿望": "Working toward", "开始专注": "Start focusing", "回到专注": "Back to focus",
     "收起": "Minimize",
-    "专注时长": "Focus length", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
+    "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，就要在「专注」里攒够这么久，才能解锁这个愿望。": "Focus minutes are optional. If you set them, the wish stays locked until you've focused that long.",
     "别离开这一页": "Stay on this page",
-    "一个番茄": "one focus session", "日历视图": "Calendar view", "页面": "Pages", "最近 14 晚": "Last 14 nights", "月度加班账单预览": "Monthly bill preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1118,9 +1169,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     staticText.forEach(([n, orig, k]) => { n.nodeValue = lang === "en" ? orig.replace(k, EN_TEXT[k]) : orig; });
     staticAttr.forEach(([el, a, orig]) => el.setAttribute(a, lang === "en" ? EN_TEXT[orig] : orig));
     document.documentElement.lang = L("zh-CN", "en");
-    document.title = L("加班夜记", "Overtime Night Log");
-    $("brandEyebrow").textContent = L("Overtime Night Log", "late-night spending log");
+    document.title = L(APP_ZH, APP_EN);
+    $("brandEyebrow").textContent = L(APP_EN, "a little study notebook");
   }
+  // App 名字只在这里改（还有 <title>、<h1>、manifest 和 iOS 工程里的显示名）
+  const APP_ZH = "加班夜记", APP_EN = "Overtime Night Log";
   const LS_KEY = "overtime-nights-v1";
   const chipList = () => L([["咖啡", 5.5], ["外卖", 16], ["能量饮料", 3.5], ["零食", 4], ["打车回家", 22], ["奶茶", 6.5]],
     [["Coffee", 5.5], ["Takeout", 16], ["Energy drink", 3.5], ["Snacks", 4], ["Ride home", 22], ["Boba", 6.5]]);
@@ -1209,17 +1262,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // ---------- render: tonight ----------
   function renderNight() {
     const n = get(current), d = parse(current), isTonight = current === nightOf();
-    $("nightEyebrow").textContent = isTonight ? L("今晚", "Tonight") : current < nightOf() ? L("补记", "Catching up") : L("未来", "Future");
+    $("nightEyebrow").textContent = isTonight ? L("今天", "Today") : current < nightOf() ? L("补记", "Catching up") : L("未来", "Future");
     $("nightTitle").textContent = fmtDay(d);
     $("datePick").value = current;
     $("nextDay").disabled = current >= nightOf();
-    if (document.activeElement !== $("endTime")) $("endTime").value = n.end || "";
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
     $("burnToggle").setAttribute("aria-pressed", String(!!n.burnout));
-    $("burnToggle").setAttribute("aria-label", n.burnout ? L("今晚 burnout 了，点一下取消", "Burnout tonight. Tap to undo.") : L("今晚 burnout 了吗？点一下标记", "Burnout tonight? Tap to mark."));
+    $("burnToggle").setAttribute("aria-label", n.burnout ? L("今天 burnout 了，点一下取消", "Burnout today. Tap to undo.") : L("今天 burnout 了吗？点一下标记", "Burnout today? Tap to mark."));
+    renderPlan();
     $("nightTotal").textContent = money(sum(n));
     const ul = $("items"); ul.textContent = "";
-    if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = L("还没记。点下面的常买项，或者自己填。", "Nothing yet. Tap a frequent buy below or type your own."); ul.append(li); }
+    if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = L("还没花钱。买了东西点下面的常买，或者自己填。", "Nothing spent yet. Tap a usual buy below or type your own."); ul.append(li); }
     if (editingItem && (editingItem.date !== current || !n.items[editingItem.i])) editingItem = null;
     n.items.forEach((it, i) => {
       const li = document.createElement("li");
@@ -1273,13 +1326,28 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     document.querySelectorAll("button[data-p]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === period)));
     const list = Object.values(nights).filter(n => inPeriod(n.date));
     const spend = list.reduce((a, n) => a + sum(n), 0);
-    $("sNights").textContent = list.length;
+    const fd = focusByDay(), fl = focusLog.filter(f => inPeriod(nightOf(new Date(f.start))));
+    const fm = fl.reduce((a, f) => a + f.min, 0);
+    $("sFocusMin").textContent = fm >= 60 ? L(`${Math.round(fm / 6) / 10} 小时`, `${Math.round(fm / 6) / 10} h`) : L(`${fm} 分钟`, `${fm} min`);
+    $("sFocus").textContent = fl.length;
+    $("sTasks").textContent = tasks.filter(t => t.done && inPeriod(nightOf(new Date(t.doneAt || 0)))).length;
     $("sSpend").textContent = money(spend);
     $("sAvg").textContent = money(list.length ? spend / list.length : 0);
     $("sBurn").textContent = list.filter(n => n.burnout).length;
-    $("sFocus").textContent = focusLog.filter(f => inPeriod(nightOf(new Date(f.start)))).length;
-    const late = list.filter(n => n.end).sort((a, b) => lateKey(b.end) - lateKey(a.end))[0];
-    $("sLate").textContent = late ? late.end : "—";
+    // 学习和花钱的关系：有记录的日子里，专注过的那几天平均花多少，没专注的那几天平均花多少
+    const days = new Set([...list.map(n => n.date), ...Object.keys(fd).filter(inPeriod)]);
+    const withF = [], noF = [];
+    days.forEach(d => (fd[d] ? withF : noF).push(nights[d] ? sum(nights[d]) : 0));
+    const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length, ins = $("insight"); ins.textContent = "";
+    ins.hidden = !(withF.length >= 2 && noF.length >= 2);
+    if (!ins.hidden) {
+      const a = avg(withF), b = avg(noF), b1 = document.createElement("b"), b2 = document.createElement("b");
+      b1.textContent = money(a); b2.textContent = money(b);
+      if (lang === "en") ins.append("On days you focused you spent ", b1, " on average; on days you didn't, ", b2, ".");
+      else ins.append("专注过的日子平均花 ", b1, "，没专注的日子平均花 ", b2, "。");
+      if (b > a * 1.2 && b - a >= 1) ins.append(L(" 学习的日子更省钱。", " Studying days are cheaper."));
+      else if (a > b * 1.2 && a - b >= 1) ins.append(L(" 学习的日子花得更多，可能是在犒劳自己。", " You spend more on study days. Treating yourself?"));
+    }
     const tally = {};
     list.forEach(n => n.items.forEach(i => { const k = i.name.trim(); if (!k) return; tally[k] = tally[k] || { c: 0, s: 0 }; tally[k].c++; tally[k].s += Number(i.amount) || 0; }));
     const top = Object.entries(tally).sort((a, b) => b[1].s - a[1].s).slice(0, 3);
@@ -1296,7 +1364,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const end = nightOf(), days = [];
     for (let i = 13; i >= 0; i--) days.push(shift(end, -i));
     const max = niceMax(Math.max(0, ...days.map(d => nights[d] ? sum(nights[d]) : 0)));
-    const plot = $("plot"), marks = $("marks"); plot.textContent = ""; marks.textContent = "";
+    const plot = $("plot"), marks = $("marks"), fdays = focusByDay(); plot.textContent = ""; marks.textContent = "";
     [0.5, 1].forEach(f => {
       const g = document.createElement("div"); g.className = "gridline"; g.style.bottom = f * 100 + "%";
       const s = document.createElement("span"); s.textContent = money(max * f); g.append(s); plot.append(g);
@@ -1309,8 +1377,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const col = document.createElement("div");
       const b = document.createElement("div"); b.className = "dots b";
       b.textContent = n?.burnout ? "×" : "";
+      const t = document.createElement("div"); t.className = "dots t"; const tn = fdays[d]?.n || 0;
+      t.textContent = tn ? (tn <= 2 ? "●".repeat(tn) : `●${tn}`) : "";
       const x = document.createElement("span"); x.className = "xlab"; x.textContent = parse(d).getDate();
-      col.append(b, x); marks.append(col);
+      col.append(t, b, x); marks.append(col);
     });
   }
 
@@ -1337,7 +1407,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     e.hidden = !loaded || list.length > 0; e.textContent = "";
     if (!e.hidden) {
       const s = document.createElement("strong"); s.textContent = L("还没有记录", "No records yet");
-      const p = document.createElement("span"); p.textContent = L("在上面的卡片里点 + 或记一笔，今晚就会出现在这里。想先看看效果，可以载入两周的示例数据。", "Tap + or add a purchase on the Tonight card and it shows up here. Want a preview first? Load two weeks of sample data.");
+      const p = document.createElement("span"); p.textContent = L("在「今天」里记一笔花销，就会出现在这里。想先看看效果，可以载入两周的示例数据。", "Log some spending on Today and it shows up here. Want a preview first? Load two weeks of sample data.");
       const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn-ghost"; btn.id = "loadSamples"; btn.textContent = L("载入示例数据", "Load sample data");
       btn.onclick = loadSamples; e.append(s, p, btn);
     }
@@ -1361,15 +1431,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const spend = recs.reduce((a, n) => a + sum(n), 0);
     const maxN = Math.max(0, ...recs.map(sum));
     const sumEl = $("calSum"); sumEl.textContent = "";
-    if (recs.length) {
-      const b1 = document.createElement("b"); b1.textContent = recs.length;
+    const mf = Object.entries(fd).filter(([d]) => d.slice(0, 7) === calMonth), ft = mf.reduce((a, [, v]) => a + v.n, 0), fm = mf.reduce((a, [, v]) => a + v.min, 0);
+    if (ft || recs.length) {
+      const b1 = document.createElement("b"); b1.textContent = fmtMin(fm);
       const b2 = document.createElement("b"); b2.textContent = money(spend);
-      if (lang === "en") sumEl.append("This month: ", b1, " overtime nights, ", b2, " spent"); else sumEl.append("这个月加班 ", b1, " 晚，一共花了 ", b2);
-      const top = recs.slice().sort((a, b) => sum(b) - sum(a))[0];
-      if (sum(top) > 0) { const d = parse(top.date); sumEl.append(L(`，最贵的一晚是 ${fmtMD(d)} ${money(sum(top))}`, `. Priciest night: ${fmtMD(d)}, ${money(sum(top))}`)); }
-    } else sumEl.textContent = L("这个月还没有加班记录", "No overtime recorded this month");
-    const ft = Object.entries(fd).filter(([d]) => d.slice(0, 7) === calMonth).reduce((a, [, v]) => a + v.n, 0);
-    if (ft) sumEl.append(L(`；专注了 ${ft} 个番茄`, `; ${ft} focus ${ft === 1 ? "session" : "sessions"}`));
+      if (lang === "en") sumEl.append("This month: focused ", b1, ` (${ft} ${ft === 1 ? "session" : "sessions"}), spent `, b2);
+      else sumEl.append("这个月专注了 ", b1, `（${ft} 个番茄），花了 `, b2);
+    } else sumEl.textContent = L("这个月还没有记录", "Nothing recorded this month");
 
     const g = $("calGrid"); g.textContent = "";
     weekHead().forEach((w, i) => { const e = document.createElement("div"); e.className = "cal-wd" + (i > 4 ? " we" : ""); e.textContent = w; g.append(e); });
@@ -1378,7 +1446,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     for (let d = 1; d <= days; d++) {
       const date = `${calMonth}-${pad(d)}`, n = nights[date], v = n ? sum(n) : 0;
       const b = document.createElement("button"); b.type = "button"; b.dataset.date = date;
-      b.className = "day" + (n ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
+      b.className = "day" + (n || fd[date] ? " has" : "") + (date > today ? " future" : "") + (date === today ? " today" : "") + (date === calSel ? " sel" : "");
       if (date > today) b.disabled = true;
       const heat = Math.round(20 + 80 * v / (maxN || 1));
       if (v > 0) b.style.background = `color-mix(in srgb, var(--money) ${heat}%, var(--card))`;
@@ -1478,7 +1546,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const ol = $("nightList"); ol.textContent = "";
     recs.forEach(n => {
       const li = document.createElement("li"); const d = parse(n.date);
-      const db = document.createElement("button"); db.type = "button"; db.className = "nl-date"; db.dataset.date = n.date; db.title = L("编辑这一晚", "Edit this night");
+      const db = document.createElement("button"); db.type = "button"; db.className = "nl-date"; db.dataset.date = n.date; db.title = L("打开这一天", "Open this day");
       const b = document.createElement("b"); b.textContent = `${d.getMonth() + 1}/${d.getDate()}`;
       const sm = document.createElement("small"); sm.textContent = wdShort(d) + (n.end ? ` ${n.end}` : "");
       const t = document.createElement("span"); t.className = "t"; t.textContent = money(sum(n));
@@ -1522,9 +1590,15 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       t.append(el("span", null, L(`专注 ${tf.n} 个番茄，${fmtMin(tf.min)}`, `${tf.n} focus ${tf.n === 1 ? "session" : "sessions"}, ${fmtMin(tf.min)}`)));
       box.append(t);
     }
+    const dt = tasks.filter(t => t.done ? nightOf(new Date(t.doneAt || 0)) === date : t.date === date);
+    if (dt.length) {
+      const ul = el("ul", "dd-tasks");
+      dt.forEach(t => ul.append(el("li", t.done ? "ok" : null, (t.done ? "✓ " : "○ ") + t.title)));
+      box.append(ul);
+    }
     if (n) {
       const meta = el("div", "dd-meta");
-      if (n.end) meta.append(el("span", null, L(`${n.end} 下班`, `left at ${n.end}`)));
+      if (n.end) meta.append(el("span", null, L(`${n.end} 收工`, `done at ${n.end}`)));
       if (n.burnout) meta.append(el("span", "pill b", "burnout"));
       if (n.sample) meta.append(el("span", "sample-tag", L("示例", "sample")));
       if (meta.childNodes.length) box.append(meta);
@@ -1532,16 +1606,16 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const ul = el("ul", "dd-items");
         n.items.forEach(it => { const li = el("li"); li.append(el("span", null, it.name), el("span", null, money(Number(it.amount) || 0))); ul.append(li); });
         box.append(ul);
-      } else box.append(el("p", "dd-empty", L("这晚没买东西。", "Bought nothing this night.")));
+      } else box.append(el("p", "dd-empty", L("这天没买东西。", "Bought nothing this day.")));
       if (n.note && !n.sample) box.append(el("p", "dd-note", L("备注：", "Note: ") + n.note));
-    } else box.append(el("p", "dd-empty", date === today ? L("今晚还没有记录。", "Nothing recorded tonight.") : L("这天没有加班记录。", "No overtime this day.")));
+    } else box.append(el("p", "dd-empty", date === today ? L("今天还没有花销。", "No spending today.") : L("这天没有花销记录。", "No spending this day.")));
     const act = el("div", "dd-actions");
     const nav = el("div", "dd-nav");
     const prev = el("button", null, "‹"); prev.type = "button"; prev.setAttribute("aria-label", L("前一天", "Previous day"));
     const next = el("button", null, "›"); next.type = "button"; next.setAttribute("aria-label", L("后一天", "Next day")); next.disabled = date >= today;
     prev.onclick = () => pickDay(shift(date, -1)); next.onclick = () => pickDay(shift(date, 1));
     nav.append(prev, next);
-    const edit = el("button", "btn-ghost", n ? L("编辑这一晚", "Edit this night") : L("补记这一晚", "Add this night")); edit.type = "button";
+    const edit = el("button", "btn-ghost", n ? L("打开这一天", "Open this day") : L("补记这一天", "Add to this day")); edit.type = "button";
     edit.onclick = () => { go(date); showTab("tonight"); };
     act.append(nav, edit); box.append(act);
   }
@@ -1666,7 +1740,65 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     update(n => n.items.splice(Number(x.dataset.i), 1));
   });
 
-  $("endTime").addEventListener("change", () => update(n => n.end = $("endTime").value));
+  // ---------- 今日计划 ----------
+  // 今天显示：日期是今天的计划 + 之前没做完的（带过来）。翻到过去的某天，只显示那天写下的
+  const PLAY = '<svg viewBox="0 0 24 24"><path d="M8 4.5 Q19 11 19.5 12 Q19 13 8 19.5 Q7.4 12 8 4.5Z"/></svg>';
+  const tasksFor = (date) => tasks.filter(t => t.date === date || (date === nightOf() && t.date < date && !t.done)).sort((a, b) => (a.done - b.done) || (a.created - b.created));
+  const taskToms = (id) => focusLog.filter(f => f.taskId === id).length;
+  function renderPlan() {
+    const ul = $("tasks"); ul.textContent = "";
+    const list = tasksFor(current);
+    if (!list.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = current === nightOf() ? L("写下今天想学的一两件事，做的时候点 ▶ 开一个番茄。", "Write down one or two things to learn today. Tap ▶ to start a focus session.") : L("这天没有写计划。", "No plan this day."); ul.append(li); }
+    list.forEach(t => {
+      const li = document.createElement("li"); li.dataset.id = t.id; if (t.done) li.className = "done";
+      const box = document.createElement("button"); box.type = "button"; box.className = "wbox"; box.dataset.act = "done"; box.innerHTML = CHECK;
+      box.setAttribute("aria-label", t.done ? L("改回没做完", "Mark as not done") : L("标记为做完了", "Mark as done"));
+      const nm = document.createElement("span"); nm.className = "tname"; nm.textContent = t.title;
+      if (t.date < current) { const sm = document.createElement("small"); sm.textContent = L(`从 ${fmtMD(parse(t.date))} 带过来`, `Carried over from ${fmtMD(parse(t.date))}`); nm.append(sm); }
+      const n = taskToms(t.id), tm = document.createElement("span"); tm.className = "ttoms";
+      if (n) tm.innerHTML = n <= 4 ? tomSVG("full").repeat(n) : tomSVG("full") + `×${n}`;
+      const end = document.createElement("span"); end.className = "tend";
+      if (!t.done) {
+        const go = document.createElement("button"); go.type = "button"; go.className = "tgo"; go.dataset.act = "go"; go.innerHTML = PLAY;
+        go.setAttribute("aria-label", L(`为「${t.title}」开一个番茄`, `Start a focus session for "${t.title}"`)); go.disabled = fActive();
+        end.append(go);
+      }
+      const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.dataset.act = "del"; x.textContent = "×"; x.setAttribute("aria-label", L("删除 ", "Delete ") + t.title);
+      end.append(x);
+      li.append(box, nm, tm, end); ul.append(li);
+    });
+    // 今天专注了多少
+    const box = $("todayFocus"); box.textContent = "";
+    const fd = focusByDay()[current];
+    if (fd) {
+      const toms = document.createElement("span"); toms.className = "toms"; toms.innerHTML = tomSVG("full").repeat(Math.min(fd.n, 12)); box.append(toms);
+      const b = document.createElement("b"); b.textContent = fmtMin(fd.min);
+      box.append(current === nightOf() ? L("今天专注了 ", "Focused ") : L("这天专注了 ", "Focused "), b, lang === "en" ? (current === nightOf() ? " today" : "") : "");
+    } else box.append(current === nightOf() ? L("今天还没开始专注", "No focus yet today") : L("这天没有专注", "No focus this day"));
+    if (current === nightOf() && !fActive()) {
+      const g = document.createElement("button"); g.type = "button"; g.className = "btn-ghost go"; g.textContent = L("开始专注", "Start focusing"); g.onclick = () => showTab("focus");
+      box.append(g);
+    }
+  }
+  $("taskForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = $("taskName").value.trim(); if (!title) { $("taskName").focus(); return; }
+    tasks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: current, title, done: false, created: Date.now() });
+    saveTasks(); renderPlan(); renderCal();
+    $("taskName").value = ""; $("taskName").focus();
+  });
+  function setTaskDone(t, done) {
+    t.done = done; if (done) t.doneAt = Date.now(); else delete t.doneAt;
+    saveTasks(); renderPlan(); renderCal(); renderStats();
+    if (done) { buzz("success"); toast(L(`做完了「${t.title}」`, `Done: "${t.title}"`)); }
+  }
+  $("tasks").addEventListener("click", (e) => {
+    const el = e.target.closest("[data-act]"); if (!el) return;
+    const t = tasks.find(x => x.id === el.closest("li").dataset.id); if (!t) return;
+    if (el.dataset.act === "done") setTaskDone(t, !t.done);
+    else if (el.dataset.act === "go") startFocus(t.id);
+    else if (el.dataset.act === "del") twoStep(el, "×", () => { tasks = tasks.filter(x => x.id !== t.id); saveTasks(); renderPlan(); renderCal(); });
+  });
   let noteT;
   $("note").addEventListener("input", () => { clearTimeout(noteT); const v = $("note").value; const d = current; noteT = setTimeout(() => { if (d === current) update(n => n.note = v); }, 700); });
   $("note").addEventListener("blur", () => { clearTimeout(noteT); if ($("note").value !== (get(current).note || "")) update(n => n.note = $("note").value); });
@@ -1700,11 +1832,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     armed = btn; btn.textContent = L("再点一次确认", "Tap again to confirm");
     setTimeout(() => { if (armed === btn) { armed = null; btn.textContent = label; } }, 3000);
   }
-  $("deleteNight").onclick = (e) => twoStep(e.target, L("删除这一晚", "Delete this night"), () => {
+  $("deleteNight").onclick = (e) => twoStep(e.target, L("清空这天的花销和备注", "Clear this day's spending and note"), () => {
     const d = current; delete nights[d];
     if (store) queue[d] = (queue[d] || Promise.resolve()).then(() => store.doc(d).delete().catch(() => toast(L("删除失败，请再试一次", "Couldn't delete. Try again."))));
     else { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {} }
-    renderAll(); toast(L("已删除这一晚的记录", "Night deleted"));
+    renderAll(); toast(L("已清空这天的花销和备注", "Cleared this day's spending and note"));
   });
   $("clearSamples").onclick = (e) => twoStep(e.target, L("清除示例数据", "Clear sample data"), () => {
     const ds = Object.values(nights).filter(n => n.sample).map(n => n.date);
@@ -1723,9 +1855,16 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const FOCUS_KEY = "overtime-focus-v1";
   let focusLog = [];   // {id, start, end, min, wishId?}
   const normFocus = (list) => (Array.isArray(list) ? list : []).filter(s => s && typeof s.id === "string" && Number(s.min) > 0 && Number(s.start) > 0)
-    .map(s => ({ id: s.id.slice(0, 40), start: Number(s.start), end: Number(s.end) || Number(s.start) + Number(s.min) * 60000, min: Math.min(600, Math.round(Number(s.min))), ...(typeof s.wishId === "string" && s.wishId ? { wishId: s.wishId.slice(0, 40) } : {}) }));
+    .map(s => ({ id: s.id.slice(0, 40), start: Number(s.start), end: Number(s.end) || Number(s.start) + Number(s.min) * 60000, min: Math.min(600, Math.round(Number(s.min))), ...(typeof s.wishId === "string" && s.wishId ? { wishId: s.wishId.slice(0, 40) } : {}), ...(typeof s.taskId === "string" && s.taskId ? { taskId: s.taskId.slice(0, 40) } : {}) }));
   try { focusLog = normFocus(JSON.parse(localStorage.getItem(FOCUS_KEY) || "[]")); } catch (e) { focusLog = []; }
   const saveFocus = () => { try { localStorage.setItem(FOCUS_KEY, JSON.stringify(focusLog)); } catch (e) {} };
+  // 今日计划：{id, date, title, done, doneAt?, created}。没做完的会一直带到之后的「今天」
+  const TASK_KEY = "overtime-tasks-v1";
+  let tasks = [];
+  const normTasks = (list) => (Array.isArray(list) ? list : []).filter(t => t && typeof t.id === "string" && typeof t.title === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.date || ""))
+    .map(t => ({ id: t.id.slice(0, 40), date: t.date, title: t.title.slice(0, 60), done: !!t.done, ...(t.done && Number(t.doneAt) ? { doneAt: Number(t.doneAt) } : {}), created: Number(t.created) || 0 }));
+  try { tasks = normTasks(JSON.parse(localStorage.getItem(TASK_KEY) || "[]")); } catch (e) { tasks = []; }
+  const saveTasks = () => { try { localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); } catch (e) {} };
 
   let editingWish = null;
   function wishEditRow(w) {
@@ -1858,10 +1997,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 专注记录 focusLog：{id, start, end, min, wishId?}，会同步到 iCloud、写进备份。
   // 正在进行的番茄 frun 只存在这台设备上：按开始时间戳算剩余时间，切到后台、关掉 App 再回来都不会走偏。
   // 愿望可以设 focusGoal（分钟）：绑定这个愿望的专注攒够了才解锁。
-  function renderFocusAll() { renderFocus(); renderStage(true); }
+  function renderFocusAll() { renderFocus(); renderStage(true); if (typeof renderPlan === "function") renderPlan(); }
   const TOMATO = '<path class="tb" d="M50 24 C25 23 9 40 11 60 C13 81 31 93 50 93 C70 93 88 81 89 60 C91 40 75 23 50 24Z"/><path class="tg" d="M27 52 Q28 41 37 35"/><path class="tl" d="M50 31 L39 21 L47 23 L45 12 L53 21 L62 13 L58 24 L69 24 L56 30 L52 37Z"/><path class="ts" d="M51 22 Q51 13 57 8"/>';
   const tomSVG = (cls = "") => `<svg viewBox="0 0 100 100" class="tom ${cls}" aria-hidden="true">${TOMATO}</svg>`;
-  ["fDialTom", "fStartTom", "fRunTom", "fPillTom", "calKeyTom"].forEach(id => ($(id).innerHTML = TOMATO));
+  ["fDialTom", "fStartTom", "fRunTom", "fPillTom", "calKeyTom", "chartKeyTom"].forEach(id => ($(id).innerHTML = TOMATO));
   const clampInt = (v, lo, hi, d) => { v = Math.round(Number(v)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
   const PRESETS = [[25, 5], [50, 10], [15, 3]];
   const FPREF_KEY = "overtime-focus-pref", FRUN_KEY = "overtime-focus-run";
@@ -1928,7 +2067,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   let wake = null, awakeNative = "";
   async function keepAwake(on) {
     const ka = plug("KeepAwake"), guarding = !!frun && frun.phase === "focus";
-    const opts = { awake: on, guard: guarding, title: L("番茄要坏掉了！", "Your tomato is going bad!"), body: L("10 秒内回到加班夜记，不然这个番茄就没了。", "Come back within 10 seconds or this session is lost.") };
+    const opts = { awake: on, guard: guarding, title: L("番茄要坏掉了！", "Your tomato is going bad!"), body: L(`10 秒内回到${APP_ZH}，不然这个番茄就没了。`, "Come back within 10 seconds or this session is lost.") };
     if (ka && awakeNative !== JSON.stringify(opts)) { awakeNative = JSON.stringify(opts); try { await ka.set(opts); } catch (e) {} }
     try {
       if (on && !wake && navigator.wakeLock && document.visibilityState === "visible") { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => (wake = null)); }
@@ -1936,10 +2075,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     } catch (e) { wake = null; }
   }
 
-  function startFocus() {
+  // taskId：从「今日计划」点 ▶ 开的番茄记在那件事上；再来一个 / 重新开始时沿用上一个番茄的那件事
+  function startFocus(taskId) {
     const f = clampInt(fpref.f, 1, 180, 25), w = fWishObj(fpref.wish);
     const cycle = frun && ["done", "breakdone", "break", "broken"].includes(frun.phase) ? frun.cycle || 0 : 0;
-    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", cycle, open: true };
+    let tid = typeof taskId === "string" ? taskId : frun && frun.taskId || "";
+    if (tid && !tasks.some(t => t.id === tid && !t.done)) tid = "";
+    frun = { phase: "focus", start: Date.now(), dur: f * 60000, paused: 0, pausedAt: 0, f, b: clampInt(fpref.b, 0, 60, 5), wishId: w && !w.got ? w.id : "", taskId: tid, cycle, open: true };
     unlockAudio(); askNotify(); saveFrun(); scheduleFocusNote(); renderFocusAll();
   }
   function startBreak() {
@@ -1957,11 +2099,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const ms = Math.min(frun.dur, Math.max(0, endAt - frun.start - frun.paused)), min = Math.round(ms / 60000);
     if (min < 1) { frun = null; saveFrun(); scheduleFocusNote(); renderFocusAll(); toast(L("不到 1 分钟，这次就不记了", "Under a minute, so this one wasn't saved")); return; }
     const w = fWishObj(frun.wishId), wasLocked = !!w && isLocked(w);
-    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(w ? { wishId: w.id } : {}) });
+    focusLog.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start: frun.start, end: endAt, min, ...(w ? { wishId: w.id } : {}), ...(frun.taskId ? { taskId: frun.taskId } : {}) });
     saveFocus();
     frun = { ...frun, phase: "done", gained: min, unlocked: wasLocked && !isLocked(w), cycle: (frun.cycle || 0) + 1, pausedAt: 0, doneAt: Date.now() };
     saveFrun(); scheduleFocusNote(); chime(); buzz("success");
-    renderWishes(); renderFocus(); renderCal(); renderStage(true);
+    renderWishes(); renderFocus(); renderCal(); renderNight(); renderStats(); renderStage(true);
     const ring = $("fsRing"); ring.classList.remove("pop"); void ring.offsetWidth; ring.classList.add("pop");
   }
   function endBreak() { frun = { ...frun, phase: "breakdone", pausedAt: 0, doneAt: Date.now() }; saveFrun(); chime(); buzz("success"); renderStage(true); }
@@ -2047,6 +2189,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       + `<circle class="track" cx="160" cy="160" r="${RR}"/><circle class="arc" id="fsArc" cx="160" cy="160" r="${RR}" transform="rotate(-90 160 160)" stroke-dasharray="${RC.toFixed(1)}" stroke-dashoffset="${RC.toFixed(1)}"/>`
       + `<g class="mk" id="fsMark"><g class="tom" transform="translate(-19 -21) scale(.38)">${TOMATO}</g></g></svg>`;
   }
+  const esc = (t) => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   function ctrlBtn(cls, label, fn) { const b = document.createElement("button"); b.type = "button"; b.className = cls; b.innerHTML = label; b.onclick = fn; return b; }
   const ROTTEN = '<svg viewBox="0 0 100 100" class="tom rot" aria-hidden="true"><path class="tb" d="M12 72 C10 58 30 51 50 52 C72 51 92 58 88 72 C86 82 68 86 50 86 C30 86 13 82 12 72Z"/><path class="crack" d="M38 53 L45 62 L39 69 L47 78"/><path class="crack" d="M66 56 L61 64 L67 70"/><path class="tl" d="M54 53 L45 47 L52 47 L50 39 L57 46 L65 41 L61 50Z"/><circle class="drip" cx="22" cy="90" r="3.4"/><circle class="drip" cx="80" cy="92" r="2.6"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M7 5 Q8.5 4.6 10 5 L10 19 Q8.5 19.4 7 19Z"/><path d="M14 5 Q15.5 4.6 17 5 L17 19 Q15.5 19.4 14 19Z"/></svg>';
@@ -2066,6 +2209,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const inSet = (frun.cycle || 0) % 4, filled = ph === "done" && inSet === 0 ? 4 : inSet;
       for (let i = 0; i < 4; i++) dots.insertAdjacentHTML("beforeend", tomSVG(i < filled ? "full" : ""));
       cyc.append(dots);
+      const tk = frun.taskId && tasks.find(t => t.id === frun.taskId), ft = $("fsTask");
+      ft.hidden = !tk; ft.textContent = "";
+      if (tk) { const sm = document.createElement("small"); sm.textContent = L("在做", "Working on"); ft.append(sm, tk.title); }
       $("fsPhase").textContent = ph === "focus" ? (frun.pausedAt ? L("暂停中", "Paused") : L("专注中", "Focusing"))
         : ph === "break" ? (frun.pausedAt ? L("暂停中", "Paused") : frun.long ? L("长休息", "Long break") : L("休息一下", "Break"))
         : ph === "done" ? L("番茄完成", "Session done") : L("休息好了", "Break's over");
@@ -2086,6 +2232,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         ctrl.append(ctrlBtn("fs-btn", L("重新开始这个番茄", "Start this one over"), startFocus), ctrlBtn("fs-side", L("先到这里", "Done for now"), closeStage));
       } else if (ph === "done") {
         const long = frun.cycle % 4 === 0, bm = long ? frun.b * 3 : frun.b;
+        const tk = frun.taskId && tasks.find(t => t.id === frun.taskId && !t.done);
+        if (tk) ctrl.append(ctrlBtn("fs-btn alt", L(`✓ 「${esc(tk.title)}」做完了`, `✓ Done with "${esc(tk.title)}"`), () => { setTaskDone(tk, true); frun.taskId = ""; saveFrun(); renderStage(true); }));
         if (bm > 0) ctrl.append(ctrlBtn("fs-btn", long ? L(`长休息 ${bm} 分钟`, `Long break · ${bm} min`) : L(`休息 ${bm} 分钟`, `Take a ${bm}-min break`), startBreak),
           ctrlBtn("fs-btn alt", L("不休息，再来一个", "Skip the break, go again"), startFocus));
         else ctrl.append(ctrlBtn("fs-btn", L("再来一个番茄", "Start another"), startFocus));
@@ -2248,7 +2396,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const W = 1080, H = 1440, st = monthStats(month), [yy, mm] = month.split("-").map(Number);
     const icons = await Promise.all(st.top.map(t => iconImage(t.name)));
     const appUrl = (location.protocol.startsWith("http") ? location.host + location.pathname.replace(/index\.html$/, "") : "").replace(/\/$/, "");
-    const avgLine = L(`平均每晚花 ${money(st.recs.length ? st.spend / st.recs.length : 0)}`, `About ${money(st.recs.length ? st.spend / st.recs.length : 0)} a night`);
+    const avgLine = L(`平均每天花 ${money(st.recs.length ? st.spend / st.recs.length : 0)}`, `About ${money(st.recs.length ? st.spend / st.recs.length : 0)} a day`);
 
     const paint = (ctx) => {
       const T = (text, x, y, size, font, color = SC.ink, align = "left", maxW = 0) => {
@@ -2267,8 +2415,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         ctx.fillStyle = SC.grid; for (let gx = 18; gx < W; gx += 36) for (let gy = 18; gy < H; gy += 36) { ctx.beginPath(); ctx.arc(gx, gy, 2.4, 0, Math.PI * 2); ctx.fill(); }
       }
       // 抬头
-      T(L("加班夜记 · Overtime Night Log", "Overtime Night Log"), 64, 104, 34, SF.hand, SC.pencil);
-      const t1 = L(`我的 ${mm} 月`, `My ${MONTH_EN[mm - 1]}`), tLabel = L("加班账单", "Overtime Bill");
+      T(L(`${APP_ZH} · ${APP_EN}`, APP_EN), 64, 104, 34, SF.hand, SC.pencil);
+      const t1 = L(`我的 ${mm} 月`, `My ${MONTH_EN[mm - 1]}`), tLabel = L("学习账单", "Recap");
       let tSize = L(92, 72);
       for (;;) { ctx.font = `${tSize}px ${SF.hand}`; if (ctx.measureText(t1).width + 22 + ctx.measureText(tLabel).width <= W - 128 || tSize <= 48) break; tSize -= 2; }
       const w1 = T(t1, 64, 210, tSize, SF.hand);
@@ -2277,7 +2425,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       T(tLabel, 64 + w1 + 22, 210, tSize, SF.hand);
       T(`${yy}`, W - 64, 104, 40, SF.num, SC.pencil, "right");
       // 第一行三格
-      const row1 = [[L("加班", "Overtime"), `${st.recs.length}`, L("晚", st.recs.length === 1 ? "night" : "nights"), SC.card], [L("花了", "Spent"), money(st.spend), "", SC.moneyHi], [L("最晚下班", "Latest finish"), st.late || "—", "", SC.card]];
+      const mfs = focusLog.filter(f => nightOf(new Date(f.start)).slice(0, 7) === month), mfm = mfs.reduce((a, f) => a + f.min, 0);
+      const fh = mfm >= 60 ? `${Math.round(mfm / 6) / 10}` : `${mfm}`, fu = mfm >= 60 ? L("小时", "h") : L("分钟", "min");
+      const row1 = [[L("专注", "Focused"), fh, fu, SC.burnHi], [L("番茄", "Sessions"), `${mfs.length}`, L("个", ""), SC.card], [L("花了", "Spent"), money(st.spend), "", SC.moneyHi]];
       row1.forEach(([k, v, unit, fill], i) => {
         const x = 64 + i * 330, y = 262;
         sketchBox(ctx, x, y, 300, 180, fill, 11 + i);
@@ -2285,33 +2435,32 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const vw = T(v, x + 28, y + 142, v.length > 6 ? 64 : 84, SF.num, SC.ink, "left", unit ? 160 : 248);
         if (unit) T(unit, x + 36 + vw, y + 142, 36, SF.hand, SC.pencil);
       });
-      // 第二行：几晚 burnout（下面列出是哪几晚）、专注了几个番茄
+      // 第二行：做完了几件事（列出几件）、几天 burnout（列出是哪几天）
       {
-        const x = 64, y = 488, w = 460, h = 236, v = st.burnout;
+        const x = 64, y = 488, w = 460, h = 236, dn = tasks.filter(t => t.done && nightOf(new Date(t.doneAt || 0)).slice(0, 7) === month);
+        sketchBox(ctx, x, y, w, h, SC.card, 22);
+        T(L("做完了", "Finished"), x + 28, y + 54, 36, SF.hand, SC.ink);
+        if (!dn.length) T(L("这个月还没勾掉计划", "Nothing ticked off yet"), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
+        else {
+          const vw = T(`${dn.length}`, x + 28, y + 150, 84, SF.num, SC.ink);
+          T(L("件事", dn.length === 1 ? "task" : "tasks"), x + 40 + vw, y + 150, 36, SF.hand, SC.ink);
+          T(dn.slice(-3).map(t => t.title).join(L("、", ", ")), x + 28, y + 202, 26, SF.hand, SC.pencil, "left", w - 56);
+        }
+      }
+      {
+        const x = 559, y = 488, w = 460, h = 236, v = st.burnout;
         sketchBox(ctx, x, y, w, h, SC.burnHi, 21);
         T("Burnout", x + 28, y + 54, 36, SF.hand, SC.burn);
-        if (!v) T(L("这个月一晚都没有，真好", "Not one night this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
+        if (!v) T(L("这个月一天都没有，真好", "Not one day this month. Nice."), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
         else {
           const vw = T(`${v}`, x + 28, y + 150, 84, SF.num, SC.burn);
-          T(L("晚", v === 1 ? "night" : "nights"), x + 40 + vw, y + 150, 36, SF.hand, SC.burn);
+          T(L("天", v === 1 ? "day" : "days"), x + 40 + vw, y + 150, 36, SF.hand, SC.burn);
           const days = st.recs.filter(n => n.burnout).map(n => `${Number(n.date.slice(5, 7))}/${Number(n.date.slice(8))}`).sort((a, b) => parseInt(a.split("/")[1]) - parseInt(b.split("/")[1]));
           T(days.join(L("、", ", ")), x + 28, y + 202, 26, SF.num, SC.pencil, "left", w - 56);
         }
       }
-      {
-        const x = 559, y = 488, w = 460, h = 236, fs = focusLog.filter(f => nightOf(new Date(f.start)).slice(0, 7) === month);
-        const fm = fs.reduce((a, f) => a + f.min, 0);
-        sketchBox(ctx, x, y, w, h, SC.card, 22);
-        T(L("专注", "Focus"), x + 28, y + 54, 36, SF.hand, SC.burn);
-        if (!fs.length) T(L("这个月还没有番茄", "No focus sessions yet"), x + 28, y + 140, 32, SF.hand, SC.pencil, "left", w - 56);
-        else {
-          const vw = T(`${fs.length}`, x + 28, y + 150, 84, SF.num, SC.ink);
-          T(L("个番茄", fs.length === 1 ? "session" : "sessions"), x + 40 + vw, y + 150, 36, SF.hand, SC.ink);
-          T(fmtMin(fm), x + 28, y + 202, 28, SF.num, SC.pencil, "left", w - 56);
-        }
-      }
-      // 每晚花费日历
-      T(L("每晚花了多少", "Spent each night"), 64, 812, 36, SF.hand);
+      // 每天花费日历
+      T(L("每天花了多少", "Spent each day"), 64, 812, 36, SF.hand);
       T(L("颜色越深 = 花得越多", "Darker = spent more"), W - 64, 812, 28, SF.hand, SC.pencil, "right");
       const gx0 = 64, gy0 = 836, cw = 130, ch = 50, gap = 8;
       weekHead().forEach((d, i) => T(d, gx0 + i * (cw + gap) + cw / 2, gy0 + 24, 24, SF.hand, i > 4 ? SC.burn : SC.pencil, "center"));
@@ -2344,7 +2493,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       if (!st.top.length) T(L("这个月没买东西，省钱冠军", "Bought nothing this month. Savings champion."), 64, topY + 80, 32, SF.hand, SC.pencil);
       // 平均 + 页脚
       T(avgLine, 64, 1378, 32, SF.hand, SC.body, "left", W - 128);
-      T(appUrl ? L(`加班夜记 · ${appUrl}`, `Overtime Night Log · ${appUrl}`) : L("加班夜记", "Overtime Night Log"), W - 64, 1418, 24, SF.hand, SC.pencil, "right");
+      T(appUrl ? L(`${APP_ZH} · ${appUrl}`, `${APP_EN} · ${appUrl}`) : L(APP_ZH, APP_EN), W - 64, 1418, 24, SF.hand, SC.pencil, "right");
     };
     // 空跑一遍收集用到的字，按需加载字体子集，再正式画
     const probe = document.createElement("canvas").getContext("2d"); let used = "";
@@ -2356,10 +2505,10 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     return canvas;
   }
 
-  const monthsWithData = () => [...new Set(Object.keys(nights).map(d => d.slice(0, 7)))].sort();
+  const monthsWithData = () => [...new Set([...Object.keys(nights), ...focusLog.map(f => nightOf(new Date(f.start)))].map(d => d.slice(0, 7)))].sort();
   async function openShare(month) {
     const months = monthsWithData();
-    if (!months.length) { toast(L("先记几晚，再来生成账单吧", "Log a few nights first, then make your bill")); return; }
+    if (!months.length) { toast(L("先记几天，再来生成账单吧", "Log a few days first, then make your recap")); return; }
     shareMonth = month || (months.includes(nightOf().slice(0, 7)) ? nightOf().slice(0, 7) : months[months.length - 1]);
     const [y, m] = shareMonth.split("-").map(Number);
     $("shareTitle").textContent = fmtMonth(y, m);
@@ -2382,7 +2531,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   $("shareGo").onclick = async () => {
     if (!shareBlob) return;
     if (NATIVE) { await nativeShareBlob(shareBlob, `overtime-bill-${shareMonth}.png`); return; }
-    const file = new File([shareBlob], L(`加班账单-${shareMonth}.png`, `overtime-bill-${shareMonth}.png`), { type: "image/png" });
+    const file = new File([shareBlob], L(`学习账单-${shareMonth}.png`, `study-recap-${shareMonth}.png`), { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === "AbortError") return; }
     }
@@ -2444,7 +2593,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         : k.lines === "dots" ? `radial-gradient(${k.c[1]} 1.2px, transparent 1.5px) 0 0 / 8px 8px, ${k.c[0]}`
         : k.lines === "ruled" ? `linear-gradient(transparent 9px, ${k.c[1]} 9px) 0 0 / 10px 10px, ${k.c[0]}` : k.c[0];
       sw.style.borderRadius = k.r;
-      const sample = document.createElement("em"); sample.textContent = L("加班 $12", "Aa $12");
+      const sample = document.createElement("em"); sample.textContent = L("学习 $12", "Aa $12");
       sample.style.cssText = `font-family:${k.font};color:${k.c[2]};border-radius:${k.r}`;
       const d1 = document.createElement("i"); d1.style.cssText = `right:26px;background:${k.c[3]};border-radius:${k.r === "0" ? "0" : "50%"}`;
       const d2 = document.createElement("i"); d2.style.cssText = `right:8px;background:${k.c[4]};border-radius:${k.r === "0" ? "0" : "50%"}`;
@@ -2513,13 +2662,13 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     $("lastBackup").textContent = t ? L(`上次备份：${t}`, `Last backup: ${t}`) : L("还没有备份过。", "No backup yet.");
     checkBackupReminder();
   }
-  const backupJSON = () => JSON.stringify({ app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes, focus: focusLog }, null, 2);
+  const backupJSON = () => JSON.stringify({ app: "overtime-night-log", version: 2, currency: "USD", exportedAt: new Date().toISOString(), nights, wishes, focus: focusLog, tasks }, null, 2);
   const backupName = () => `overtime-log-backup-${ymd(new Date())}.json`;
   function markBackedUp(how) {
     lsSet(BK_KEY, `${ymd(new Date())} ${new Date().toTimeString().slice(0, 5)}`);
     lsSet(BK_AT, String(Date.now()));
     showLastBackup();
-    toast(how === "icloud" ? L(`已备份 ${Object.keys(nights).length} 晚的记录`, `Backed up ${Object.keys(nights).length} nights`) : L(`已导出 ${Object.keys(nights).length} 晚的记录`, `Exported ${Object.keys(nights).length} nights`));
+    toast(how === "icloud" ? L("已备份", "Backed up") : L("已导出备份", "Backup exported"));
   }
   function downloadBackup() {
     const blob = new Blob([backupJSON()], { type: "application/json" });
@@ -2534,7 +2683,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const file = new File([backupJSON()], backupName(), { type: "application/json" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: L("加班夜记备份", "Overtime Night Log backup") });
+        await navigator.share({ files: [file], title: L(`${APP_ZH}备份`, `${APP_EN} backup`) });
         markBackedUp("icloud");
       } catch (e) {
         if (e && e.name === "AbortError") return;   // 用户自己关掉了菜单
@@ -2554,7 +2703,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const show = count > 0 && due && !snoozed && !(NATIVE && icloud.on);   // App 里已经自动同步到 iCloud，就不用提醒
     $("bkRemind").hidden = !show;
     document.querySelector(".gear").classList.toggle("dot", show);
-    if (show) { const days = Math.round((parse(ymd(new Date(now))) - parse(ymd(new Date(last)))) / DAY); $("bkRemindText").textContent = last ? L(`已经 ${days} 天没备份了`, `${days} days since your last backup`) : L(`已经记了 ${count} 晚，还没备份过`, `${count} nights logged, no backup yet`); }
+    if (show) { const days = Math.round((parse(ymd(new Date(now))) - parse(ymd(new Date(last)))) / DAY); $("bkRemindText").textContent = last ? L(`已经 ${days} 天没备份了`, `${days} days since your last backup`) : L(`已经记了 ${count} 天，还没备份过`, `${count} days logged, no backup yet`); }
   }
   $("icloudBtn").onclick = backupToICloud;
   $("bkRemindGo").onclick = backupToICloud;
@@ -2594,9 +2743,14 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         const inc = normFocus(raw.focus), ids = new Set(inc.map(s => s.id));
         focusLog = focusLog.filter(s => !ids.has(s.id)).concat(inc); fAdded = inc.length; saveFocus();
       }
-      if (!added && !wAdded && !fAdded) throw new Error();
+      let tAdded = 0;
+      if (Array.isArray(raw.tasks)) {
+        const inc = normTasks(raw.tasks), ids = new Set(inc.map(t => t.id));
+        tasks = tasks.filter(t => !ids.has(t.id)).concat(inc); tAdded = inc.length; saveTasks();
+      }
+      if (!added && !wAdded && !fAdded && !tAdded) throw new Error();
       try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {}
-      renderAll(); toast(L(`已导入 ${added} 晚的记录` + (wAdded ? `和 ${wAdded} 个愿望` : "") + (fAdded ? `、${fAdded} 个番茄` : ""), `Imported ${added} nights` + (wAdded ? ` and ${wAdded} wishes` : "") + (fAdded ? `, ${fAdded} focus sessions` : "")));
+      renderAll(); toast(L(`已导入 ${added} 天的花销` + (wAdded ? `、${wAdded} 个愿望` : "") + (fAdded ? `、${fAdded} 个番茄` : "") + (tAdded ? `、${tAdded} 条计划` : ""), `Imported ${added} days of spending` + (wAdded ? `, ${wAdded} wishes` : "") + (fAdded ? `, ${fAdded} focus sessions` : "") + (tAdded ? `, ${tAdded} plan items` : "")));
     } catch (err) { toast(L("这个文件读不出来，请选择「导出备份」生成的 .json 文件", "Can't read this file. Choose a .json file made by Export backup.")); }
   });
 
@@ -2679,22 +2833,23 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
         return;
       }
       const got = await ic.get({ key: IC_KEY });
-      let remote = { nights: {}, wishes: [], focus: [] };
+      let remote = { nights: {}, wishes: [], focus: [], tasks: [] };
       if (got && got.value) { try { remote = JSON.parse(got.value) || remote; } catch (e) {} }
-      let base = { nights: {}, wishes: {}, focus: {} };
+      let base = { nights: {}, wishes: {}, focus: {}, tasks: {} };
       try { base = JSON.parse(localStorage.getItem(IC_BASE) || "null") || base; } catch (e) {}
       const mN = merge3(base.nights || {}, nights, normFlags(remote.nights || {}));
       const mW = merge3(base.wishes || {}, wishMap(wishes), wishMap(remote.wishes));
       const mF = merge3(base.focus || {}, wishMap(focusLog), wishMap(normFocus(remote.focus)));
-      if (JSON.stringify(mN) !== JSON.stringify(nights) || JSON.stringify(mW) !== JSON.stringify(wishMap(wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(focusLog))) {
-        nights = mN; wishes = Object.values(mW); focusLog = Object.values(mF);
+      const mT = merge3(base.tasks || {}, wishMap(tasks), wishMap(normTasks(remote.tasks)));
+      if (JSON.stringify(mN) !== JSON.stringify(nights) || JSON.stringify(mW) !== JSON.stringify(wishMap(wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(focusLog)) || JSON.stringify(mT) !== JSON.stringify(wishMap(tasks))) {
+        nights = mN; wishes = Object.values(mW); focusLog = Object.values(mF); tasks = Object.values(mT);
         try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (e) {}
-        saveWishes(); saveFocus(); renderAll();
+        saveWishes(); saveFocus(); saveTasks(); renderAll();
       }
-      if (!got || !got.value || JSON.stringify(mN) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mW) !== JSON.stringify(wishMap(remote.wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(normFocus(remote.focus)))) {
-        await ic.set({ key: IC_KEY, value: JSON.stringify({ app: "overtime-night-log", version: 4, currency: "USD", updatedAt: new Date().toISOString(), nights: mN, wishes: Object.values(mW), focus: Object.values(mF) }) });
+      if (!got || !got.value || JSON.stringify(mN) !== JSON.stringify(remote.nights || {}) || JSON.stringify(mW) !== JSON.stringify(wishMap(remote.wishes)) || JSON.stringify(mF) !== JSON.stringify(wishMap(normFocus(remote.focus))) || JSON.stringify(mT) !== JSON.stringify(wishMap(normTasks(remote.tasks)))) {
+        await ic.set({ key: IC_KEY, value: JSON.stringify({ app: "overtime-night-log", version: 5, currency: "USD", updatedAt: new Date().toISOString(), nights: mN, wishes: Object.values(mW), focus: Object.values(mF), tasks: Object.values(mT) }) });
       }
-      try { localStorage.setItem(IC_BASE, JSON.stringify({ nights: mN, wishes: mW, focus: mF })); } catch (e) {}
+      try { localStorage.setItem(IC_BASE, JSON.stringify({ nights: mN, wishes: mW, focus: mF, tasks: mT })); } catch (e) {}
       icloud = { on: true, last: new Date().toTimeString().slice(0, 5), msg: "" };
     } catch (e) {
       icloud.msg = (e && e.code === "TOO_LARGE")
@@ -2711,7 +2866,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (ic && ic.addListener) ic.addListener("change", () => icloudSync());
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") icloudSync(); else pushWidget(true); });
     // 本地有改动：3 秒内推到 iCloud
-    setInterval(() => { const now = JSON.stringify([nights, wishes, focusLog]); if (now !== icLastLocal) { icLastLocal = now; icloudSync(); } }, 3000);
+    setInterval(() => { const now = JSON.stringify([nights, wishes, focusLog, tasks]); if (now !== icLastLocal) { icLastLocal = now; icloudSync(); } }, 3000);
   }
 
   // 每晚提醒：本地通知，不需要服务器。工作日是周一到周五（1 = 周日）。
@@ -2728,12 +2883,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     if (perm.display !== "granted") perm = await ln.requestPermissions();
     if (perm.display !== "granted") {
       rem.on = false; saveRem(); renderReminder();
-      toast(L("没有通知权限。请到「设置 → 通知 → 加班夜记」里打开。", "Notifications are off. Turn them on in Settings → Notifications → Overtime Night Log."));
+      toast(L(`没有通知权限。请到「设置 → 通知 → ${APP_ZH}」里打开。`, `Notifications are off. Turn them on in Settings → Notifications → ${APP_EN}.`));
       return;
     }
     const [h, m] = rem.time.split(":").map(Number);
-    const title = L("加班夜记", "Overtime Night Log");
-    const body = L("今晚加班了吗？花了什么、累不累，10 秒记一笔。", "Working late tonight? Log what you spent and how you feel in 10 seconds.");
+    const title = L(APP_ZH, APP_EN);
+    const body = L("今天学了吗？哪怕只开一个 25 分钟的番茄也好。", "Studied today? Even one 25-minute session counts.");
     const when = rem.days === "all" ? [null] : [2, 3, 4, 5, 6];
     await ln.schedule({ notifications: when.map((wd, i) => ({ id: i + 1, title, body,
       schedule: { on: wd ? { weekday: wd, hour: h, minute: m } : { hour: h, minute: m }, allowWhileIdle: true } })) });
@@ -2751,26 +2906,27 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   let widgetLast = "";
   function pushWidget(force) {
     const wb = plug("WidgetBridge"); if (!wb || !loaded) return;
-    const month = nightOf().slice(0, 7), st = monthStats(month), m = Number(month.slice(5)), tn = nights[nightOf()];
+    const month = nightOf().slice(0, 7), st = monthStats(month), m = Number(month.slice(5));
     const cs = getComputedStyle(document.documentElement), cv = (n) => cs.getPropertyValue(n).trim();
     const end = nightOf(), trend = [];
     for (let i = 13; i >= 0; i--) { const d = shift(end, -i), n = nights[d]; trend.push([d, n ? sum(n) : 0, n]); }
     const tMax = niceMax(Math.max(0, ...trend.map(x => x[1])));
-    // 最近 22 周，按这段时间里花得最多的一晚分 4 档
+    // 学习日历：最近 22 周每天专注了多久，按这段时间里专注最多的一天分 4 档
+    const fdays = focusByDay(), mfs = focusLog.filter(f => nightOf(new Date(f.start)).slice(0, 7) === month), tf = fdays[end];
     const hStart = shift(end, -((parse(end).getDay() + 6) % 7) - 21 * 7), hDays = [];
-    for (let d = hStart; d <= end; d = shift(d, 1)) hDays.push(nights[d] ? sum(nights[d]) : 0);
+    for (let d = hStart; d <= end; d = shift(d, 1)) hDays.push(fdays[d] ? fdays[d].min : 0);
     const hMax = Math.max(0, ...hDays);
     const heat = hDays.map(v => v > 0 ? Math.min(4, Math.max(1, Math.ceil(v / hMax * 4))) : 0);
     const json = JSON.stringify({
-      appName: L("加班夜记", "Overtime"), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
-      nights: st.recs.length, nightsLabel: L("晚", st.recs.length === 1 ? "night" : "nights"), spent: money(st.spend), spentLabel: L("花了", "spent"),
+      appName: L(APP_ZH, APP_EN), monthTitle: L(`${m} 月`, MONTH_EN[m - 1]),
+      nights: mfs.length, nightsLabel: L("个番茄", mfs.length === 1 ? "session" : "sessions"), spent: money(st.spend), spentLabel: L("花了", "spent"),
       burnout: st.burnout, burnoutLabel: "Burnout",
-      tonight: tn ? money(sum(tn)) : "", tonightLabel: L("今晚", "Tonight"), emptyText: L("打开 App 记第一晚", "Open the app to log tonight"),
+      tonight: tf ? fmtMin(tf.min) : "", tonightLabel: L("今天专注", "Today"), emptyText: L("打开 App 开始专注", "Open the app to start focusing"),
       dayStartHour: DAY_START_HOUR,
-      // 最近 14 晚的花费趋势：h 是相对最高刻度的高度（0–1），t 标出今晚
-      trendTitle: L("近 14 晚", "Last 14 nights"),
+      // 最近 14 天的花费趋势：h 是相对最高刻度的高度（0–1），t 标出今天
+      trendTitle: L("近 14 天花费", "Spent, last 14 days"),
       trend: trend.map(([d, v, n]) => ({ d: parse(d).getDate(), h: Math.round(v / tMax * 1000) / 1000, t: d === end, b: !!n?.burnout })),
-      // 加班日历（GitHub 那种小方块）：从 heatStart（周一）起每天一个等级，0 没花钱，1–4 越大花得越多
+      // 学习日历（GitHub 那种小方块）：从 heatStart（周一）起每天一个等级，0 没专注，1–4 越大专注越久
       heatStart: hStart, heat, monthShort: L(Array.from({ length: 12 }, (_, i) => `${i + 1}月`), MON_EN),
       colors: { paper: cv("--paper"), ink: cv("--ink"), pencil: cv("--pencil"), card: cv("--card"), money: cv("--money"), moneyHi: cv("--money-hi"), burn: cv("--burn"), body: cv("--body") },
     });
@@ -2795,7 +2951,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   if (frun && frun.phase === "focus") checkLeft(frun.leftAt || frun.seen || frun.start);
   if (NATIVE) {
     renderReminder(); renderICloud(); syncStatusBar();
-    icLastLocal = JSON.stringify([nights, wishes, focusLog]); icloudSync();
+    icLastLocal = JSON.stringify([nights, wishes, focusLog, tasks]); icloudSync();
     if (rem.on) applyReminder();   // 每次启动重新排一次，防止系统清掉
   }
   // 请求持久存储，降低浏览器自动清理数据的概率
