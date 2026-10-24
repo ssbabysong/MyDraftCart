@@ -177,8 +177,8 @@ ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .tgo:disabled { opacity: .35; box-shadow: none; }
 .g-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 2px dashed var(--grid); }
 .g-stats div { min-width: 0; line-height: 1.2; }
-.g-stats b { font-family: var(--f-num); font-weight: 600; font-size: 28px; }
-.g-stats small { font-size: 13px; color: var(--ink); margin-left: 2px; }
+.g-stats b { font-family: var(--f-num); font-weight: 400; font-size: 20px; }
+.g-stats small { font-size: 12px; color: var(--pencil); margin-left: 2px; }
 .g-stats span { display: block; font-size: 12px; color: var(--pencil); margin-top: 2px; white-space: nowrap; }
 .g-more { margin: -2px 0 0; font-size: 13px; color: var(--pencil); }
 /* 每张目标卡片顶上一条纸胶带，颜色跟着目标走 */
@@ -196,13 +196,13 @@ ul.g-done small { color: var(--pencil); margin-left: 8px; font-family: var(--f-n
 .heat::-webkit-scrollbar { display: none; }
 /* 打卡表：开始前是空心圈，开始后没打卡是浅灰点，打卡了是这个目标的颜色，今天外面套一个圈 */
 .heat { overflow: hidden; padding: 4px 2px; }
-.heat-grid { display: inline-grid; grid-template-rows: 16px repeat(7, 12px); grid-auto-flow: row; gap: 4px; align-items: center; }
-.heat-grid b { font-weight: 400; font-size: 11px; color: var(--pencil); white-space: nowrap; line-height: 1; }
-.heat-grid b.hm { overflow: visible; width: 12px; }
-.heat-grid i { display: block; width: 12px; height: 12px; border-radius: 50%; background: color-mix(in srgb, var(--pencil) 22%, var(--card)); }
-.heat-grid i.out { background: transparent; box-shadow: inset 0 0 0 1.3px color-mix(in srgb, var(--pencil) 28%, var(--card)); }
+.heat-grid { display: inline-grid; grid-template-rows: 14px repeat(7, 8px); grid-auto-flow: row; gap: 3px; align-items: center; }
+.heat-grid b { font-weight: 400; font-size: 10px; color: var(--pencil); white-space: nowrap; line-height: 1; }
+.heat-grid b.hm { overflow: visible; width: 8px; }
+.heat-grid i { display: block; width: 8px; height: 8px; border-radius: 50%; background: color-mix(in srgb, var(--pencil) 22%, var(--card)); }
+.heat-grid i.out { background: transparent; box-shadow: inset 0 0 0 1.1px color-mix(in srgb, var(--pencil) 28%, var(--card)); }
 .heat-grid i.hit { background: var(--gc, var(--leaf)); }
-.heat-grid i.today { box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--ink); }
+.heat-grid i.today { box-shadow: 0 0 0 1.5px var(--card), 0 0 0 2.8px var(--ink); }
 form.goal-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 8px 10px; align-items: end; }
 form.goal-add #goalName { grid-column: 1 / -1; }
 form.goal-add input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
@@ -2455,11 +2455,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function heatGrid(g, days) {
     const today = nightOf(), end = g.closed ? goalLast(g) : today;
     const inner = Math.min(innerWidth, 660) - 32 - 36 - 22;          // 卡片内宽减去左边星期那一列
-    const cols = Math.max(8, Math.min(26, Math.floor((inner + 4) / 16)));
+    const cols = Math.max(8, Math.min(26, Math.floor((inner + 3) / 11)));
     const lastSun = shift(end, (7 - parse(end).getDay()) % 7), first = shift(lastSun, -cols * 7 + 1);
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
-    grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `18px repeat(${cols}, 12px)`;
+    grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `16px repeat(${cols}, 8px)`;
     // 第一行：月份（这一周里有 1 号，或者第一列）
     grid.append(document.createElement("b"));
     let lastMonth = "";
