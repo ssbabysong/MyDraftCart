@@ -40,10 +40,10 @@
   --burn-hi: #FFD3CC;
   --body: #7550C8;         /* 紫笔 */
   --body-hi: #E4D8FF;
-  /* 手写字体：全部用马善政毛笔楷书；小赖字体（App 自带）和 Shantell Sans 作后备 */
-  --f-title: "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", cursive;
-  --f-hand: "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", system-ui, sans-serif;
-  --f-num: "Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", cursive;
+  /* 手写字体：Shantell Sans 排第一——它没有中文字，所以英文和数字用它，中文落到马善政毛笔楷书；小赖字体（App 自带）作后备 */
+  --f-title: "Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", cursive;
+  --f-hand: "Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", system-ui, sans-serif;
+  --f-num: "Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", cursive;
   --wob1: 255px 15px 225px 15px / 15px 225px 15px 255px;
   --wob2: 15px 225px 15px 255px / 255px 15px 225px 15px;
   --wob3: 225px 20px 255px 15px / 20px 255px 15px 225px;
@@ -2612,7 +2612,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 用 Canvas 画一张 1080×1440（3:4，适合小红书）的手绘风账单。字体按需加载：先「空跑」一遍收集要画的字，加载好再正式画。
   const SC = { paper: "#FAFAF4", grid: "#DCE6EF", ink: "#26354D", pencil: "#6E7889", card: "#FFFFFF",
     money: "#F5C21B", moneyHi: "#FFEB7A", burn: "#D9483B", burnHi: "#FFD3CC", body: "#7550C8", bodyHi: "#E4D8FF" };
-  const SF = { title: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", serif' };
+  const SF = { title: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", serif' };
   let shareMonth = null, shareBlob = null;
 
   function monthStats(month) {
@@ -2663,7 +2663,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   async function drawShareCard(month) {
     // 分享图跟随当前主题的配色
     const cs = getComputedStyle(document.documentElement), cv = (n, f) => (cs.getPropertyValue(n).trim() || f);
-    const SF0 = { title: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", serif' };
+    const SF0 = { title: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Shantell Sans", "Ma Shan Zheng", "Xiaolai SC", serif' };
     Object.assign(SF, look().hand ? { ...SF0, title: cv("--f-title", SF0.title) } : { title: cv("--f-title", SF0.title), hand: cv("--f-hand", SF0.hand), num: cv("--f-num", SF0.num) });
     Object.assign(SC, { paper: cv("--paper", SC.paper), grid: cv("--grid", SC.grid), ink: cv("--ink", SC.ink), pencil: cv("--pencil", SC.pencil), card: cv("--card", SC.card),
       money: cv("--money", SC.money), moneyHi: cv("--money-hi", SC.moneyHi), burn: cv("--burn", SC.burn), burnHi: cv("--burn-hi", SC.burnHi), body: cv("--body", SC.body), bodyHi: cv("--body-hi", SC.bodyHi) });
@@ -2774,7 +2774,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     const probe = document.createElement("canvas").getContext("2d"); let used = "";
     const real = probe.fillText.bind(probe); probe.fillText = (t, ...a) => { used += t; return real(t, ...a); };
     paint(probe);
-    try { await Promise.all([SF.title, SF.hand, SF.num].map(f => document.fonts.load(`40px ${f.split(",")[0]}`, used))); } catch (e) {}
+    // 英文数字的字体和中文的字体分开加载（每组前两个）
+    const fams = [...new Set([SF.title, SF.hand, SF.num].flatMap(f => f.split(",").slice(0, 2).map(x => x.trim())))];
+    try { await Promise.all(fams.map(f => document.fonts.load(`40px ${f}`, used))); } catch (e) {}
     const canvas = document.createElement("canvas"); canvas.width = W; canvas.height = H;
     paint(canvas.getContext("2d"));
     return canvas;
