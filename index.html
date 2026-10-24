@@ -874,6 +874,11 @@ form.adder .goal-end input { flex: 1; max-width: 10em; font-family: var(--f-num)
 form.adder #wishPrice { border-left: 0; padding-left: 2px; border-top: 1.5px solid var(--grid); }
 form.adder #wishGoal { border-top: 1.5px solid var(--grid); }
 form.adder.pg-form { margin-top: 8px; }
+/* 番茄页：为了哪个目标（小胶囊，选中的用目标的颜色） */
+.f-goalpick { display: flex; flex-direction: column; gap: 6px; }
+.fg-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fg-chips button { border: var(--bw, 1.5px) solid var(--grid); background: transparent; color: var(--pencil); border-radius: 999px; padding: 4px 12px; font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fg-chips button[aria-pressed="true"] { border-color: var(--gc, var(--ink)); color: var(--ink); background: color-mix(in srgb, var(--gc, var(--ink)) 14%, var(--card)); }
 </style>
 </head>
 <body>
@@ -1046,6 +1051,10 @@ form.adder.pg-form { margin-top: 8px; }
       <div class="cur-row f-custom" id="fCustom" hidden>
         <label>专注 <input type="number" id="fCustF" min="1" max="180" step="1" inputmode="numeric" aria-label="专注分钟"> 分钟</label>
         <label>休息 <input type="number" id="fCustB" min="0" max="60" step="1" inputmode="numeric" aria-label="休息分钟"> 分钟</label>
+      </div>
+      <div class="f-goalpick" id="fGoalPick" hidden>
+        <span class="eyebrow">为了哪个目标</span>
+        <div class="fg-chips" id="fGoalChips" role="group" aria-label="为了哪个目标"></div>
       </div>
       <button type="button" class="f-start" id="fStart"><svg viewBox="0 0 100 100" class="tom" id="fStartTom"></svg><span>开始专注</span></button>
     </div>
@@ -1268,7 +1277,7 @@ form.adder.pg-form { margin-top: 8px; }
     "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，开番茄时选它，攒够这么久才解锁。": "Focus minutes are optional. If set, pick this wish when you start a session; it unlocks once you've saved up that long.",
     "别离开这一页": "Stay on this page",
-    "一个番茄": "one focus session", "这个番茄攒给…": "Save this session toward…", "不攒，直接开始": "Nothing, just start", "番茄": "Timer", "展开月历": "Show month", "我的目标": "My goals", "为了哪个目标": "Goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "这个番茄攒给…": "Save this session toward…", "不攒，直接开始": "Nothing, just start", "番茄": "Timer", "展开月历": "Show month", "我的目标": "My goals", "为了哪个目标": "For which goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -2433,6 +2442,16 @@ form.adder.pg-form { margin-top: 8px; }
     if (document.activeElement !== $("fCustB")) $("fCustB").value = fpref.b;
 
     $("fDialMin").textContent = fpref.f;
+    // 番茄页直接开始时算给哪个目标：不选 / 进行中的目标，记住上次选的
+    const ag = activeGoals();
+    if (fpref.goal && !ag.some(g => g.id === fpref.goal)) fpref.goal = "";
+    $("fGoalPick").hidden = !ag.length;
+    const gc = $("fGoalChips"); gc.textContent = "";
+    [{ id: "", title: L("不选", "None") }, ...ag].forEach(g => {
+      const b = document.createElement("button"); b.type = "button"; b.dataset.goal = g.id; b.textContent = g.id ? `${goalIcon(g)} ${g.title}` : g.title;
+      b.setAttribute("aria-pressed", String((fpref.goal || "") === g.id)); if (g.id) b.style.setProperty("--gc", goalColor(g));
+      gc.append(b);
+    });
     renderGoals();
 
     $("fSetup").hidden = fActive(); $("fRunning").hidden = !fActive();
@@ -2630,7 +2649,8 @@ form.adder.pg-form { margin-top: 8px; }
   $("wishSheetNone").onclick = () => { if (!sheetFor) return; const o = sheetFor; closeSheet(); startFocus({ ...o, wishId: "" }); };
   $("wishSheetClose").onclick = closeSheet;
   $("wishSheet").addEventListener("click", (e) => { if (e.target === $("wishSheet")) closeSheet(); });
-  $("fStart").onclick = () => startWithWish({});
+  $("fGoalChips").addEventListener("click", (e) => { const b = e.target.closest("button[data-goal]"); if (!b) return; fpref.goal = b.dataset.goal; savePref(); renderFocus(); });
+  $("fStart").onclick = () => startWithWish({ goalId: fpref.goal || "" });
 
   // ---------- 月度加班账单分享图 ----------
   // 用 Canvas 画一张 1080×1440（3:4，适合小红书）的手绘风账单。字体按需加载：先「空跑」一遍收集要画的字，加载好再正式画。
