@@ -162,7 +162,8 @@ button.counter:active { transform: scale(.97); }
 ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 .goal { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--rad, var(--wob1)); }
 .goals li:nth-child(even) .goal { border-radius: var(--rad, var(--wob2)); }
-.g-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.g-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.g-icon { font-size: 30px; line-height: 1; }
 .g-name { font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
 .g-name small { display: block; font-size: 13px; color: var(--pencil); margin-top: 2px; }
 .g-acts { display: flex; gap: 8px; align-items: center; }
@@ -174,28 +175,34 @@ ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .tgo svg { width: 20px; height: 20px; overflow: visible; flex: none; }
 .tgo:active { transform: translate(1px, 1px); box-shadow: none; }
 .tgo:disabled { opacity: .35; box-shadow: none; }
-.g-stats { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: var(--pencil); }
-.g-stats b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); margin-right: 2px; }
-.g-foot { display: flex; justify-content: flex-end; gap: 14px; }
+.g-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 2px dashed var(--grid); }
+.g-stats div { min-width: 0; line-height: 1.2; }
+.g-stats b { font-family: var(--f-num); font-weight: 600; font-size: 28px; }
+.g-stats small { font-size: 13px; color: var(--ink); margin-left: 2px; }
+.g-stats span { display: block; font-size: 12px; color: var(--pencil); margin-top: 2px; white-space: nowrap; }
+.g-more { margin: -2px 0 0; font-size: 13px; color: var(--pencil); }
+/* 每张目标卡片顶上一条纸胶带，颜色跟着目标走 */
+.goal { position: relative; }
+.goal::before { display: var(--tape, block); content: ""; position: absolute; top: -11px; left: 22px; width: 92px; height: 22px; transform: rotate(calc(-2deg * var(--tilt, 1)));
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--gc) 45%, transparent) 0 8px, color-mix(in srgb, var(--gc) 32%, transparent) 8px 16px); }
+.goals li:nth-child(even) .goal::before { left: auto; right: 26px; transform: rotate(calc(2deg * var(--tilt, 1))); }
+.g-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+.g-foot .link { margin-left: 0; }
+.goal.closed .g-foot { justify-content: flex-end; }
 ul.g-done { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
 ul.g-done small { color: var(--pencil); margin-left: 8px; font-family: var(--f-num); }
 /* 打卡记录：像 GitHub 的提交记录，一列一周，从上到下周一到周日 */
 .heat { overflow-x: auto; scrollbar-width: none; padding: 4px; margin: -4px; }
 .heat::-webkit-scrollbar { display: none; }
-/* 打卡小点点：没打卡是小灰点，打卡了是圆滚滚的绿点，越深专注越久 */
-.heat-grid { display: inline-grid; grid-auto-flow: column; grid-template-rows: repeat(7, 9px); grid-auto-columns: 9px; gap: 4px; }
-.heat-grid i { display: block; border-radius: 50%; background: var(--grid); transform: scale(.5); }
-.heat-grid i[class*="lv"] { transform: none; }
-.heat-grid i.lv1 { background: color-mix(in srgb, var(--leaf) 35%, var(--card)); }
-.heat-grid i.lv2 { background: color-mix(in srgb, var(--leaf) 60%, var(--card)); }
-.heat-grid i.lv3 { background: color-mix(in srgb, var(--leaf) 82%, var(--card)); }
-.heat-grid i.lv4 { background: var(--leaf); }
-.heat-grid i.fut { background: transparent; border: 1.5px solid var(--grid); transform: scale(.45); }
-.heat-grid i.pad { visibility: hidden; }
-.heat-grid i.today { transform: none; box-shadow: 0 0 0 1.5px var(--paper), 0 0 0 3px var(--ink); }
-.heat-grid i.today:not([class*="lv"]) { background: var(--card); }
-.heat-key { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--pencil); justify-content: flex-end; }
-.heat-key i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+/* 打卡表：开始前是空心圈，开始后没打卡是浅灰点，打卡了是这个目标的颜色，今天外面套一个圈 */
+.heat { overflow: hidden; padding: 4px 2px; }
+.heat-grid { display: inline-grid; grid-template-rows: 16px repeat(7, 12px); grid-auto-flow: row; gap: 4px; align-items: center; }
+.heat-grid b { font-weight: 400; font-size: 11px; color: var(--pencil); white-space: nowrap; line-height: 1; }
+.heat-grid b.hm { overflow: visible; width: 12px; }
+.heat-grid i { display: block; width: 12px; height: 12px; border-radius: 50%; background: color-mix(in srgb, var(--pencil) 22%, var(--card)); }
+.heat-grid i.out { background: transparent; box-shadow: inset 0 0 0 1.3px color-mix(in srgb, var(--pencil) 28%, var(--card)); }
+.heat-grid i.hit { background: var(--gc, var(--leaf)); }
+.heat-grid i.today { box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--ink); }
 form.goal-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 8px 10px; align-items: end; }
 form.goal-add #goalName { grid-column: 1 / -1; }
 form.goal-add input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
@@ -2436,33 +2443,63 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     return out;
   }
   const goalLast = (g) => g.closed && g.closedAt ? nightOf(new Date(g.closedAt)) : nightOf();
+  // 每个目标一种颜色（按创建顺序轮着用）
+  const GOAL_COLORS = ["#4F6EA8", "#6E9C63", "#D0704F", "#8A6BC0", "#C49A2C", "#3E9A9A"];
+  const goalColor = (g) => GOAL_COLORS[Math.max(0, goals.slice().sort((a, b) => a.created - b.created).findIndex(x => x.id === g.id)) % GOAL_COLORS.length];
+  // 按名字配个小图标
+  const GOAL_ICONS = [[/读|书|阅读|\bread/i, "📖"], [/日语|英语|韩语|法语|单词|N[1-5]|雅思|托福|\bielts|\btoefl|\bjlpt|语言|\bvocab/i, "🗣️"], [/跑|运动|健身|锻炼|瑜伽|\brun|\bgym|\byoga|\bworkout/i, "🏃"],
+    [/代码|编程|算法|python|swift|\bjs\b|leetcode|\bcod/i, "💻"], [/写|日记|作文|论文|\bwrit|\bjournal/i, "✍️"], [/记账|存钱|省钱|理财|\bsave|\bbudget/i, "💰"],
+    [/考|证|复习|备考|\bexam|\btest/i, "📝"], [/画|设计|\bdraw|\bdesign/i, "🎨"], [/琴|音乐|吉他|\bmusic|\bpiano|\bguitar/i, "🎵"], [/手机|早睡|睡|\bsleep|\bphone/i, "🌙"]];
+  const goalIcon = (g) => (GOAL_ICONS.find(([re]) => re.test(g.title)) || [, "🎯"])[1];
+  // 打卡表：最近若干周，一列一周（周一在上），上面标月份，左边标一 / 三 / 五 / 日
   function heatGrid(g, days) {
-    const today = nightOf(), last = g.closed ? goalLast(g) : (g.end && g.end > today ? g.end : today);
-    let first = shift(g.start, -((parse(g.start).getDay() + 6) % 7));
-    let lastSun = shift(last, (7 - parse(last).getDay()) % 7);
-    if ((parse(lastSun) - parse(first)) / 864e5 > 26 * 7) first = shift(lastSun, -26 * 7 + 1);   // 太长只看最近半年
-    let cols = Math.round((parse(lastSun) - parse(first)) / 864e5 + 1) / 7;
-    if (cols < 8) { lastSun = shift(first, 8 * 7 - 1); cols = 8; }   // 刚开始的目标也画 8 周，后面是空点点
+    const today = nightOf(), end = g.closed ? goalLast(g) : today;
+    const inner = Math.min(innerWidth, 660) - 32 - 36 - 22;          // 卡片内宽减去左边星期那一列
+    const cols = Math.max(8, Math.min(26, Math.floor((inner + 4) / 16)));
+    const lastSun = shift(end, (7 - parse(end).getDay()) % 7), first = shift(lastSun, -cols * 7 + 1);
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
-    for (let d = first; d <= lastSun; d = shift(d, 1)) {
-      const c = document.createElement("i"), v = days[d];
-      if (d < g.start || (g.closed && d > last)) c.className = "pad";
-      else if (d > today) c.className = "fut";
-      else if (v && v.hit) c.className = "lv" + (v.min >= 120 ? 4 : v.min >= 60 ? 3 : v.min >= 25 ? 2 : 1);
-      if (d === today) c.classList.add("today");
-      if (v && v.hit) c.title = `${fmtMD(parse(d))} ${v.min ? fmtMin(v.min) : L("打卡", "checked in")}`;
-      grid.append(c);
+    grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `18px repeat(${cols}, 12px)`;
+    // 第一行：月份（这一周里有 1 号，或者第一列）
+    grid.append(document.createElement("b"));
+    let lastMonth = "";
+    for (let c = 0; c < cols; c++) {
+      const mon = shift(first, c * 7), monthOfWeek = [0, 1, 2, 3, 4, 5, 6].map(k => shift(mon, k)).find(d => d.endsWith("-01")) || (c === 0 ? mon : "");
+      const lab = document.createElement("b"); lab.className = "hm";
+      if (monthOfWeek && monthOfWeek.slice(0, 7) !== lastMonth && c < cols - 1) { lastMonth = monthOfWeek.slice(0, 7); lab.textContent = L(`${+lastMonth.slice(5)}月`, MON_EN[+lastMonth.slice(5) - 1]); }
+      grid.append(lab);
+    }
+    const wd = L(["一", "", "三", "", "五", "", "日"], ["M", "", "W", "", "F", "", "S"]);
+    for (let r = 0; r < 7; r++) {
+      const lab = document.createElement("b"); lab.className = "hw"; lab.textContent = wd[r]; grid.append(lab);
+      for (let c = 0; c < cols; c++) {
+        const d = shift(first, c * 7 + r), v = days[d], i = document.createElement("i");
+        i.className = d < g.start || (g.closed && d > end) ? "out" : v && v.hit && d <= today ? "hit" : "";
+        if (d === today) i.classList.add("today");
+        if (v && v.hit) i.title = `${fmtMD(parse(d))} ${v.min ? fmtMin(v.min) : L("打卡", "checked in")}`;
+        grid.append(i);
+      }
     }
     wrap.append(grid);
-    requestAnimationFrame(() => (wrap.scrollLeft = wrap.scrollWidth));
     return wrap;
+  }
+  // 连续天数、完成率、累计（只算从开始到今天 / 完成那天）
+  function goalStreaks(g, days) {
+    const end = goalLast(g), hit = (d) => !!(days[d] && days[d].hit);
+    let cur = 0, d = hit(end) ? end : shift(end, -1);   // 今天还没打卡不算断
+    while (d >= g.start && hit(d)) { cur++; d = shift(d, -1); }
+    let best = 0, run = 0, total = 0;
+    for (let x = g.start; x <= end; x = shift(x, 1)) { if (hit(x)) { run++; total++; best = Math.max(best, run); } else run = 0; }
+    const span = Math.min(30, Math.round((parse(end) - parse(g.start)) / 864e5) + 1);
+    let recent = 0; for (let k = 0; k < span; k++) if (hit(shift(end, -k))) recent++;
+    return { cur, best, total, rate: span ? Math.round(recent / span * 100) : 0 };
   }
   function goalCard(g) {
     const today = nightOf(), days = goalDays(g), last = goalLast(g);
     const li = document.createElement("li"); li.dataset.id = g.id;
-    const card = document.createElement("div"); card.className = "goal sketch" + (g.closed ? " closed" : "");
+    const card = document.createElement("div"); card.className = "goal sketch" + (g.closed ? " closed" : ""); card.style.setProperty("--gc", goalColor(g));
     const head = document.createElement("div"); head.className = "g-head";
+    const ic = document.createElement("span"); ic.className = "g-icon"; ic.textContent = goalIcon(g); ic.setAttribute("aria-hidden", "true");
     const nm = document.createElement("div"); nm.className = "g-name"; nm.textContent = g.title;
     const span = Math.round((parse(last) - parse(g.start)) / 864e5) + 1;
     const sm = document.createElement("small");
@@ -2480,14 +2517,18 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       go.setAttribute("aria-label", L(`为「${g.title}」开一个番茄`, `Start a focus session for "${g.title}"`));
       acts.append(ck, go);
     }
-    head.append(nm, acts);
+    head.append(ic, nm);
     const from = g.start, to = last;
-    const fm = Object.values(days).reduce((a, v) => a + v.min, 0), hits = Object.entries(days).filter(([d, v]) => v.hit && d >= from && d <= to).length;
+    const fm = Object.values(days).reduce((a, v) => a + v.min, 0), sk = goalStreaks(g, days);
     let spent = 0; Object.values(nights).forEach(n => { if (n.date >= from && n.date <= to) spent += sum(n); });
+    // 四个大数字：当前连续、最长连续、近 30 天完成率、累计
     const st = document.createElement("div"); st.className = "g-stats";
-    const stat = (v, k) => { const e = document.createElement("span"); const b = document.createElement("b"); b.textContent = v; e.append(b, k); return e; };
-    st.append(stat(fmtMin(fm), L(" 专注", " focused")), stat(String(hits), L(" 天打卡", hits === 1 ? " day checked in" : " days checked in")), stat(money(spent), L(" 这段时间花的", " spent meanwhile")));
-    card.append(head, heatGrid(g, days), st);
+    const stat = (v, unit, k) => { const e = document.createElement("div"); const b = document.createElement("b"); b.textContent = v; const u = document.createElement("small"); u.textContent = unit; const kk = document.createElement("span"); kk.textContent = k; e.append(b, u, kk); return e; };
+    st.append(stat(sk.cur, L("天", sk.cur === 1 ? "day" : "days"), L("当前连续", "Current streak")), stat(sk.best, L("天", sk.best === 1 ? "day" : "days"), L("最长连续", "Longest streak")),
+      stat(sk.rate, "%", L("近30天完成率", "Last 30 days")), stat(sk.total, L("次", sk.total === 1 ? "time" : "times"), L("累计", "Total")));
+    const more = document.createElement("p"); more.className = "g-more";
+    more.textContent = L(`专注 ${fmtMin(fm)} · 这段时间花了 ${money(spent)}`, `${fmtMin(fm)} focused · ${money(spent)} spent meanwhile`);
+    card.append(head, heatGrid(g, days), st, more);
     // 最近做完的事：今日计划里属于这个目标的
     const recent = tasks.filter(t => t.goalId === g.id && t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 3);
     if (recent.length) {
@@ -2496,7 +2537,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       card.append(ul);
     }
     const foot = document.createElement("div"); foot.className = "g-foot";
-    if (!g.closed) { const c = document.createElement("button"); c.type = "button"; c.className = "btn-ghost"; c.dataset.act = "close"; c.textContent = L("完成目标", "Complete goal"); foot.append(c); }
+    if (!g.closed) { const c = document.createElement("button"); c.type = "button"; c.className = "link"; c.dataset.act = "close"; c.textContent = L("完成目标", "Complete goal"); foot.append(c, acts); }
     else {
       const r = document.createElement("button"); r.type = "button"; r.className = "link"; r.dataset.act = "reopen"; r.textContent = L("重新打开", "Reopen");
       const x = document.createElement("button"); x.type = "button"; x.className = "link"; x.dataset.act = "del"; x.textContent = L("删除", "Delete");
