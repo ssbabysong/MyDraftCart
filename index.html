@@ -919,7 +919,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <button type="button" class="gear" data-go="records" aria-label="设置和记录">
         <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M13.6 4.5 L18.4 4.4 L19.2 8.1 Q20.6 8.7 21.7 9.6 L25.3 8.4 L27.6 12.6 L24.8 15.1 Q25 16.6 24.7 18 L27.5 20.4 L25.2 24.6 L21.6 23.4 Q20.5 24.3 19.1 24.9 L18.3 28.6 L13.5 28.5 L12.8 24.8 Q11.4 24.2 10.3 23.3 L6.7 24.5 L4.4 20.3 L7.2 17.8 Q7 16.4 7.3 15 L4.5 12.5 L6.8 8.4 L10.4 9.6 Q11.5 8.7 12.9 8.1Z"/><circle cx="16" cy="16.5" r="3.6"/></svg>
       </button>
-      <div class="clock"><b id="clock">--:--</b><span id="clockSub"></span></div>
+      <div class="clock"><b id="clock">--:--</b></div>
     </div>
   </header>
 
@@ -948,16 +948,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       </div>
       <button type="button" class="cal-toggle" id="calExpand" aria-expanded="false">展开月历</button>
     </div>
-  <section class="card sketch plan-card" aria-labelledby="nightTitle">
-    <div class="card-head">
-      <div>
-        <div class="eyebrow" id="nightEyebrow">今天</div>
-        <h2 id="nightTitle">—</h2>
-      </div>
-    </div>
-
+  <section class="card sketch plan-card" aria-labelledby="planTitle">
     <div class="plan">
-      <div class="eyebrow">今日计划</div>
+      <div class="eyebrow" id="planTitle">今日计划</div>
       <div id="planGroups"></div>
       <form class="task-add" id="taskForm" autocomplete="off">
         <input type="text" id="taskName" placeholder="今天想学点什么？" maxlength="60" aria-label="新的计划">
@@ -1381,7 +1374,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   function tick() {
     const d = new Date();
     $("clock").textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    $("clockSub").textContent = fmtDay(d);
   }
   tick(); setInterval(tick, 30000);
 
@@ -1417,8 +1409,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // ---------- render: tonight ----------
   function renderNight() {
     const n = get(current), d = parse(current), isTonight = current === nightOf();
-    $("nightEyebrow").textContent = isTonight ? L("今天", "Today") : current < nightOf() ? L("补记", "Catching up") : L("未来", "Future");
-    $("nightTitle").textContent = fmtDay(d);
+    // 日期只在日历里显示；选中别的日子时，标题写出是哪天
+    $("planTitle").textContent = isTonight ? L("今日计划", "Today's plan") : L(`${fmtMD(d)}的计划`, `Plan for ${fmtMD(d)}`);
+    $("spendTitle").textContent = isTonight ? L("今天花了", "Spent today") : L("这天花了", "Spent that day");
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
     $("burnToggle").setAttribute("aria-pressed", String(!!n.burnout));
     $("burnToggle").setAttribute("aria-label", n.burnout ? L("今天 burnout 了，点一下取消", "Burnout today. Tap to undo.") : L("今天 burnout 了吗？点一下标记", "Burnout today? Tap to mark."));
