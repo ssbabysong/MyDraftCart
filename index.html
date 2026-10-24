@@ -1008,10 +1008,8 @@ form.adder.pg-form { margin-top: 8px; }
       <div class="marks" id="marks"></div>
     </div>
     <div id="calItemsView" class="items-view">
-      <div class="eyebrow">这个月买过的东西</div>
+      <div class="eyebrow">这个月买到的愿望</div>
       <div class="item-wall" id="itemWall"></div>
-      <div class="eyebrow">每天买了什么</div>
-      <ol class="night-list" id="nightList"></ol>
     </div>
     <button type="button" class="share-cta" id="shareOpen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 9h6M9 13h4"/></svg>
@@ -1261,7 +1259,7 @@ form.adder.pg-form { margin-top: 8px; }
     "崩溃、想摆烂、脑子转不动、身体不舒服": "Melting down, brain fried, or feeling unwell",
     "记一笔": "Add", "备注": "Note", 
     "日历": "Calendar", "月历": "Month", "商品": "Items", "本月": "This month", "本周": "This week", "全部": "All time",
-    "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每天买了什么": "What I bought each day",
+    "花得越多颜色越深": "Darker = spent more", "这个月买到的愿望": "Wishes bought this month",
     "统计": "Stats", "专注时长": "Focus time", "做完的事": "Tasks done", "愿望花了": "Spent on wishes", "买到的愿望": "Wishes bought", "Burnout 天数": "Burnout days",
     "专注番茄": "Focus sessions", "每天花费": "Spent per day", "番茄": "Focus sessions",
     "生成我的月度学习账单": "Make my monthly recap", "专注、做完的事和花销，一张手绘风长图": "Focus, finished tasks and spending in one hand-drawn image",
@@ -1442,14 +1440,7 @@ form.adder.pg-form { margin-top: 8px; }
     $("sAvg").textContent = list.reduce((a, n) => a + n.items.filter(i => i.wishId).length, 0);
     $("sBurn").textContent = list.filter(n => n.burnout).length;
     $("insight").hidden = true;
-    const tally = {};
-    list.forEach(n => n.items.forEach(i => { const k = i.name.trim(); if (!k) return; tally[k] = tally[k] || { c: 0, s: 0 }; tally[k].c++; tally[k].s += Number(i.amount) || 0; }));
-    const top = Object.entries(tally).sort((a, b) => b[1].s - a[1].s).slice(0, 3);
-    const tb = $("topBuys"); tb.textContent = "";
-    if (top.length) {
-      tb.append(L("买到的：", "Bought: "));
-      top.forEach(([k, v], i) => { const b = document.createElement("b"); b.textContent = L(`${k} ${money(v.s)}（${v.c} 次）`, `${k} ${money(v.s)} (${v.c}×)`); tb.append(b); if (i < top.length - 1) tb.append(L("、", ", ")); });
-    }
+    $("topBuys").hidden = true;   // 买到的愿望在下面的墙里，这里不再重复
   }
 
   // ---------- render: 14-night chart ----------
@@ -1617,17 +1608,17 @@ form.adder.pg-form { margin-top: 8px; }
     return span;
   }
 
-  // 日历「商品」视图：本月商品墙 + 每晚明细，不用点就能全部看到
+  // 统计页：这个月买到的愿望（只算从愿望清单买的）
   function renderItemsView() {
     const recs = Object.values(nights).filter(n => n.date.slice(0, 7) === calMonth).sort((a, b) => b.date.localeCompare(a.date));
     const wall = $("itemWall"); wall.textContent = "";
     const tally = new Map();
     recs.forEach(n => n.items.forEach(it => {
-      const key = it.name.trim(); if (!key) return;
+      const key = it.name.trim(); if (!key || !it.wishId) return;
       const t = tally.get(key) || { name: key, c: 0, s: 0 }; t.c++; t.s += Number(it.amount) || 0; tally.set(key, t);
     }));
     const list = [...tally.values()].sort((a, b) => b.s - a.s);
-    if (!list.length) { const p = document.createElement("p"); p.className = "nl-none"; p.textContent = L("这个月还没买过东西。", "Nothing bought this month."); wall.append(p); }
+    if (!list.length) { const p = document.createElement("p"); p.className = "nl-none"; p.textContent = L("这个月还没买到愿望。", "No wishes bought this month."); wall.append(p); }
     list.forEach(t => {
       const c = document.createElement("div"); c.className = "wall-card";
       const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = t.name;
@@ -1636,29 +1627,6 @@ form.adder.pg-form { margin-top: 8px; }
       c.append(logoFor(t.name), nm, sm, ct); wall.append(c);
     });
 
-    const ol = $("nightList"); ol.textContent = "";
-    recs.forEach(n => {
-      const li = document.createElement("li"); const d = parse(n.date);
-      const db = document.createElement("button"); db.type = "button"; db.className = "nl-date"; db.dataset.date = n.date; db.title = L("打开这一天", "Open this day");
-      const b = document.createElement("b"); b.textContent = `${d.getMonth() + 1}/${d.getDate()}`;
-      const sm = document.createElement("small"); sm.textContent = wdShort(d) + (n.end ? ` ${n.end}` : "");
-      const t = document.createElement("span"); t.className = "t"; t.textContent = money(sum(n));
-      db.append(b, sm, t);
-      const box = document.createElement("div"); box.className = "nl-items";
-      if (n.items.length) n.items.forEach(it => {
-        const chip = document.createElement("span"); chip.className = "chip";
-        const nm = document.createElement("span"); nm.className = "n"; nm.textContent = it.name;
-        const p = document.createElement("span"); p.className = "p"; p.textContent = money(Number(it.amount) || 0);
-        chip.append(logoFor(it.name, true), nm, p); box.append(chip);
-      });
-      else { const e = document.createElement("span"); e.className = "nl-none"; e.textContent = L("没买东西", "Bought nothing"); box.append(e); }
-      if (n.burnout) {
-        const f = document.createElement("span"); f.className = "nl-flags";
-        if (n.burnout) { const x = document.createElement("span"); x.className = "b"; x.textContent = "burnout × "; f.append(x); }
-        box.append(f);
-      }
-      li.append(db, box); ol.append(li);
-    });
   }
 
   // 日历下方的当晚详情：买了什么、花了多少、状态
@@ -1830,7 +1798,6 @@ form.adder.pg-form { margin-top: 8px; }
   $("calPrev").onclick = () => wkMode() ? go(shift(current, -7)) : monthShift(-1);
   $("calNext").onclick = () => wkMode() ? go(shift(current, 7)) : monthShift(1);
   $("calToday").onclick = () => go(nightOf());
-  $("nightList").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b) { go(b.dataset.date); showTab("tonight"); } });
   $("calGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b && !b.disabled) go(b.dataset.date); });
   $("history").addEventListener("click", (e) => { const b = e.target.closest("button[data-date]"); if (b) { go(b.dataset.date); showTab("tonight"); } });
 
