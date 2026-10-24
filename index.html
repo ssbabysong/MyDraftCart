@@ -200,6 +200,7 @@ ul.g-done small { color: var(--pencil); margin-left: 8px; font-family: var(--f-n
 .heat-grid b { font-weight: 400; font-size: 10px; color: var(--pencil); white-space: nowrap; line-height: 1; }
 .heat-grid b.hm { overflow: visible; width: 8px; }
 .heat-grid i { display: block; width: 8px; height: 8px; border-radius: 50%; background: color-mix(in srgb, var(--pencil) 22%, var(--card)); }
+.heat-grid i.pad { visibility: hidden; }
 .heat-grid i.out { background: transparent; box-shadow: inset 0 0 0 1.1px color-mix(in srgb, var(--pencil) 28%, var(--card)); }
 .heat-grid i.hit { background: var(--gc, var(--leaf)); }
 .heat-grid i.today { box-shadow: 0 0 0 1.5px var(--card), 0 0 0 2.8px var(--ink); }
@@ -857,6 +858,22 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   .h-right { grid-column: 1 / -1; justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* 「加东西」的输入统一成一种：虚线手绘框，里面是输入框和一个小圆「+」；点进去变实线 */
+form.adder { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 5px 5px 5px 14px; margin-top: 4px;
+  border: var(--bw, 1.5px) dashed color-mix(in srgb, var(--pencil) 70%, transparent); border-radius: var(--rad, var(--wob2)); background: color-mix(in srgb, var(--card) 60%, transparent); }
+form.adder:focus-within { border-style: solid; border-color: var(--bc, var(--ink)); background: var(--card); }
+form.adder input, form.adder select { flex: 1 1 8em; min-width: 0; border: 0; border-radius: 0; background: transparent; padding: 7px 2px; box-shadow: none; outline: none; }
+form.adder input[type=number] { flex: 0 1 6.5em; font-family: var(--f-num); font-size: 16px; padding-left: 10px; border-left: 1.5px solid var(--grid); }
+form.adder .add { flex: none; width: 34px; height: 34px; padding: 0; margin: 0 0 0 auto; display: grid; place-items: center; border: 0; border-radius: 50%;
+  background: var(--ink); color: var(--paper); font-family: var(--f-num); font-size: 22px; line-height: 1; box-shadow: none; transform: none; }
+form.adder .add.txt { width: auto; border-radius: 999px; padding: 0 14px; font-family: var(--f-hand); font-size: 15px; }
+form.adder .add:active { transform: scale(.92); box-shadow: none; }
+form.adder #goalName, form.adder #wishName { flex-basis: 100%; }
+form.adder .goal-end { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pencil); border-top: 1.5px solid var(--grid); padding-top: 4px; }
+form.adder .goal-end input { flex: 1; max-width: 10em; font-family: var(--f-num); font-size: 15px; padding: 4px 2px; border: 0; color: var(--ink); }
+form.adder #wishPrice { border-left: 0; padding-left: 2px; border-top: 1.5px solid var(--grid); }
+form.adder #wishGoal { border-top: 1.5px solid var(--grid); }
+form.adder.pg-form { margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -904,7 +921,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <div class="plan">
       <div class="eyebrow" id="planTitle">今日计划</div>
       <div id="planGroups"></div>
-      <form class="task-add" id="taskForm" autocomplete="off">
+      <form class="task-add adder" id="taskForm" autocomplete="off">
         <input type="text" id="taskName" placeholder="今天想学点什么？" maxlength="60" aria-label="新的计划">
         <button type="submit" class="add" aria-label="加到计划">+</button>
       </form>
@@ -920,7 +937,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     <div id="spendBody" class="spend-body" hidden>
     <div class="receipt">
       <ul class="items" id="items"></ul>
-      <form class="buy" id="buyForm" autocomplete="off">
+      <form class="buy adder" id="buyForm" autocomplete="off">
         <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
         <input type="number" id="buyAmt" placeholder="金额 $" min="0" step="0.01" inputmode="decimal" aria-label="金额">
         <button type="submit" class="add" aria-label="记一笔">+</button>
@@ -998,7 +1015,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   <section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="focusTitle">
     <h2 class="underlined" id="focusTitle">我的目标</h2>
     <ul class="goals" id="goalList"></ul>
-    <form class="goal-add" id="goalForm" autocomplete="off">
+    <form class="goal-add adder" id="goalForm" autocomplete="off">
       <input type="text" id="goalName" placeholder="新目标，比如：三个月考过 N2" maxlength="40" aria-label="新目标">
       <label class="goal-end"><span>截止日期（可不填）</span><input type="date" id="goalEnd"></label>
       <button type="submit" class="add" aria-label="添加目标">+</button>
@@ -1043,11 +1060,11 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       <div class="big-total"><span id="wishTotal">$0</span></div>
       <p id="wishCompare"></p>
     </div>
-    <form class="wish" id="wishForm" autocomplete="off">
+    <form class="wish adder" id="wishForm" autocomplete="off">
       <input type="text" id="wishName" placeholder="想买什么" maxlength="40" aria-label="想买的东西">
       <input type="number" id="wishPrice" placeholder="价格 $" min="0" step="0.01" inputmode="decimal" aria-label="价格">
       <input type="number" id="wishGoal" placeholder="专注分钟" min="0" max="100000" step="1" inputmode="numeric" aria-label="专注多少分钟后解锁">
-      <button type="submit" class="add">许个愿</button>
+      <button type="submit" class="add txt">许个愿</button>
     </form>
     <p class="wish-hint">专注分钟可以不填；填了，开番茄时选它，攒够这么久才解锁。</p>
     <ul class="wishes" id="wishList"></ul>
@@ -1828,9 +1845,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       sec.append(head, ul);
       if (isToday) {
         if (addingGoal === g.id) {
-          const f = document.createElement("form"); f.className = "pg-form"; f.autocomplete = "off";
+          const f = document.createElement("form"); f.className = "pg-form adder"; f.autocomplete = "off";
           const inp = document.createElement("input"); inp.type = "text"; inp.maxLength = 60; inp.placeholder = L(`为「${g.title}」做点什么？`, `Something for "${g.title}"?`); inp.setAttribute("aria-label", inp.placeholder);
-          const ok = document.createElement("button"); ok.type = "submit"; ok.textContent = L("加上", "Add");
+          const ok = document.createElement("button"); ok.type = "submit"; ok.className = "add"; ok.textContent = "+"; ok.setAttribute("aria-label", L("加上", "Add"));
           f.append(inp, ok); sec.append(f);
           f.onsubmit = (e) => { e.preventDefault(); const title = inp.value.trim(); if (!title) { addingGoal = null; renderPlan(); return; } addTask(title, g.id); inp.value = ""; renderPlan(); };
           f.addEventListener("focusout", (e) => { if (!f.contains(e.relatedTarget)) setTimeout(() => { if (addingGoal === g.id && !inp.value.trim()) { addingGoal = null; renderPlan(); } }, 150); });
@@ -2453,10 +2470,17 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   const goalIcon = (g) => (GOAL_ICONS.find(([re]) => re.test(g.title)) || [, "🎯"])[1];
   // 打卡表：最近若干周，一列一周（周一在上），上面标月份，左边标一 / 三 / 五 / 日
   function heatGrid(g, days) {
-    const today = nightOf(), end = g.closed ? goalLast(g) : today;
+    // 只画这个目标自己的时间段：开始那周 → 截止那周（没设截止就到今天；完成了就到完成那天）
+    const today = nightOf(), end = g.closed ? goalLast(g) : (g.end && g.end > today ? g.end : today);
     const inner = Math.min(innerWidth, 660) - 32 - 36 - 22;          // 卡片内宽减去左边星期那一列
-    const cols = Math.max(8, Math.min(26, Math.floor((inner + 3) / 11)));
-    const lastSun = shift(end, (7 - parse(end).getDay()) % 7), first = shift(lastSun, -cols * 7 + 1);
+    const maxCols = Math.max(8, Math.min(26, Math.floor((inner + 3) / 11)));
+    const lastSun = shift(end, (7 - parse(end).getDay()) % 7), startMon = shift(g.start, -((parse(g.start).getDay() + 6) % 7));
+    let cols = Math.round((parse(lastSun) - parse(startMon)) / 864e5 + 1) / 7, first = startMon;
+    if (cols > maxCols) {   // 太长：以今天那周为准，往前往后取满一屏
+      const todaySun = shift(today, (7 - parse(today).getDay()) % 7);
+      const tail = Math.min(Math.round((parse(lastSun) - parse(todaySun)) / 864e5 / 7), Math.floor(maxCols / 3));
+      first = shift(todaySun, (tail - maxCols) * 7 + 1); cols = maxCols;
+    }
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
     grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `16px repeat(${cols}, 8px)`;
@@ -2466,7 +2490,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     for (let c = 0; c < cols; c++) {
       const mon = shift(first, c * 7), monthOfWeek = [0, 1, 2, 3, 4, 5, 6].map(k => shift(mon, k)).find(d => d.endsWith("-01")) || (c === 0 ? mon : "");
       const lab = document.createElement("b"); lab.className = "hm";
-      if (monthOfWeek && monthOfWeek.slice(0, 7) !== lastMonth && c < cols - 1) { lastMonth = monthOfWeek.slice(0, 7); lab.textContent = L(`${+lastMonth.slice(5)}月`, MON_EN[+lastMonth.slice(5) - 1]); }
+      if (monthOfWeek && monthOfWeek.slice(0, 7) !== lastMonth && (c < cols - 1 || cols < 3)) { lastMonth = monthOfWeek.slice(0, 7); lab.textContent = L(`${+lastMonth.slice(5)}月`, MON_EN[+lastMonth.slice(5) - 1]); }
       grid.append(lab);
     }
     const wd = L(["一", "", "三", "", "五", "", "日"], ["M", "", "W", "", "F", "", "S"]);
@@ -2474,7 +2498,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
       const lab = document.createElement("b"); lab.className = "hw"; lab.textContent = wd[r]; grid.append(lab);
       for (let c = 0; c < cols; c++) {
         const d = shift(first, c * 7 + r), v = days[d], i = document.createElement("i");
-        i.className = d < g.start || (g.closed && d > end) ? "out" : v && v.hit && d <= today ? "hit" : "";
+        i.className = d < g.start || d > end ? "pad" : v && v.hit && d <= today ? "hit" : d > today ? "out" : "";
         if (d === today) i.classList.add("today");
         if (v && v.hit) i.title = `${fmtMD(parse(d))} ${v.min ? fmtMin(v.min) : L("打卡", "checked in")}`;
         grid.append(i);
