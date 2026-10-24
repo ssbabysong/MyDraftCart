@@ -226,23 +226,25 @@ form.goal-add .add { width: 46px; height: 46px; padding: 0; display: grid; place
 .pgroup { display: flex; flex-direction: column; }
 .pg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
 .pg-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.pg-ic { flex: none; width: 34px; height: 34px; display: grid; place-items: center; font-size: 19px; border-radius: 11px 9px 12px 8px / 9px 12px 8px 11px; background: color-mix(in srgb, var(--gc, var(--pencil)) 22%, var(--card)); border: 2px solid var(--gc, var(--pencil)); }
-.pg-name { font-family: var(--f-title); font-size: 20px; min-width: 0; overflow-wrap: anywhere; }
+.pg-ic { flex: none; width: 28px; height: 28px; display: grid; place-items: center; font-size: 16px; border-radius: 11px 9px 12px 8px / 9px 12px 8px 11px; background: color-mix(in srgb, var(--gc, var(--pencil)) 22%, var(--card)); border: 2px solid var(--gc, var(--pencil)); }
+.pg-name { font-family: var(--f-title); font-size: 17px; min-width: 0; overflow-wrap: anywhere; }
 /* 组里的事：往里缩，左边一条目标色的线，勾选框小一号 —— 一眼看出目标是大标题、事情是它下面的小项 */
 .pgroup > .pg-form { margin-left: 16px; }
 .pgroup > ul.tasks, .pgroup > .pg-add { margin-left: 16px; padding-left: 16px; border-left: 2.5px solid color-mix(in srgb, var(--gc, var(--pencil)) 55%, transparent); }
 .pgroup > ul.tasks:empty { display: none; }
 .pgroup ul.tasks li { padding: 6px 2px; }
-.pgroup ul.tasks .wbox { width: 20px; height: 20px; border-width: 1.8px; }
-.pgroup ul.tasks .wbox svg { width: 15px; height: 15px; }
-.pgroup ul.tasks .tname { font-size: 16px; }
+.pgroup ul.tasks .wbox { width: 18px; height: 18px; border-width: 1.8px; }
+.pgroup ul.tasks .wbox svg { width: 13px; height: 13px; }
+.pgroup ul.tasks .tgo { height: 28px; font-size: 13px; padding: 0 10px 0 5px; }
+.pgroup ul.tasks .tgo svg { width: 16px; height: 16px; }
+.pgroup ul.tasks .tname { font-size: 14.5px; }
 .pgroup + .pgroup { border-top: 1.5px dashed color-mix(in srgb, var(--pencil) 35%, transparent); padding-top: 14px; }
 .pgroup.other .pg-ic { border-style: dashed; background: transparent; color: var(--pencil); }
-.pgroup.other .pg-name { color: var(--pencil); font-size: 18px; }
+.pgroup.other .pg-name { color: var(--pencil); font-size: 15.5px; }
 .pg-meta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--pencil); white-space: nowrap; }
 .pg-meta svg { width: 14px; height: 14px; overflow: visible; }
 .pg-meta .ok { color: var(--leaf); }
-.pg-add { align-self: flex-start; border: 0; background: none; color: var(--pencil); font-size: 14px; padding: 8px 2px 0; }
+.pg-add { align-self: flex-start; border: 0; background: none; color: var(--pencil); font-size: 13px; padding: 8px 2px 0; }
 .pg-add:hover { color: var(--ink); }
 .pg-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; padding-top: 6px; }
 .pg-form input { min-width: 0; background: transparent; border: 0; border-bottom: var(--bw, 2px) solid var(--bc, var(--ink)); padding: 6px 4px; }
@@ -251,7 +253,7 @@ form.goal-add .add { width: 46px; height: 46px; padding: 0; display: grid; place
 .plan { display: flex; flex-direction: column; gap: 8px; }
 ul.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 ul.tasks li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 2px dashed var(--grid); }
-ul.tasks .tname { min-width: 0; overflow-wrap: anywhere; font-size: 17px; line-height: 1.35; }
+ul.tasks .tname { min-width: 0; overflow-wrap: anywhere; font-size: 15px; line-height: 1.35; }
 ul.tasks .tname small { display: block; font-size: 12px; color: var(--pencil); }
 ul.tasks .done .tname { text-decoration: line-through; text-decoration-color: var(--burn); text-decoration-thickness: 2px; color: var(--pencil); }
 ul.tasks .done .wbox { color: var(--burn); }
