@@ -163,7 +163,12 @@ ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .goal { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--rad, var(--wob1)); }
 .goals li:nth-child(even) .goal { border-radius: var(--rad, var(--wob2)); }
 .g-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
-.g-icon { font-size: 30px; line-height: 1; }
+.g-icon { font-size: 30px; line-height: 1; border: 0; background: none; padding: 2px; border-radius: 10px; cursor: pointer; }
+.g-icon:hover { background: color-mix(in srgb, var(--gc, var(--pencil)) 16%, transparent); }
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 6px; }
+.icon-grid button { font-size: 24px; height: 46px; border: var(--bw, 1.5px) solid transparent; background: transparent; border-radius: 12px; }
+.icon-grid button[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, var(--card)); }
+.ws-none[aria-pressed="true"] { color: var(--ink); }
 .g-name { font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
 .g-name small { display: block; font-size: 13px; color: var(--pencil); margin-top: 2px; }
 .g-acts { display: flex; gap: 8px; align-items: center; }
@@ -878,7 +883,9 @@ form.adder .add { flex: none; width: 34px; height: 34px; padding: 0; margin: 0 0
   background: var(--ink); color: var(--paper); font-family: var(--f-num); font-size: 22px; line-height: 1; box-shadow: none; transform: none; }
 form.adder .add.txt { width: auto; border-radius: 999px; padding: 0 14px; font-family: var(--f-hand); font-size: 15px; }
 form.adder .add:active { transform: scale(.92); box-shadow: none; }
-form.adder #goalName, form.adder #wishName { flex-basis: 100%; }
+form.adder #wishName { flex-basis: 100%; }
+form.adder #goalName { flex: 1 1 calc(100% - 52px); }
+form.adder .goal-ic { flex: none; width: 38px; height: 38px; font-size: 22px; border: var(--bw, 1.5px) dashed var(--pencil); background: transparent; border-radius: 10px; padding: 0; }
 form.adder .goal-end { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pencil); border-top: 1.5px solid var(--grid); padding-top: 4px; }
 form.adder .goal-end input { flex: 1; max-width: 10em; font-family: var(--f-num); font-size: 15px; padding: 4px 2px; border: 0; color: var(--ink); }
 form.adder #wishPrice { border-left: 0; padding-left: 2px; border-top: 1.5px solid var(--grid); }
@@ -946,25 +953,12 @@ form.adder.pg-form { margin-top: 8px; }
 
   <section class="card sketch spend-card" aria-labelledby="spendTitle">
     <button type="button" class="spend-toggle" id="spendToggle" aria-expanded="false" aria-controls="spendBody">
-      <span class="eyebrow" id="spendTitle">今天花了</span><span class="spend-n" id="spendCount"></span>
+      <span class="eyebrow" id="spendTitle">今天的小记</span><span class="spend-n" id="spendCount"></span>
       <span class="total" id="nightTotal">$0</span><span class="chev" aria-hidden="true">›</span>
     </button>
     <div id="spendBody" class="spend-body" hidden>
     <div class="receipt">
       <ul class="items" id="items"></ul>
-      <form class="buy adder" id="buyForm" autocomplete="off">
-        <input type="text" id="buyName" placeholder="买了什么" maxlength="40" aria-label="物品">
-        <input type="number" id="buyAmt" placeholder="金额 $" min="0" step="0.01" inputmode="decimal" aria-label="金额">
-        <button type="submit" class="add" aria-label="记一笔">+</button>
-      </form>
-      <div class="quick">
-        <span class="quick-k">常买</span>
-        <div class="chips scroll" id="chips"></div>
-      </div>
-      <div class="quick" id="wishPick" hidden>
-        <span class="quick-k">愿望</span>
-        <div class="chips scroll" id="wishChips"></div>
-      </div>
     </div>
 
     <div>
@@ -978,7 +972,7 @@ form.adder.pg-form { margin-top: 8px; }
       <textarea id="note" maxlength="500" placeholder="今天学得怎么样？有什么想记下的？"></textarea>
       <div class="saved" id="saved"></div>
     </div>
-    <div style="text-align:right"><button type="button" class="link" id="deleteNight" hidden>清空这天的花销和备注</button></div>
+    <div style="text-align:right"><button type="button" class="link" id="deleteNight" hidden>清空这天的备注</button></div>
     </div>
   </section>
   </main>
@@ -997,8 +991,8 @@ form.adder.pg-form { margin-top: 8px; }
       <div class="tile"><span class="v" id="sFocusMin">0</span><span class="k">专注时长</span></div>
       <div class="tile"><span class="v" id="sFocus">0</span><span class="k">专注番茄</span></div>
       <div class="tile"><span class="v" id="sTasks">0</span><span class="k">做完的事</span></div>
-      <div class="tile money"><span class="v" id="sSpend">$0</span><span class="k">总花费</span></div>
-      <div class="tile money"><span class="v" id="sAvg">$0</span><span class="k">平均每天花</span></div>
+      <div class="tile money"><span class="v" id="sSpend">$0</span><span class="k">愿望花了</span></div>
+      <div class="tile money"><span class="v" id="sAvg">0</span><span class="k">买到的愿望</span></div>
       <div class="tile burn"><span class="v" id="sBurn">0</span><span class="k">Burnout 天数</span></div>
     </div>
     <p class="insight" id="insight" hidden></p>
@@ -1031,6 +1025,7 @@ form.adder.pg-form { margin-top: 8px; }
     <h2 class="underlined" id="focusTitle">我的目标</h2>
     <ul class="goals" id="goalList"></ul>
     <form class="goal-add adder" id="goalForm" autocomplete="off">
+      <button type="button" class="goal-ic" id="goalIconBtn" aria-label="选图标">🎯</button>
       <input type="text" id="goalName" placeholder="新目标，比如：三个月考过 N2" maxlength="40" aria-label="新目标">
       <label class="goal-end"><span>截止日期（可不填）</span><input type="date" id="goalEnd"></label>
       <button type="submit" class="add" aria-label="添加目标">+</button>
@@ -1219,6 +1214,13 @@ form.adder.pg-form { margin-top: 8px; }
     <button type="button" class="ws-none" id="wishSheetNone">不攒，直接开始</button>
   </div>
 </div>
+<div class="share-modal" id="iconSheet" role="dialog" aria-modal="true" aria-labelledby="iconSheetTitle" hidden>
+  <div class="share-sheet wish-sheet">
+    <div class="ws-head"><h3 id="iconSheetTitle">选一个图标</h3><button type="button" class="close" id="iconSheetClose" aria-label="关闭">×</button></div>
+    <div class="icon-grid" id="iconGrid" role="group" aria-label="选一个图标"></div>
+    <button type="button" class="ws-none" id="iconAuto">按名字自动选</button>
+  </div>
+</div>
 <div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareTitle" hidden>
   <div class="share-sheet">
     <div class="share-head">
@@ -1255,12 +1257,12 @@ form.adder.pg-form { margin-top: 8px; }
   const fmtMonth = (y, m) => L(`${y} 年 ${m} 月`, `${MONTH_EN[m - 1]} ${y}`);
   const weekHead = () => L(["一", "二", "三", "四", "五", "六", "日"], ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]);
   const EN_TEXT = {
-    "加班": "Overtime ", "夜记": "Night Log", "今天": "Today", "今日计划": "Today's plan", "今天想学点什么？": "What to learn today?", "目标": "Goals", "番茄钟": "Timer", "番茄时长": "Session length", "新的计划": "New plan item", "加到计划": "Add to plan", "今天花了": "Spent today",
+    "加班": "Overtime ", "夜记": "Night Log", "今天": "Today", "今日计划": "Today's plan", "今天想学点什么？": "What to learn today?", "目标": "Goals", "番茄钟": "Timer", "番茄时长": "Session length", "新的计划": "New plan item", "加到计划": "Add to plan", "今天的小记": "Today's notes", "清空这天的备注": "Clear this day's notes",
     "崩溃、想摆烂、脑子转不动、身体不舒服": "Melting down, brain fried, or feeling unwell",
-    "记一笔": "Add", "备注": "Note", "清空这天的花销和备注": "Clear this day's spending and note",
+    "记一笔": "Add", "备注": "Note", 
     "日历": "Calendar", "月历": "Month", "商品": "Items", "本月": "This month", "本周": "This week", "全部": "All time",
     "花得越多颜色越深": "Darker = spent more", "这个月买过的东西": "Bought this month", "每天买了什么": "What I bought each day",
-    "统计": "Stats", "专注时长": "Focus time", "做完的事": "Tasks done", "总花费": "Total spent", "平均每天花": "Per day", "Burnout 天数": "Burnout days",
+    "统计": "Stats", "专注时长": "Focus time", "做完的事": "Tasks done", "愿望花了": "Spent on wishes", "买到的愿望": "Wishes bought", "Burnout 天数": "Burnout days",
     "专注番茄": "Focus sessions", "每天花费": "Spent per day", "番茄": "Focus sessions",
     "生成我的月度学习账单": "Make my monthly recap", "专注、做完的事和花销，一张手绘风长图": "Focus, finished tasks and spending in one hand-drawn image",
     "愿望": "Wishes", "愿望清单": "Wishlist", "还想买的，一共": "Still on my list", "许个愿": "Make a wish",
@@ -1287,7 +1289,7 @@ form.adder.pg-form { margin-top: 8px; }
     "专注时长": "Focus time", "专注分钟": "Focus min", "休息分钟": "Break minutes", "专注多少分钟后解锁": "Focus minutes to unlock", 
     "专注分钟可以不填；填了，开番茄时选它，攒够这么久才解锁。": "Focus minutes are optional. If set, pick this wish when you start a session; it unlocks once you've saved up that long.",
     "别离开这一页": "Stay on this page",
-    "一个番茄": "one focus session", "这个番茄攒给…": "Save this session toward…", "不攒，直接开始": "Nothing, just start", "番茄": "Timer", "展开月历": "Show month", "我的目标": "My goals", "为了哪个目标": "For which goal", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
+    "一个番茄": "one focus session", "这个番茄攒给…": "Save this session toward…", "不攒，直接开始": "Nothing, just start", "番茄": "Timer", "展开月历": "Show month", "我的目标": "My goals", "为了哪个目标": "For which goal", "选一个图标": "Pick an icon", "按名字自动选": "Auto (from the name)", "选图标": "Pick icon", "新目标，比如：三个月考过 N2": "New goal, e.g. pass N2 in 3 months", "新目标": "New goal", "截止日期（可不填）": "Deadline (optional)", "添加目标": "Add goal", "属于哪个目标": "Goal for this task", "日历视图": "Calendar view", "页面": "Pages", "最近 14 天": "Last 14 days", "月度学习账单预览": "Monthly recap preview", "统计范围": "Stats range", "选择日期": "Pick a date",
   };
   // 打开时记下所有固定文字的原文，切换语言时据此改写
   const staticText = [], staticAttr = [];
@@ -1311,8 +1313,6 @@ form.adder.pg-form { margin-top: 8px; }
   // App 名字只在这里改（还有 <title>、<h1>、manifest 和 iOS 工程里的显示名）
   const APP_ZH = "加班夜记", APP_EN = "Overtime Night Log";
   const LS_KEY = "overtime-nights-v1";
-  const chipList = () => L([["咖啡", 5.5], ["外卖", 16], ["能量饮料", 3.5], ["零食", 4], ["打车回家", 22], ["奶茶", 6.5]],
-    [["Coffee", 5.5], ["Takeout", 16], ["Energy drink", 3.5], ["Snacks", 4], ["Ride home", 22], ["Boba", 6.5]]);
 
   let nights = {};            // date -> {date, items:[{name, amount, wishId?}], burnout, end, note, sample?}
   let store = null, loaded = false;
@@ -1399,55 +1399,27 @@ form.adder.pg-form { margin-top: 8px; }
     const n = get(current), d = parse(current), isTonight = current === nightOf();
     // 日期只在日历里显示；选中别的日子时，标题写出是哪天
     $("planTitle").textContent = isTonight ? L("今日计划", "Today's plan") : L(`${fmtMD(d)}的计划`, `Plan for ${fmtMD(d)}`);
-    $("spendTitle").textContent = isTonight ? L("今天花了", "Spent today") : L("这天花了", "Spent that day");
+    $("spendTitle").textContent = isTonight ? L("今天的小记", "Today's notes") : L("这天的小记", "Notes that day");
     if (document.activeElement !== $("note")) $("note").value = n.note || "";
     $("burnToggle").setAttribute("aria-pressed", String(!!n.burnout));
     $("burnToggle").setAttribute("aria-label", n.burnout ? L("今天 burnout 了，点一下取消", "Burnout today. Tap to undo.") : L("今天 burnout 了吗？点一下标记", "Burnout today? Tap to mark."));
     renderPlan();
-    $("nightTotal").textContent = money(sum(n));
-    $("spendCount").textContent = n.items.length ? L(`${n.items.length} 笔`, `${n.items.length} ${n.items.length === 1 ? "item" : "items"}`) : L("记一笔", "add");
-    const ul = $("items"); ul.textContent = "";
-    if (!n.items.length) { const li = document.createElement("li"); li.className = "no-items"; li.textContent = L("还没花钱。买了东西点下面的常买，或者自己填。", "Nothing spent yet. Tap a usual buy below or type your own."); ul.append(li); }
-    if (editingItem && (editingItem.date !== current || !n.items[editingItem.i])) editingItem = null;
+    // 不再手动记账：这里只列出这天买到的愿望（在愿望页勾「买到了」时记进来），点 × 放回愿望清单
+    $("nightTotal").textContent = n.items.length ? money(sum(n)) : "";
+    $("spendCount").textContent = n.items.length ? L(`★ 买到 ${n.items.length} 个愿望`, `★ ${n.items.length} ${n.items.length === 1 ? "wish" : "wishes"} bought`) : (n.note || n.burnout ? L("已记", "noted") : "");
+    const ul = $("items"); ul.textContent = ""; ul.parentElement.hidden = !n.items.length;
     n.items.forEach((it, i) => {
       const li = document.createElement("li");
-      if (editingItem && editingItem.i === i) { li.className = "editing"; li.append(itemEditForm(it, i)); ul.append(li); return; }
-      const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name; nm.dataset.edit = i; nm.title = L("点一下修改", "Tap to edit");
+      const nm = document.createElement("span"); nm.className = "name"; nm.textContent = it.name;
       if (it.wishId) { const t = document.createElement("span"); t.className = "wtag"; t.textContent = L("★ 愿望", "★ wish"); nm.append(t); }
-      const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0); am.dataset.edit = i; am.title = L("点一下修改", "Tap to edit");
+      const am = document.createElement("span"); am.className = "amt"; am.textContent = money(Number(it.amount) || 0);
       const x = document.createElement("button"); x.type = "button"; x.className = "x"; x.textContent = "×"; x.dataset.i = i; x.setAttribute("aria-label", L("删除 ", "Delete ") + it.name);
       li.append(logoFor(it.name, true), nm, am, x); ul.append(li);
     });
-    renderChips(); renderWishPick();
     $("deleteNight").hidden = !nights[current];
     $("clearSamples").hidden = !Object.values(nights).some(v => v.sample);
   }
 
-
-  // 今晚已添加的商品：点名称或金额就地修改
-  let editingItem = null;   // {date, i}
-  function itemEditForm(it, i) {
-    const f = document.createElement("form"); f.className = "iedit"; f.autocomplete = "off";
-    const n = document.createElement("input"); n.type = "text"; n.id = "iedit-name"; n.maxLength = 40; n.value = it.name; n.setAttribute("aria-label", L("买了什么", "What did you buy"));
-    const p = document.createElement("input"); p.type = "number"; p.id = "iedit-amt"; p.min = "0"; p.step = "0.01"; p.inputMode = "decimal"; p.value = dispRound(toDisp(it.amount)); p.setAttribute("aria-label", L("金额 ", "Amount ") + curSym());
-    const btns = document.createElement("div"); btns.className = "btns";
-    const c = document.createElement("button"); c.type = "button"; c.className = "cancel"; c.textContent = L("取消", "Cancel");
-    const ok = document.createElement("button"); ok.type = "submit"; ok.className = "save"; ok.textContent = L("保存", "Save");
-    btns.append(c, ok); f.append(n, p, btns);
-    c.onclick = () => { editingItem = null; renderNight(); };
-    f.onkeydown = (e) => { if (e.key === "Escape") c.onclick(); };
-    f.onsubmit = (e) => {
-      e.preventDefault();
-      const name = n.value.trim(), amt = parseFloat(p.value);
-      if (!name) { n.focus(); return; }
-      if (!(amt >= 0)) { p.focus(); toast(L("请填一个金额，比如 5.5", "Enter an amount, like 5.5")); return; }
-      editingItem = null;
-      update(night => { if (night.items[i]) night.items[i] = { name, amount: toBase(amt), ...(night.items[i].wishId ? { wishId: night.items[i].wishId } : {}) }; });
-      toast(L("已保存", "Saved"));
-    };
-    setTimeout(() => { n.focus(); n.select(); });
-    return f;
-  }
 
   // ---------- render: stats ----------
   function inPeriod(date) {
@@ -1460,35 +1432,22 @@ form.adder.pg-form { margin-top: 8px; }
   function renderStats() {
     document.querySelectorAll("button[data-p]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === period)));
     const list = Object.values(nights).filter(n => inPeriod(n.date));
-    const spend = list.reduce((a, n) => a + sum(n), 0);
+    const spend = list.reduce((a, n) => a + n.items.filter(i => i.wishId).reduce((x, i) => x + (Number(i.amount) || 0), 0), 0);   // 只算买到的愿望
     const fd = focusByDay(), fl = focusLog.filter(f => inPeriod(nightOf(new Date(f.start))));
     const fm = fl.reduce((a, f) => a + f.min, 0);
     $("sFocusMin").textContent = fm >= 60 ? L(`${Math.round(fm / 6) / 10} 小时`, `${Math.round(fm / 6) / 10} h`) : L(`${fm} 分钟`, `${fm} min`);
     $("sFocus").textContent = fl.length;
     $("sTasks").textContent = tasks.filter(t => t.done && inPeriod(nightOf(new Date(t.doneAt || 0)))).length;
     $("sSpend").textContent = money(spend);
-    $("sAvg").textContent = money(list.length ? spend / list.length : 0);
+    $("sAvg").textContent = list.reduce((a, n) => a + n.items.filter(i => i.wishId).length, 0);
     $("sBurn").textContent = list.filter(n => n.burnout).length;
-    // 学习和花钱的关系：有记录的日子里，专注过的那几天平均花多少，没专注的那几天平均花多少
-    const days = new Set([...list.map(n => n.date), ...Object.keys(fd).filter(inPeriod)]);
-    const withF = [], noF = [];
-    days.forEach(d => (fd[d] ? withF : noF).push(nights[d] ? sum(nights[d]) : 0));
-    const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length, ins = $("insight"); ins.textContent = "";
-    ins.hidden = !(withF.length >= 2 && noF.length >= 2);
-    if (!ins.hidden) {
-      const a = avg(withF), b = avg(noF), b1 = document.createElement("b"), b2 = document.createElement("b");
-      b1.textContent = money(a); b2.textContent = money(b);
-      if (lang === "en") ins.append("On days you focused you spent ", b1, " on average; on days you didn't, ", b2, ".");
-      else ins.append("专注过的日子平均花 ", b1, "，没专注的日子平均花 ", b2, "。");
-      if (b > a * 1.2 && b - a >= 1) ins.append(L(" 学习的日子更省钱。", " Studying days are cheaper."));
-      else if (a > b * 1.2 && a - b >= 1) ins.append(L(" 学习的日子花得更多，可能是在犒劳自己。", " You spend more on study days. Treating yourself?"));
-    }
+    $("insight").hidden = true;
     const tally = {};
     list.forEach(n => n.items.forEach(i => { const k = i.name.trim(); if (!k) return; tally[k] = tally[k] || { c: 0, s: 0 }; tally[k].c++; tally[k].s += Number(i.amount) || 0; }));
     const top = Object.entries(tally).sort((a, b) => b[1].s - a[1].s).slice(0, 3);
     const tb = $("topBuys"); tb.textContent = "";
     if (top.length) {
-      tb.append(L("花得最多：", "Top spends: "));
+      tb.append(L("买到的：", "Bought: "));
       top.forEach(([k, v], i) => { const b = document.createElement("b"); b.textContent = L(`${k} ${money(v.s)}（${v.c} 次）`, `${k} ${money(v.s)} (${v.c}×)`); tb.append(b); if (i < top.length - 1) tb.append(L("、", ", ")); });
     }
   }
@@ -1733,88 +1692,14 @@ form.adder.pg-form { margin-top: 8px; }
   // ---------- events ----------
   $("burnToggle").onclick = () => update(n => n.burnout = n.burnout ? 0 : 1);
 
-  $("buyForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = $("buyName").value.trim(), amt = parseFloat($("buyAmt").value);
-    if (!name) { $("buyName").focus(); return; }
-    if (!(amt >= 0)) { $("buyAmt").focus(); toast(L("请填一个金额，比如 18", "Enter an amount, like 18")); return; }
-    update(n => n.items.push({ name, amount: toBase(amt) }));
-    $("buyName").value = ""; $("buyAmt").value = ""; $("buyName").focus();
-  });
-  // 常买：先放自己最常买的（按次数，金额取最近一次），不够 8 个再用默认的补上。点一下直接记一笔，金额不对点金额就能改
-  function quickList() {
-    const t = {};
-    Object.values(nights).filter(n => !n.sample).sort((a, b) => a.date.localeCompare(b.date)).forEach(n => n.items.forEach(i => {
-      const k = (i.name || "").trim(); if (!k || i.wishId) return;
-      const e = t[k] || (t[k] = { c: 0, usd: 0 }); e.c++; e.usd = Number(i.amount) || 0;
-    }));
-    const list = Object.entries(t).sort((a, b) => b[1].c - a[1].c).slice(0, 8).map(([name, e]) => ({ name, usd: e.usd }));
-    const seen = new Set(list.map(x => x.name.toLowerCase()));
-    for (const [name, amt] of chipList()) {
-      if (list.length >= 8) break;
-      if (!seen.has(name.toLowerCase())) list.push({ name, usd: toBase(niceDisp(amt)) });
-    }
-    return list;
-  }
-  function renderChips() {
-    const box = $("chips"), sx = box.scrollLeft; box.textContent = "";
-    quickList().forEach(({ name, usd }) => {
-      const b = document.createElement("button"); b.type = "button"; b.dataset.name = name; b.dataset.usd = usd;
-      const lg = logoFor(name, true); lg.classList.add("xs");
-      const pr = document.createElement("span"); pr.className = "pr"; pr.textContent = money(usd);
-      b.append(lg, name, pr);
-      b.setAttribute("aria-label", L(`记一笔：${name} ${money(usd)}`, `Add ${name} ${money(usd)}`));
-      box.append(b);
-    });
-    box.scrollLeft = sx;
-  }
-  $("chips").addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-name]"); if (!b) return;
-    const name = b.dataset.name, usd = Number(b.dataset.usd) || 0;
-    update(n => n.items.push({ name, amount: usd }));
-    toast(L(`记了 ${name} ${money(usd)}，金额不对点一下就能改`, `Added ${name} ${money(usd)}. Tap the amount to change it.`));
-  });
-  renderChips();
-  // 从愿望清单里买：点一下就记成今晚的一笔，同时把这个愿望勾成「买到了」。还没攒够专注的愿望要再点一下确认
-  let pickArmed = null;
-  function renderWishPick() {
-    const open = wishes.filter(w => !w.got).sort((a, b) => (a.price || 0) - (b.price || 0));
-    $("wishPick").hidden = !open.length;
-    const box = $("wishChips"); box.textContent = "";
-    open.forEach(w => {
-      const b = document.createElement("button"); b.type = "button"; b.dataset.wish = w.id;
-      const locked = isLocked(w); if (locked) b.className = "locked";
-      b.innerHTML = locked ? LOCK : '<svg viewBox="0 0 24 24"><path d="M12 3.5 L14.4 8.6 L20 9.3 L15.9 13.1 L17 18.7 L12 16 L7 18.7 L8.1 13.1 L4 9.3 L9.6 8.6Z"/></svg>';
-      const pr = document.createElement("span"); pr.className = "pr"; pr.textContent = money(w.price || 0);
-      b.append(w.name, pr);
-      b.setAttribute("aria-label", L(`买了愿望「${w.name}」${money(w.price || 0)}`, `Bought wish "${w.name}" ${money(w.price || 0)}`) + (locked ? L("（还没解锁）", " (still locked)") : ""));
-      box.append(b);
-    });
-  }
-  $("wishChips").addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-wish]"); if (!b) return;
-    const w = wishes.find(v => v.id === b.dataset.wish); if (!w || w.got) return;
-    if (isLocked(w) && pickArmed !== w.id) {
-      pickArmed = w.id; clearTimeout(renderWishPick.t); renderWishPick.t = setTimeout(() => (pickArmed = null), 3000);
-      toast(L(`「${w.name}」还差 ${fmtMin(goalLeft(w))} 专注才解锁。真要买？再点一下`, `"${w.name}" needs ${fmtMin(goalLeft(w))} more focus. Buy anyway? Tap again.`)); return;
-    }
-    pickArmed = null;
-    w.got = true; w.gotAt = current; delete w.sample; saveWishes();
-    update(n => n.items.push({ name: w.name, amount: w.price || 0, wishId: w.id }));
-    buzz("success");
-    toast(L(`买到愿望「${w.name}」啦，已经从清单里勾掉`, `Got your wish "${w.name}"! Ticked off your list.`));
-  });
   $("items").addEventListener("click", (e) => {
-    const ed = e.target.closest("[data-edit]");
-    if (ed) { editingItem = { date: current, i: Number(ed.dataset.edit) }; renderNight(); return; }
     const x = e.target.closest(".x"); if (!x) return;
-    editingItem = null;
     const it = get(current).items[Number(x.dataset.i)], w = it && it.wishId && wishes.find(v => v.id === it.wishId);
     if (w && w.got) { w.got = false; w.gotAt = ""; saveWishes(); toast(L(`「${w.name}」放回愿望清单了`, `"${w.name}" is back on your wishlist`)); }
     update(n => n.items.splice(Number(x.dataset.i), 1));
   });
 
-  // 花销默认收起成一行，点开再记账；展开状态记在本机
+  // 小记默认收起成一行；展开状态记在本机
   const SPEND_KEY = "overtime-spend-open";
   function setSpendOpen(open) { $("spendBody").hidden = !open; $("spendToggle").setAttribute("aria-expanded", String(open)); try { localStorage.setItem(SPEND_KEY, open ? "1" : ""); } catch (e) {} }
   $("spendToggle").addEventListener("click", () => setSpendOpen($("spendBody").hidden));
@@ -1961,11 +1846,11 @@ form.adder.pg-form { margin-top: 8px; }
     armed = btn; btn.textContent = L("再点一次确认", "Tap again to confirm");
     setTimeout(() => { if (armed === btn) { armed = null; btn.textContent = label; } }, 3000);
   }
-  $("deleteNight").onclick = (e) => twoStep(e.target, L("清空这天的花销和备注", "Clear this day's spending and note"), () => {
+  $("deleteNight").onclick = (e) => twoStep(e.target, L("清空这天的备注", "Clear this day's notes"), () => {
     const d = current; delete nights[d];
     if (store) queue[d] = (queue[d] || Promise.resolve()).then(() => store.doc(d).delete().catch(() => toast(L("删除失败，请再试一次", "Couldn't delete. Try again."))));
     else { try { localStorage.setItem(LS_KEY, JSON.stringify(nights)); } catch (err) {} }
-    renderAll(); toast(L("已清空这天的花销和备注", "Cleared this day's spending and note"));
+    renderAll(); toast(L("已清空这天的小记", "Cleared this day's notes"));
   });
   $("clearSamples").onclick = (e) => twoStep(e.target, L("清除示例数据", "Clear sample data"), () => {
     const ds = Object.values(nights).filter(n => n.sample).map(n => n.date);
@@ -1994,14 +1879,14 @@ form.adder.pg-form { margin-top: 8px; }
     .map(t => ({ id: t.id.slice(0, 40), date: t.date, title: t.title.slice(0, 60), done: !!t.done, ...(t.done && Number(t.doneAt) ? { doneAt: Number(t.doneAt) } : {}), ...(typeof t.goalId === "string" && t.goalId ? { goalId: t.goalId.slice(0, 40) } : {}), created: Number(t.created) || 0 }));
   try { tasks = normTasks(JSON.parse(localStorage.getItem(TASK_KEY) || "[]")); } catch (e) { tasks = []; }
   const saveTasks = () => { try { localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); } catch (e) {} };
-  // 目标：{id, title, start, end?, closed, closedAt?, checks: [手动打卡的日期], created}
+  // 目标：{id, title, start, end?, closed, closedAt?, checks: [手动打卡的日期], icon?（自己选的图标，没选就按名字猜）, created}
   // 一段时间里的专注（番茄记 goalId）、打卡（专注过 / 做完了属于它的计划 / 手动打卡的日子）、这段时间的花销都按它统计
   const GOAL_KEY = "overtime-goals-v1";
   let goals = [];
   const isDate = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
   const normGoals = (list) => (Array.isArray(list) ? list : []).filter(g => g && typeof g.id === "string" && typeof g.title === "string" && isDate(g.start))
     .map(g => ({ id: g.id.slice(0, 40), title: g.title.slice(0, 40), start: g.start, ...(isDate(g.end) ? { end: g.end } : {}), closed: !!g.closed,
-      ...(g.closed && Number(g.closedAt) ? { closedAt: Number(g.closedAt) } : {}), checks: Array.isArray(g.checks) ? [...new Set(g.checks.filter(isDate))].sort() : [], created: Number(g.created) || 0 }));
+      ...(g.closed && Number(g.closedAt) ? { closedAt: Number(g.closedAt) } : {}), checks: Array.isArray(g.checks) ? [...new Set(g.checks.filter(isDate))].sort() : [], ...(typeof g.icon === "string" && g.icon ? { icon: [...g.icon].slice(0, 4).join("") } : {}), created: Number(g.created) || 0 }));
   try { goals = normGoals(JSON.parse(localStorage.getItem(GOAL_KEY) || "[]")); } catch (e) { goals = []; }
   const saveGoals = () => { try { localStorage.setItem(GOAL_KEY, JSON.stringify(goals)); } catch (e) {} };
   const activeGoals = () => goals.filter(g => !g.closed).sort((a, b) => a.created - b.created);
@@ -2084,7 +1969,7 @@ form.adder.pg-form { margin-top: 8px; }
     const g = $("gotList"); g.textContent = "";
     got.forEach(w => g.append(wishRow(w)));
     $("gotHead").hidden = !got.length;
-    renderFocus(); renderWishPick();
+    renderFocus();
     $("gotHead").textContent = got.length ? L(`已经买到 ${got.length} 个，一共 ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))}`, `Got ${got.length}, ${money(got.reduce((a, w) => a + (Number(w.price) || 0), 0))} in total`) : "";
 
     const e = $("wishEmpty"); e.hidden = wishes.length > 0; e.textContent = "";
@@ -2124,12 +2009,22 @@ form.adder.pg-form { margin-top: 8px; }
     }
     lockArmed = null;
     if (el.dataset.act === "got") {
-      w.got = !w.got; w.gotAt = w.got ? ymd(new Date()) : ""; saveWishes(); renderWishes();
-      if (w.got) toast(L(`恭喜，买到了「${w.name}」`, `Nice, you got "${w.name}"`));
+      setGot(w, !w.got);
+      if (w.got) { buzz("success"); toast(L(`恭喜，买到了「${w.name}」，记到今天了`, `Nice, you got "${w.name}". Logged for today.`)); }
     } else if (el.dataset.act === "del") {
       wishes = wishes.filter(x => x.id !== id); saveWishes(); renderWishes(); toast(L(`已删除「${w.name}」`, `Deleted "${w.name}"`));
     }
   };
+  // 买到愿望：记成当天的一笔（这是唯一记花销的地方）；改回没买，就把那一笔也删掉
+  function setGot(w, got) {
+    for (const d of Object.keys(nights)) {
+      if (!nights[d].items.some(i => i.wishId === w.id)) continue;
+      const n = JSON.parse(JSON.stringify(nights[d])); n.items = n.items.filter(i => i.wishId !== w.id); persist(n);
+    }
+    w.got = got; w.gotAt = got ? nightOf() : ""; delete w.sample;
+    if (got) { const n = JSON.parse(JSON.stringify(get(w.gotAt))); n.items.push({ name: w.name, amount: w.price || 0, wishId: w.id }); delete n.sample; persist(n); }
+    saveWishes(); renderAll();
+  }
   $("wishList").addEventListener("click", onWishClick);
   $("gotList").addEventListener("click", onWishClick);
 
@@ -2502,7 +2397,10 @@ form.adder.pg-form { margin-top: 8px; }
   const GOAL_ICONS = [[/读|书|阅读|\bread/i, "📖"], [/日语|英语|韩语|法语|单词|N[1-5]|雅思|托福|\bielts|\btoefl|\bjlpt|语言|\bvocab/i, "🗣️"], [/跑|运动|健身|锻炼|瑜伽|\brun|\bgym|\byoga|\bworkout/i, "🏃"],
     [/代码|编程|算法|python|swift|\bjs\b|leetcode|\bcod/i, "💻"], [/写|日记|作文|论文|\bwrit|\bjournal/i, "✍️"], [/记账|存钱|省钱|理财|\bsave|\bbudget/i, "💰"],
     [/考|证|复习|备考|\bexam|\btest/i, "📝"], [/画|设计|\bdraw|\bdesign/i, "🎨"], [/琴|音乐|吉他|\bmusic|\bpiano|\bguitar/i, "🎵"], [/手机|早睡|睡|\bsleep|\bphone/i, "🌙"]];
-  const goalIcon = (g) => (GOAL_ICONS.find(([re]) => re.test(g.title)) || [, "🎯"])[1];
+  const guessIcon = (title) => (GOAL_ICONS.find(([re]) => re.test(title)) || [, "🎯"])[1];
+  const goalIcon = (g) => g.icon || guessIcon(g.title);
+  // 可选的图标
+  const ICON_CHOICES = ["🎯", "📚", "📖", "✍️", "📝", "🗣️", "🔤", "🇯🇵", "🇬🇧", "🇰🇷", "💻", "🧮", "🧠", "📊", "💼", "🧪", "🎨", "🎸", "🎹", "📷", "🏃", "💪", "🧘", "🏊", "🚴", "🍳", "🌱", "💰", "☕", "🏆", "⭐", "❤️"];
   // 打卡表：最近若干周，一列一周（周一在上），上面标月份，左边标一 / 三 / 五 / 日
   function heatGrid(g, days) {
     // 只画这个目标自己的时间段：开始那周 → 截止那周（没设截止就到今天；完成了就到完成那天）
@@ -2564,7 +2462,7 @@ form.adder.pg-form { margin-top: 8px; }
     const li = document.createElement("li"); li.dataset.id = g.id;
     const card = document.createElement("div"); card.className = "goal sketch" + (g.closed ? " closed" : ""); card.style.setProperty("--gc", goalColor(g));
     const head = document.createElement("div"); head.className = "g-head";
-    const ic = document.createElement("span"); ic.className = "g-icon"; ic.textContent = goalIcon(g); ic.setAttribute("aria-hidden", "true");
+    const ic = document.createElement("button"); ic.type = "button"; ic.className = "g-icon"; ic.dataset.act = "icon"; ic.textContent = goalIcon(g); ic.setAttribute("aria-label", L("换图标", "Change icon"));
     const nm = document.createElement("div"); nm.className = "g-name"; nm.textContent = g.title;
     const span = Math.round((parse(last) - parse(g.start)) / 864e5) + 1;
     const sm = document.createElement("small");
@@ -2583,16 +2481,14 @@ form.adder.pg-form { margin-top: 8px; }
       acts.append(ck, go);
     }
     head.append(ic, nm);
-    const from = g.start, to = last;
     const fm = Object.values(days).reduce((a, v) => a + v.min, 0), sk = goalStreaks(g, days);
-    let spent = 0; Object.values(nights).forEach(n => { if (n.date >= from && n.date <= to) spent += sum(n); });
     // 四个大数字：当前连续、最长连续、近 30 天完成率、累计
     const st = document.createElement("div"); st.className = "g-stats";
     const stat = (v, unit, k) => { const e = document.createElement("div"); const b = document.createElement("b"); b.textContent = v; const u = document.createElement("small"); u.textContent = unit; const kk = document.createElement("span"); kk.textContent = k; e.append(b, u, kk); return e; };
     st.append(stat(sk.cur, L("天", sk.cur === 1 ? "day" : "days"), L("当前连续", "Current streak")), stat(sk.best, L("天", sk.best === 1 ? "day" : "days"), L("最长连续", "Longest streak")),
       stat(sk.rate, "%", L("近30天完成率", "Last 30 days")), stat(sk.total, L("次", sk.total === 1 ? "time" : "times"), L("累计", "Total")));
     const more = document.createElement("p"); more.className = "g-more";
-    more.textContent = L(`专注 ${fmtMin(fm)} · 这段时间花了 ${money(spent)}`, `${fmtMin(fm)} focused · ${money(spent)} spent meanwhile`);
+    more.textContent = L(`一共专注了 ${fmtMin(fm)}`, `${fmtMin(fm)} focused in total`);
     card.append(head, heatGrid(g, days), st, more);
     // 最近做完的事：今日计划里属于这个目标的
     const recent = tasks.filter(t => t.goalId === g.id && t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 3);
@@ -2614,7 +2510,7 @@ form.adder.pg-form { margin-top: 8px; }
   function renderGoals() {
     const ul = $("goalList"); ul.textContent = "";
     const ag = activeGoals();
-    if (!ag.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = L("给自己定一个目标，比如「三个月考过 N2」。之后为它专注、打卡，这段时间学了多少、花了多少都会记在这里。", "Set a goal, like \"Pass N2 in three months\". Focus and check in for it, and see how much you studied and spent along the way."); ul.append(li); }
+    if (!ag.length) { const li = document.createElement("li"); li.className = "no-tasks"; li.textContent = L("给自己定一个目标，比如「三个月考过 N2」。之后为它专注、打卡，这段时间学了多少都会记在这里。", "Set a goal, like \"Pass N2 in three months\". Focus and check in for it, and see how much you studied along the way."); ul.append(li); }
     ag.forEach(g => ul.append(goalCard(g)));
     const done = goals.filter(g => g.closed).sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
     $("goalsDone").hidden = !done.length;
@@ -2626,16 +2522,41 @@ form.adder.pg-form { margin-top: 8px; }
     const title = $("goalName").value.trim(); if (!title) { $("goalName").focus(); return; }
     const end = $("goalEnd").value, start = nightOf();
     if (end && end < start) { toast(L("截止日期要在今天之后", "The deadline has to be after today")); return; }
-    goals.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, start, ...(end ? { end } : {}), closed: false, checks: [], created: Date.now() });
+    goals.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, start, ...(end ? { end } : {}), closed: false, checks: [], ...(newIcon ? { icon: newIcon } : {}), created: Date.now() });
     saveGoals(); renderFocus(); renderPlan();
-    $("goalName").value = ""; $("goalEnd").value = "";
+    $("goalName").value = ""; $("goalEnd").value = ""; newIcon = ""; showNewIcon();
     toast(L(`定好了：${title}`, `Goal set: ${title}`));
   });
+  // 图标：新目标在表单里选（没选就跟着名字猜），已有的目标点卡片上的图标换
+  let newIcon = "", iconFor = null;
+  const showNewIcon = () => { $("goalIconBtn").textContent = newIcon || guessIcon($("goalName").value); };
+  $("goalName").addEventListener("input", showNewIcon);
+  $("goalIconBtn").onclick = () => openIconSheet("new");
+  function openIconSheet(target) {
+    iconFor = target;
+    const cur = target === "new" ? newIcon : target.icon || "";
+    const box = $("iconGrid"); box.textContent = "";
+    ICON_CHOICES.forEach(ch => { const b = document.createElement("button"); b.type = "button"; b.dataset.icon = ch; b.textContent = ch; b.setAttribute("aria-pressed", String(ch === cur)); box.append(b); });
+    $("iconAuto").setAttribute("aria-pressed", String(!cur));
+    $("iconSheet").hidden = false;
+  }
+  const closeIconSheet = () => { $("iconSheet").hidden = true; iconFor = null; };
+  const pickIcon = (ch) => {
+    if (!iconFor) return;
+    if (iconFor === "new") { newIcon = ch; showNewIcon(); }
+    else { if (ch) iconFor.icon = ch; else delete iconFor.icon; saveGoals(); renderFocus(); renderPlan(); }
+    closeIconSheet();
+  };
+  $("iconGrid").addEventListener("click", (e) => { const b = e.target.closest("button[data-icon]"); if (b) pickIcon(b.dataset.icon); });
+  $("iconAuto").onclick = () => pickIcon("");
+  $("iconSheetClose").onclick = closeIconSheet;
+  $("iconSheet").addEventListener("click", (e) => { if (e.target === $("iconSheet")) closeIconSheet(); });
   const onGoalClick = (e) => {
     const el = e.target.closest("[data-act]"); if (!el) return;
     const g = goals.find(x => x.id === el.closest("li").dataset.id); if (!g) return;
     const act = el.dataset.act, today = nightOf();
     if (act === "go") { startWithWish({ goalId: g.id }); return; }
+    if (act === "icon") { openIconSheet(g); return; }
     if (act === "check") {
       if (g.checks.includes(today)) g.checks = g.checks.filter(d => d !== today);
       else { g.checks.push(today); buzz("success"); toast(L(`「${g.title}」今天打卡了`, `Checked in for "${g.title}"`)); }
@@ -2906,9 +2827,8 @@ form.adder.pg-form { margin-top: 8px; }
     });
   }
   function updateCurrencyLabels() {
-    $("buyAmt").placeholder = L("金额 ", "Amount ") + curSym(); $("buyAmt").setAttribute("aria-label", L("金额 ", "Amount ") + curSym());
     $("wishPrice").placeholder = L("价格 ", "Price ") + curSym(); $("wishPrice").setAttribute("aria-label", L("价格 ", "Price ") + curSym());
-    $("buyAmt").step = $("wishPrice").step = noCents() ? "1" : "0.01";
+    $("wishPrice").step = noCents() ? "1" : "0.01";
   }
   function renderCurrency() {
     const sel = $("curSel"); sel.textContent = "";
@@ -2918,7 +2838,7 @@ form.adder.pg-form { margin-top: 8px; }
     $("rateCode").textContent = cur.code; $("curRate").value = curRate();
   }
   const saveCur = () => { try { localStorage.setItem(CUR_KEY, JSON.stringify(cur)); } catch (e) {} };
-  const applyCurrency = () => { saveCur(); renderCurrency(); updateCurrencyLabels(); renderChips(); renderAll(); };
+  const applyCurrency = () => { saveCur(); renderCurrency(); updateCurrencyLabels(); renderAll(); };
   $("curSel").addEventListener("change", (e) => { cur.code = e.target.value; applyCurrency(); });
   $("curRate").addEventListener("change", (e) => {
     const v = parseFloat(e.target.value);
@@ -2957,7 +2877,7 @@ form.adder.pg-form { margin-top: 8px; }
     applyLanguage();
   });
   function applyLanguage() {
-    applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings(); tick();
+    applyStaticLang(); updateCurrencyLabels(); renderSettings(); tick();
     if (loaded) { renderAll(); showLastBackup(); $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device"); }
     if (NATIVE) { renderICloud(); if (rem.on) applyReminder(); }
   }
@@ -3288,7 +3208,7 @@ form.adder.pg-form { margin-top: 8px; }
     document.querySelectorAll(".web-only").forEach(e => (e.hidden = true));
     document.querySelectorAll(".native-only").forEach(e => (e.hidden = false));
   }
-  applySkin(); applyStaticLang(); updateCurrencyLabels(); renderChips(); renderSettings();
+  applySkin(); applyStaticLang(); updateCurrencyLabels(); renderSettings();
   try { nights = normFlags(JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}); } catch (e) { nights = {}; }
   loaded = true;
   $("sync").textContent = L("数据只存在这台设备上", "Data stays on this device");
