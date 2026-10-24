@@ -218,12 +218,21 @@ form.goal-add .add { width: 46px; height: 46px; padding: 0; display: grid; place
 /* 今日计划：按目标分组，一个目标一组 */
 #planGroups { display: flex; flex-direction: column; gap: 18px; }
 .pgroup { display: flex; flex-direction: column; }
-.pg-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 2px; }
-.pg-name { font-family: var(--f-title); font-size: 18px; min-width: 0; overflow-wrap: anywhere; }
-.pg-name::before { content: "◎ "; color: var(--burn); }
+.pg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
+.pg-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.pg-ic { flex: none; width: 34px; height: 34px; display: grid; place-items: center; font-size: 19px; border-radius: 11px 9px 12px 8px / 9px 12px 8px 11px; background: color-mix(in srgb, var(--gc, var(--pencil)) 22%, var(--card)); border: 2px solid var(--gc, var(--pencil)); }
+.pg-name { font-family: var(--f-title); font-size: 20px; min-width: 0; overflow-wrap: anywhere; }
+/* 组里的事：往里缩，左边一条目标色的线，勾选框小一号 —— 一眼看出目标是大标题、事情是它下面的小项 */
+.pgroup > .pg-form { margin-left: 16px; }
+.pgroup > ul.tasks, .pgroup > .pg-add { margin-left: 16px; padding-left: 16px; border-left: 2.5px solid color-mix(in srgb, var(--gc, var(--pencil)) 55%, transparent); }
+.pgroup > ul.tasks:empty { display: none; }
+.pgroup ul.tasks li { padding: 6px 2px; }
+.pgroup ul.tasks .wbox { width: 20px; height: 20px; border-width: 1.8px; }
+.pgroup ul.tasks .wbox svg { width: 15px; height: 15px; }
+.pgroup ul.tasks .tname { font-size: 16px; }
 .pgroup + .pgroup { border-top: 1.5px dashed color-mix(in srgb, var(--pencil) 35%, transparent); padding-top: 14px; }
-.pgroup.other .pg-name::before { content: "○ "; color: var(--pencil); }
-.pgroup.other .pg-name { color: var(--pencil); }
+.pgroup.other .pg-ic { border-style: dashed; background: transparent; color: var(--pencil); }
+.pgroup.other .pg-name { color: var(--pencil); font-size: 18px; }
 .pg-meta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--pencil); white-space: nowrap; }
 .pg-meta svg { width: 14px; height: 14px; overflow: visible; }
 .pg-meta .ok { color: var(--leaf); }
@@ -1848,13 +1857,16 @@ form.adder.pg-form { margin-top: 8px; }
       const sec = document.createElement("div"); sec.className = "pgroup" + (g.id ? "" : " other"); sec.dataset.goal = g.id;
       const head = document.createElement("div"); head.className = "pg-head";
       const nm = document.createElement("span"); nm.className = "pg-name"; nm.textContent = g.title;
+      const ic = document.createElement("span"); ic.className = "pg-ic"; ic.textContent = g.id ? goalIcon(g) : "·"; ic.setAttribute("aria-hidden", "true");
+      if (g.id) sec.style.setProperty("--gc", goalColor(g));
+      const nmw = document.createElement("span"); nmw.className = "pg-title"; nmw.append(ic, nm);
       const meta = document.createElement("span"); meta.className = "pg-meta";
       if (g.id) {
         const day = goalDays(g)[current], fn = focusLog.filter(f => f.goalId === g.id && nightOf(new Date(f.start)) === current).length;
         if (fn) meta.innerHTML = tomSVG("full") + `×${fn}`;
         if (day && day.hit) { const ok = document.createElement("span"); ok.className = "ok"; ok.textContent = L("✓ 已打卡", "✓ checked in"); meta.append(ok); }
       } else meta.textContent = L("不算给目标", "not for a goal");
-      head.append(nm, meta);
+      head.append(nmw, meta);
       const ul = document.createElement("ul"); ul.className = "tasks"; items.forEach(t => ul.append(taskRow(t)));
       sec.append(head, ul);
       if (isToday) {
