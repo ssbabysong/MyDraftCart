@@ -2503,13 +2503,20 @@ form.adder.pg-form { margin-top: 8px; }
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
     grid.style.setProperty("--gc", goalColor(g)); grid.style.gridTemplateColumns = `16px repeat(${cols}, 8px)`;
-    // 第一行：月份（这一周里有 1 号，或者第一列）
+    // 第一行：月份（这一周里有 1 号，或者第一列）。月份字要占大约 3 列，挨太近就只留真正的 1 号那个
     grid.append(document.createElement("b"));
-    let lastMonth = "";
+    const labs = [];
     for (let c = 0; c < cols; c++) {
-      const mon = shift(first, c * 7), monthOfWeek = [0, 1, 2, 3, 4, 5, 6].map(k => shift(mon, k)).find(d => d.endsWith("-01")) || (c === 0 ? mon : "");
-      const lab = document.createElement("b"); lab.className = "hm";
-      if (monthOfWeek && monthOfWeek.slice(0, 7) !== lastMonth && (c < cols - 1 || cols < 3)) { lastMonth = monthOfWeek.slice(0, 7); lab.textContent = L(`${+lastMonth.slice(5)}月`, MON_EN[+lastMonth.slice(5) - 1]); }
+      const mon = shift(first, c * 7), one = [0, 1, 2, 3, 4, 5, 6].map(k => shift(mon, k)).find(d => d.endsWith("-01"));
+      const m = (one || (c === 0 ? mon : "")).slice(0, 7);
+      if (!m || (labs.length && labs[labs.length - 1].m === m) || (c > cols - 2 && cols >= 3)) continue;
+      const prev = labs[labs.length - 1];
+      if (prev && c - prev.c < 3) { if (prev.c === 0 && !prev.one) labs.pop(); else continue; }
+      labs.push({ c, m, one: !!one });
+    }
+    for (let c = 0; c < cols; c++) {
+      const lab = document.createElement("b"), x = labs.find(o => o.c === c); lab.className = "hm";
+      if (x) lab.textContent = L(`${+x.m.slice(5)}月`, MON_EN[+x.m.slice(5) - 1]);
       grid.append(lab);
     }
     const wd = L(["一", "", "三", "", "五", "", "日"], ["M", "", "W", "", "F", "", "S"]);
