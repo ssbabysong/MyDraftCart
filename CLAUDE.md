@@ -66,3 +66,4 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/plat
 - 2026-10-24 简化：番茄只归属目标（从计划或目标卡片的「专注」开；番茄钟本身没有下拉框）。愿望不再绑定番茄，`focusFor(w)` = 许愿之后所有专注分钟（旧数据里绑定过 `wishId` 的也算），完成页顺带显示解锁了哪个愿望或离最近的还差多少。今天页的花销卡片默认收起成一行（`overtime-spend-open` 记住展开状态），计划的目标下拉框只在输入时出现。
 - 今日计划按目标分组（`renderPlan`）：每个进行中的目标一组，组头显示今天为它开的番茄数和是否已打卡，组里「+ 加一件事」直接加到这个目标；没目标的事在「其他」，底部输入框加的就是「其他」。目标页：目标卡片（打卡点点、专注、打卡天数、这段时间花销、最近做完的 3 件事）在上，番茄钟（只调时长 + 随便专注一下）在下。
 - 开番茄（计划 / 目标 / 番茄页）前会弹「这个番茄攒给…」面板（`startWithWish`），列出还锁着的愿望和进度，上次选的排第一；选了的番茄记 `wishId`，愿望进度只算这些（`focusFor`）。再来一个 / 重新开始沿用上一个番茄的愿望（解锁了就不再沿用）。没有锁着的愿望就直接开始。
+- 字体：中文是小赖字体 Xiaolai SC（SIL OFL，自带在 `fonts/xiaolai/`，按字切成 366 个小 woff2，网页只下载用到的那几块，service worker 存进字体缓存；`npm run build` 会把 `fonts/` 复制进 App，所以 App 里离线也能用），数字和英文是 Shantell Sans（Google Fonts）。旧的站酷快乐体 / 马善政 / Patrick Hand 留作后备字体。分享图的字体在 `SF` 和 `drawShareCard` 里的 `SF0`。

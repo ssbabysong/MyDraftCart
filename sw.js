@@ -1,7 +1,7 @@
 // 加班夜记 service worker：离线可用 + 安全更新。
 // 发布新版本时只需把 VERSION 加一：打开中的 App 会弹出「有新版本」提示，点一下就换上新界面。
 // 这里只缓存 App 本身的文件；你的记录存在 localStorage 里，更新和清理缓存都不会碰到它。
-const VERSION = "v47";
+const VERSION = "v48";
 const SHELL = `shell-${VERSION}`;
 const FONTS = "fonts";
 const ASSETS = ["./", "manifest.webmanifest", "icons/icon.svg", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
@@ -40,6 +40,12 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   if (url.origin !== location.origin) return;
+
+  // 自带的小赖字体（按字切成很多小文件）：用到哪块才下载，存进字体缓存，之后断网也能用
+  if (url.pathname.includes("/fonts/")) {
+    e.respondWith(caches.open(FONTS).then(async (c) => (await c.match(req)) || fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; })));
+    return;
+  }
 
   // 页面：有网就向服务器确认最新版（no-cache 会绕过 10 分钟的浏览器缓存），断网才用缓存
   if (req.mode === "navigate") {
