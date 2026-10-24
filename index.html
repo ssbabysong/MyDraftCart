@@ -173,17 +173,20 @@ ul.goals { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .g-stats b { font-family: var(--f-num); font-weight: 400; font-size: 18px; color: var(--ink); margin-right: 2px; }
 .g-foot { display: flex; justify-content: flex-end; gap: 14px; }
 /* 打卡记录：像 GitHub 的提交记录，一列一周，从上到下周一到周日 */
-.heat { overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.heat { overflow-x: auto; scrollbar-width: none; padding: 4px; margin: -4px; }
 .heat::-webkit-scrollbar { display: none; }
-.heat-grid { display: inline-grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--c, 12px)); grid-auto-columns: var(--c, 12px); gap: 3px; }
-.heat-grid i { display: block; border-radius: calc(var(--c, 12px) / 4); background: var(--grid); }
+/* 打卡小点点：没打卡是小灰点，打卡了是圆滚滚的绿点，越深专注越久 */
+.heat-grid { display: inline-grid; grid-auto-flow: column; grid-template-rows: repeat(7, 9px); grid-auto-columns: 9px; gap: 4px; }
+.heat-grid i { display: block; border-radius: 50%; background: var(--grid); transform: scale(.5); }
+.heat-grid i[class*="lv"] { transform: none; }
 .heat-grid i.lv1 { background: color-mix(in srgb, var(--leaf) 35%, var(--card)); }
 .heat-grid i.lv2 { background: color-mix(in srgb, var(--leaf) 60%, var(--card)); }
 .heat-grid i.lv3 { background: color-mix(in srgb, var(--leaf) 82%, var(--card)); }
 .heat-grid i.lv4 { background: var(--leaf); }
-.heat-grid i.fut { background: transparent; border: 1px dashed var(--grid); }
+.heat-grid i.fut { background: transparent; border: 1.5px solid var(--grid); transform: scale(.45); }
 .heat-grid i.pad { visibility: hidden; }
-.heat-grid i.today { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.heat-grid i.today { transform: none; box-shadow: 0 0 0 1.5px var(--paper), 0 0 0 3px var(--ink); }
+.heat-grid i.today:not([class*="lv"]) { background: var(--card); }
 .heat-key { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--pencil); justify-content: flex-end; }
 .heat-key i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 form.goal-add { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 8px 10px; align-items: end; }
@@ -2438,12 +2441,9 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
     let lastSun = shift(last, (7 - parse(last).getDay()) % 7);
     if ((parse(lastSun) - parse(first)) / 864e5 > 26 * 7) first = shift(lastSun, -26 * 7 + 1);   // 太长只看最近半年
     let cols = Math.round((parse(lastSun) - parse(first)) / 864e5 + 1) / 7;
-    if (cols < 8) { lastSun = shift(first, 8 * 7 - 1); cols = 8; }   // 刚开始的目标也画 8 周，后面是空格子
+    if (cols < 8) { lastSun = shift(first, 8 * 7 - 1); cols = 8; }   // 刚开始的目标也画 8 周，后面是空点点
     const wrap = document.createElement("div"); wrap.className = "heat";
     const grid = document.createElement("div"); grid.className = "heat-grid"; grid.setAttribute("aria-hidden", "true");
-    // 格子尽量铺满卡片宽度：卡片内宽 ≈ 屏幕宽 − 页面边距 − 卡片内边距
-    const inner = Math.min(innerWidth, 660) - 32 - 36;
-    grid.style.setProperty("--c", Math.max(10, Math.min(22, Math.floor((inner - (cols - 1) * 3) / cols))) + "px");
     for (let d = first; d <= lastSun; d = shift(d, 1)) {
       const c = document.createElement("i"), v = days[d];
       if (d < g.start || (g.closed && d > last)) c.className = "pad";
