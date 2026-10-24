@@ -40,10 +40,10 @@
   --burn-hi: #FFD3CC;
   --body: #7550C8;         /* 紫笔 */
   --body-hi: #E4D8FF;
-  /* 手写字体：中文小赖字体（App 自带，fonts/xiaolai），数字和英文 Shantell Sans */
-  --f-title: "Xiaolai SC", "Ma Shan Zheng", "Kaiti SC", "KaiTi", cursive;
-  --f-hand: "Xiaolai SC", "ZCOOL KuaiLe", "Hannotate SC", "HanziPen SC", "Kaiti SC", system-ui, sans-serif;
-  --f-num: "Shantell Sans", "Patrick Hand", "Xiaolai SC", cursive;
+  /* 手写字体：全部用马善政毛笔楷书；小赖字体（App 自带）和 Shantell Sans 作后备 */
+  --f-title: "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", cursive;
+  --f-hand: "Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", "KaiTi", system-ui, sans-serif;
+  --f-num: "Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", cursive;
   --wob1: 255px 15px 225px 15px / 15px 225px 15px 255px;
   --wob2: 15px 225px 15px 255px / 255px 15px 225px 15px;
   --wob3: 225px 20px 255px 15px / 20px 255px 15px 225px;
@@ -2612,7 +2612,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // 用 Canvas 画一张 1080×1440（3:4，适合小红书）的手绘风账单。字体按需加载：先「空跑」一遍收集要画的字，加载好再正式画。
   const SC = { paper: "#FAFAF4", grid: "#DCE6EF", ink: "#26354D", pencil: "#6E7889", card: "#FFFFFF",
     money: "#F5C21B", moneyHi: "#FFEB7A", burn: "#D9483B", burnHi: "#FFD3CC", body: "#7550C8", bodyHi: "#E4D8FF" };
-  const SF = { title: '"Xiaolai SC", "Ma Shan Zheng", "Kaiti SC", KaiTi, serif', hand: '"Xiaolai SC", "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif', num: '"Shantell Sans", "Patrick Hand", "Xiaolai SC", sans-serif' };
+  const SF = { title: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", serif' };
   let shareMonth = null, shareBlob = null;
 
   function monthStats(month) {
@@ -2663,7 +2663,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   async function drawShareCard(month) {
     // 分享图跟随当前主题的配色
     const cs = getComputedStyle(document.documentElement), cv = (n, f) => (cs.getPropertyValue(n).trim() || f);
-    const SF0 = { title: '"Xiaolai SC", "Ma Shan Zheng", "Kaiti SC", KaiTi, serif', hand: '"Xiaolai SC", "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif', num: '"Shantell Sans", "Patrick Hand", "Xiaolai SC", sans-serif' };
+    const SF0 = { title: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', hand: '"Ma Shan Zheng", "Xiaolai SC", "Kaiti SC", KaiTi, serif', num: '"Ma Shan Zheng", "Shantell Sans", "Xiaolai SC", serif' };
     Object.assign(SF, look().hand ? { ...SF0, title: cv("--f-title", SF0.title) } : { title: cv("--f-title", SF0.title), hand: cv("--f-hand", SF0.hand), num: cv("--f-num", SF0.num) });
     Object.assign(SC, { paper: cv("--paper", SC.paper), grid: cv("--grid", SC.grid), ink: cv("--ink", SC.ink), pencil: cv("--pencil", SC.pencil), card: cv("--card", SC.card),
       money: cv("--money", SC.money), moneyHi: cv("--money-hi", SC.moneyHi), burn: cv("--burn", SC.burn), burnHi: cv("--burn-hi", SC.burnHi), body: cv("--body", SC.body), bodyHi: cv("--body-hi", SC.bodyHi) });
@@ -2819,8 +2819,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wr
   // ---------- 设置：语言、主题 ----------
   const SKIN_KEY = "overtime-skin";
   const SKINS = [
-    { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "手绘 · 跟随深浅色", noteEn: "Hand-drawn · auto dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"], font: '"Xiaolai SC", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
-    { id: "sakura", zh: "樱花", en: "Sakura", noteZh: "手绘", noteEn: "Hand-drawn", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"], font: '"Xiaolai SC", sans-serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
+    { id: "grid", zh: "方格本", en: "Grid paper", noteZh: "手绘 · 跟随深浅色", noteEn: "Hand-drawn · auto dark", c: ["#FAFAF4", "#DCE6EF", "#26354D", "#F5C21B", "#D9483B"], font: '"Ma Shan Zheng", serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
+    { id: "sakura", zh: "樱花", en: "Sakura", noteZh: "手绘", noteEn: "Hand-drawn", c: ["#FFF3F6", "#F5D7E0", "#4A2338", "#F4A261", "#D6336C"], font: '"Ma Shan Zheng", serif', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "grid" },
     { id: "washi", zh: "和纸手账", en: "Washi", noteZh: "横线本 · 纸胶带", noteEn: "Ruled notebook, washi tape", c: ["#F6F0E2", "#E2D6BC", "#2B3654", "#E3A83B", "#C8553D"], font: '"Long Cang", "Ma Shan Zheng", cursive', r: "10px 14px 9px 13px / 13px 9px 14px 10px", lines: "ruled" },
     { id: "receipt", zh: "收据", en: "Receipt", noteZh: "小票等宽字", noteEn: "Till-roll mono", c: ["#FFFDF7", "#D5D0C5", "#1B1B1B", "#F1CB3B", "#D2261E"], font: '"JetBrains Mono", monospace', r: "0" },
     { id: "news", zh: "报纸", en: "Newsprint", noteZh: "宋体 · 双线框", noteEn: "Serif, double rules", c: ["#EFEBE1", "#D6CFBE", "#1A1916", "#E2B33C", "#B3261E"], font: '"Noto Serif SC", serif', r: "0" },
